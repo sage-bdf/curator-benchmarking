@@ -41,9 +41,9 @@ class Experiment:
         # Generate experiment ID
         self.experiment_id = self._generate_experiment_id()
         
-        # Results storage
-        self.results_dir = Path(__file__).parent.parent / "results"
-        self.results_dir.mkdir(exist_ok=True)
+        # Results storage - use docs/results/ as the main results directory
+        self.results_dir = Path(__file__).parent.parent / "docs" / "results"
+        self.results_dir.mkdir(parents=True, exist_ok=True)
     
     def _generate_experiment_id(self) -> str:
         """Generate a unique experiment ID based on parameters."""

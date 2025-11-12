@@ -47,7 +47,7 @@ jobs:
             let comment = '## Experiment Results\n\n';
             
             // Try to read results file
-            const resultsDir = path.join(process.cwd(), 'results');
+            const resultsDir = path.join(process.cwd(), 'docs', 'results');
             if (fs.existsSync(resultsDir)) {
               const files = fs.readdirSync(resultsDir);
               const resultFiles = files.filter(f => f.endsWith('_results.json'));
@@ -80,7 +80,7 @@ jobs:
                   }
                 }
                 
-                comment += `\n**Results saved to:** \`results/${latestFile}\`\n`;
+                comment += `\n**Results saved to:** \`docs/results/${latestFile}\`\n`;
               } else {
                 comment += '⚠️ Experiment completed but results file not found.\n';
               }
@@ -112,11 +112,6 @@ jobs:
               });
             }
       
-      - name: Update GitHub Pages
-        if: steps.run-experiment.outcome == 'success'
-        run: |
-          python scripts/update_gh_pages.py
-      
       - name: Commit and push results
         if: steps.run-experiment.outcome == 'success'
         run: |
@@ -126,9 +121,7 @@ jobs:
           # Pull latest changes to avoid conflicts
           git pull --rebase origin main || git pull origin main
           
-          # Add results/ directory (experiment results)
-          git add results/
-          # Add docs/results/ (for GitHub Pages)
+          # Add docs/results/ (main results directory)
           git add docs/results/
           
           # Check if there are any changes to commit
@@ -149,7 +142,7 @@ jobs:
                   sleep $((retry_count * 2))
                   git pull --rebase origin main || git pull origin main
                   # Re-add files in case they were updated
-                  git add results/ docs/results/
+                  git add docs/results/
                   # Amend commit if needed, or create new one
                   if git diff --staged --quiet; then
                     git commit --amend --no-edit || true

@@ -44,7 +44,7 @@ def main():
             'overall_metrics': result['overall_metrics']
         }
         
-        summary_path = Path(__file__).parent.parent / 'experiment_summary.json'
+        summary_path = Path(__file__).parent.parent / 'docs' / 'results' / 'experiment_summary.json'
         with open(summary_path, 'w') as f:
             json.dump(summary, f, indent=2)
         

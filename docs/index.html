@@ -426,9 +426,9 @@
                     experimentsToRemove.push(exp);
                 }
             }
-            // Remove experiments without detailed results
-            allExperiments = allExperiments.filter(exp => !experimentsToRemove.includes(exp));
-            console.log(`Loaded detailed results for ${loadedCount} experiments. Removed ${experimentsToRemove.length} experiments without detailed results.`);
+            // Don't remove experiments without detailed results - just log a warning
+            // They might still have valid summary data from the log file
+            console.log(`Loaded detailed results for ${loadedCount} experiments. ${experimentsToRemove.length} experiments without detailed results files (may still have summary data).`);
         }
 
         function updateStats() {
@@ -499,11 +499,18 @@
 
         function calculateOverallPerformance(experiments) {
             // Filter experiments where all tasks have 100% success rate
+            // But include experiments even if they don't have task_results loaded yet
             const validExperiments = experiments.filter(exp => {
+                // If no task_results, check if we have overall_metrics from log file
                 if (!exp.task_results) {
-                    console.log(`Experiment ${exp.experiment_id}: No task_results`);
+                    // Still include if we have overall_metrics from the log
+                    if (exp.overall_metrics && exp.overall_metrics.tasks_completed > 0) {
+                        return true;
+                    }
+                    console.log(`Experiment ${exp.experiment_id}: No task_results and no overall_metrics`);
                     return false;
                 }
+                // If we have task_results, check all tasks have 100% success rate
                 for (const [taskName, taskResult] of Object.entries(exp.task_results)) {
                     if (taskResult.error) {
                         console.log(`Experiment ${exp.experiment_id}, task ${taskName}: Has error`);
