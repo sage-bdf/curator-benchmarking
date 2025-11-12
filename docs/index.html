@@ -363,11 +363,15 @@
         }
 
         function updateStats() {
+            // Only count experiments with 100% success rate
+            const validExperiments = allExperiments.filter(exp => (exp.metrics.success_rate || 0) >= 1.0);
+            
             const stats = {
-                total: allExperiments.length,
-                tasks: new Set(allExperiments.map(e => e.task_name)).size,
-                avgScore: allExperiments.reduce((sum, e) => sum + (e.metrics.average_score || 0), 0) / allExperiments.length,
-                successRate: allExperiments.reduce((sum, e) => sum + (e.metrics.success_rate || 0), 0) / allExperiments.length
+                total: validExperiments.length,
+                tasks: new Set(validExperiments.map(e => e.task_name)).size,
+                avgScore: validExperiments.length > 0 
+                    ? validExperiments.reduce((sum, e) => sum + (e.metrics.average_score || 0), 0) / validExperiments.length
+                    : 0
             };
 
             document.getElementById('stats').innerHTML = `
@@ -382,10 +386,6 @@
                 <div class="stat-card">
                     <div class="stat-value">${(stats.avgScore * 100).toFixed(2)}%</div>
                     <div class="stat-label">Average Score</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${(stats.successRate * 100).toFixed(1)}%</div>
-                    <div class="stat-label">Success Rate</div>
                 </div>
             `;
         }
@@ -439,6 +439,11 @@
                 return;
             }
 
+            // Filter out experiments with success rate < 100%
+            filteredExperiments = filteredExperiments.filter(exp => {
+                return (exp.metrics.success_rate || 0) >= 1.0;
+            });
+
             // Group experiments by task
             const tasksMap = {};
             filteredExperiments.forEach(exp => {
@@ -471,8 +476,6 @@
                                     <th>Score</th>
                                     <th>Model</th>
                                     <th>Samples</th>
-                                    <th>Success Rate</th>
-                                    <th>Score Range</th>
                                     <th>Experiment ID</th>
                                     <th>Date</th>
                                 </tr>
@@ -490,8 +493,6 @@
                                             <td class="score-cell ${getScoreClass(score)}">${scorePercent}%</td>
                                             <td class="model-cell">${exp.model_id}</td>
                                             <td>${exp.metrics.total_samples || 0}</td>
-                                            <td>${((exp.metrics.success_rate || 0) * 100).toFixed(1)}%</td>
-                                            <td>${((exp.metrics.min_score || 0) * 100).toFixed(1)}% - ${((exp.metrics.max_score || 0) * 100).toFixed(1)}%</td>
                                             <td class="experiment-id-cell">${exp.experiment_id}</td>
                                             <td class="timestamp-cell">${date}</td>
                                         </tr>

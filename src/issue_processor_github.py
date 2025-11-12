@@ -19,6 +19,13 @@ def main():
         processor = IssueProcessor()
         result = processor.run_experiment_from_issue(issue_body, issue_number)
         
+        # Check success rate - must be 100%
+        success_rate = result['metrics'].get('success_rate', 0)
+        if success_rate < 1.0:
+            print(f"\n❌ Experiment {result['experiment_id']} failed: Success rate is {success_rate * 100:.1f}% (must be 100%)")
+            print(f"Metrics: {result['metrics']}")
+            sys.exit(1)
+        
         # Save result summary for GitHub Actions
         summary = {
             'experiment_id': result['experiment_id'],
