@@ -144,7 +144,8 @@ class Experiment:
                     
                     score = self.scorer.score(
                         prediction=prediction_content,
-                        ground_truth=ground_truth_dict
+                        ground_truth=ground_truth_dict,
+                        input_data=sample
                     )
                     print(f"✓ Score: {(score * 100):.2f}%")
                 else:

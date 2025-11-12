@@ -153,31 +153,31 @@ class BedrockClient:
                         if error_code == 'ValidationException' and 'on-demand throughput' in error_message:
                             # Convert to converse API format
                             converse_messages = []
-                        for msg in body.get('messages', []):
-                            converse_messages.append({
-                                'role': msg.get('role', 'user'),
-                                'content': [{'text': msg.get('content', '')}]
-                            })
-                        
-                        converse_kwargs = {
-                            'modelId': model_id,
-                            'messages': converse_messages
-                        }
-                        
-                        if body.get('system'):
-                            converse_kwargs['system'] = [{'text': body['system']}]
-                        
-                        if 'max_tokens' in body:
-                            converse_kwargs['inferenceConfig'] = {
-                                'maxTokens': body['max_tokens'],
-                                'temperature': body.get('temperature', 0.0)
+                            for msg in body.get('messages', []):
+                                converse_messages.append({
+                                    'role': msg.get('role', 'user'),
+                                    'content': [{'text': msg.get('content', '')}]
+                                })
+                            
+                            converse_kwargs = {
+                                'modelId': model_id,
+                                'messages': converse_messages
                             }
-                        
-                        response = self.bedrock_runtime.converse(**converse_kwargs)
-                        # Converse API returns response directly, not wrapped in 'body'
-                        response_body = response
-                    else:
-                        raise e
+                            
+                            if body.get('system'):
+                                converse_kwargs['system'] = [{'text': body['system']}]
+                            
+                            if 'max_tokens' in body:
+                                converse_kwargs['inferenceConfig'] = {
+                                    'maxTokens': body['max_tokens'],
+                                    'temperature': body.get('temperature', 0.0)
+                                }
+                            
+                            response = self.bedrock_runtime.converse(**converse_kwargs)
+                            # Converse API returns response directly, not wrapped in 'body'
+                            response_body = response
+                        else:
+                            raise e
                 
                 # Extract content based on model response format
                 content = ''
