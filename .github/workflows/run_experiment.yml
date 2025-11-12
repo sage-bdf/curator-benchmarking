@@ -26,6 +26,7 @@ jobs:
           pip install -r requirements.txt
       
       - name: Run experiment
+        id: run-experiment
         env:
           AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
         run: |
@@ -94,16 +95,20 @@ jobs:
       
       - name: Close issue
         uses: actions/github-script@v7
-        if: success()
+        if: always()
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.rest.issues.update({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'closed'
-            });
+            // Check if the "Run experiment" step succeeded
+            const experimentOutcome = '${{ steps.run-experiment.outcome }}';
+            if (experimentOutcome === 'success') {
+              github.rest.issues.update({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed'
+              });
+            }
       
       - name: Upload results
         if: always()
