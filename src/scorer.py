@@ -1,10 +1,36 @@
 """Scoring and evaluation for experiment results."""
 from typing import Dict, Any, Optional
 import json
+import re
 
 
 class Scorer:
     """Handles scoring of predictions against ground truth."""
+    
+    def _extract_json(self, text: str) -> Optional[str]:
+        """
+        Extract JSON from text, handling markdown code blocks and other formatting.
+        
+        Args:
+            text: Text that may contain JSON
+            
+        Returns:
+            Extracted JSON string, or None if no JSON found
+        """
+        # Remove markdown code blocks (```json ... ``` or ``` ... ```)
+        text = re.sub(r'```json\s*\n?', '', text)
+        text = re.sub(r'```\s*\n?', '', text)
+        text = text.strip()
+        
+        # Try to find JSON object boundaries
+        # Look for { ... } pattern
+        start = text.find('{')
+        end = text.rfind('}')
+        
+        if start != -1 and end != -1 and end > start:
+            return text[start:end+1]
+        
+        return text
     
     def score(
         self,
@@ -15,16 +41,19 @@ class Scorer:
         Score a prediction against ground truth using strict matching.
         
         Args:
-            prediction: The model's prediction (must be valid JSON)
+            prediction: The model's prediction (must be valid JSON, may be wrapped in markdown)
             ground_truth: The expected result as a dictionary
             
         Returns:
             Score between 0.0 and 1.0, or None if scoring is not possible
         """
         try:
+            # Extract JSON from prediction (handles markdown code blocks)
+            json_str = self._extract_json(prediction)
+            
             # Try to parse prediction as JSON
             try:
-                pred_dict = json.loads(prediction)
+                pred_dict = json.loads(json_str)
             except (json.JSONDecodeError, TypeError):
                 # If not JSON, return 0.0 - adherence to prompt format is part of the test
                 return 0.0

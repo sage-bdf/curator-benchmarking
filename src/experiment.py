@@ -119,9 +119,26 @@ class Experiment:
                 # Score if ground truth available
                 score = None
                 if ground_truth_samples and idx < len(ground_truth_samples):
+                    prediction_content = response.get('content', '')
+                    ground_truth_dict = ground_truth_samples[idx]
+                    
+                    # Debug output for first sample of first task
+                    if idx == 0 and task.name == list(self._get_all_tasks())[0].name:
+                        print(f"\n    [DEBUG] Sample {idx + 1} - Prediction (first 200 chars):")
+                        print(f"    {prediction_content[:200]}...")
+                        print(f"    [DEBUG] Ground truth: {ground_truth_dict}")
+                        # Use scorer's extraction method to show what will be scored
+                        json_str = self.scorer._extract_json(prediction_content)
+                        try:
+                            pred_parsed = json.loads(json_str)
+                            print(f"    [DEBUG] Extracted and parsed prediction: {pred_parsed}")
+                        except Exception as e:
+                            print(f"    [DEBUG] Failed to parse extracted JSON: {e}")
+                            print(f"    [DEBUG] Extracted JSON string: {json_str[:200]}")
+                    
                     score = self.scorer.score(
-                        prediction=response.get('content', ''),
-                        ground_truth=ground_truth_samples[idx]
+                        prediction=prediction_content,
+                        ground_truth=ground_truth_dict
                     )
                     print(f"✓ Score: {(score * 100):.2f}%")
                 else:
