@@ -108,106 +108,140 @@
             font-size: 0.9em;
         }
 
-        .experiments-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 20px;
-        }
-
-        .experiment-card {
+        .task-section {
             background: white;
-            padding: 25px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
+            margin-bottom: 30px;
+            overflow: hidden;
         }
 
-        .experiment-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .experiment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-
-        .experiment-id {
-            font-size: 0.85em;
-            color: #999;
-            font-family: 'Courier New', monospace;
-        }
-
-        .task-name {
-            font-size: 1.3em;
+        .task-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            font-size: 1.5em;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
             text-transform: capitalize;
         }
 
-        .score-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .score-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .score-percentage {
-            font-size: 1.2em;
-            color: #666;
-        }
-
-        .score-bar {
+        .leaderboard-table {
             width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 10px;
+            border-collapse: collapse;
         }
 
-        .score-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s;
+        .leaderboard-table thead {
+            background: #f8f9fa;
         }
 
-        .experiment-details {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.9em;
-        }
-
-        .detail-label {
-            color: #666;
-            font-weight: 500;
-        }
-
-        .detail-value {
+        .leaderboard-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
             color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .timestamp {
-            color: #999;
+        .leaderboard-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 25px;
+        }
+
+        .leaderboard-table th.sortable:hover {
+            background: #f0f0f0;
+        }
+
+        .leaderboard-table th.sortable::after {
+            content: ' ↕';
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+        }
+
+        .leaderboard-table th.sortable.sorted-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        .leaderboard-table th.sortable.sorted-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        .leaderboard-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .leaderboard-table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .leaderboard-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .rank {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #667eea;
+            text-align: center;
+            width: 60px;
+        }
+
+        .rank.gold {
+            color: #ffd700;
+        }
+
+        .rank.silver {
+            color: #c0c0c0;
+        }
+
+        .rank.bronze {
+            color: #cd7f32;
+        }
+
+        .score-cell {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .score-cell.high {
+            color: #28a745;
+        }
+
+        .score-cell.medium {
+            color: #ffc107;
+        }
+
+        .score-cell.low {
+            color: #dc3545;
+        }
+
+        .model-cell {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .experiment-id-cell {
+            font-family: 'Courier New', monospace;
             font-size: 0.85em;
-            margin-top: 10px;
+            color: #999;
+        }
+
+        .timestamp-cell {
+            font-size: 0.9em;
+            color: #666;
         }
 
         .loading {
@@ -262,30 +296,14 @@
             
             <div class="controls">
                 <div class="control-group">
-                    <label>Filter by Task</label>
-                    <select id="taskFilter">
-                        <option value="">All Tasks</option>
-                    </select>
-                </div>
-                <div class="control-group">
                     <label>Filter by Model</label>
                     <select id="modelFilter">
                         <option value="">All Models</option>
                     </select>
                 </div>
-                <div class="control-group">
-                    <label>Sort by</label>
-                    <select id="sortBy">
-                        <option value="timestamp-desc">Date (Newest First)</option>
-                        <option value="timestamp-asc">Date (Oldest First)</option>
-                        <option value="score-desc">Score (Highest First)</option>
-                        <option value="score-asc">Score (Lowest First)</option>
-                        <option value="task-asc">Task (A-Z)</option>
-                    </select>
-                </div>
             </div>
 
-            <div class="experiments-grid" id="experimentsGrid"></div>
+            <div id="taskTables"></div>
         </div>
     </div>
 
@@ -373,16 +391,7 @@
         }
 
         function populateFilters() {
-            const tasks = [...new Set(allExperiments.map(e => e.task_name))].sort();
             const models = [...new Set(allExperiments.map(e => e.model_id))].sort();
-
-            const taskFilter = document.getElementById('taskFilter');
-            tasks.forEach(task => {
-                const option = document.createElement('option');
-                option.value = task;
-                option.textContent = task.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                taskFilter.appendChild(option);
-            });
 
             const modelFilter = document.getElementById('modelFilter');
             models.forEach(model => {
@@ -394,43 +403,35 @@
         }
 
         function filterAndDisplay() {
-            const taskFilter = document.getElementById('taskFilter').value;
             const modelFilter = document.getElementById('modelFilter').value;
-            const sortBy = document.getElementById('sortBy').value;
 
             filteredExperiments = allExperiments.filter(exp => {
-                if (taskFilter && exp.task_name !== taskFilter) return false;
                 if (modelFilter && exp.model_id !== modelFilter) return false;
                 return true;
-            });
-
-            // Sort
-            filteredExperiments.sort((a, b) => {
-                switch (sortBy) {
-                    case 'timestamp-desc':
-                        return new Date(b.timestamp) - new Date(a.timestamp);
-                    case 'timestamp-asc':
-                        return new Date(a.timestamp) - new Date(b.timestamp);
-                    case 'score-desc':
-                        return (b.metrics.average_score || 0) - (a.metrics.average_score || 0);
-                    case 'score-asc':
-                        return (a.metrics.average_score || 0) - (b.metrics.average_score || 0);
-                    case 'task-asc':
-                        return a.task_name.localeCompare(b.task_name);
-                    default:
-                        return 0;
-                }
             });
 
             displayExperiments();
         }
 
+        function getScoreClass(score) {
+            if (score >= 0.7) return 'high';
+            if (score >= 0.4) return 'medium';
+            return 'low';
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'gold';
+            if (rank === 2) return 'silver';
+            if (rank === 3) return 'bronze';
+            return '';
+        }
+
         function displayExperiments() {
-            const grid = document.getElementById('experimentsGrid');
+            const container = document.getElementById('taskTables');
             
             if (filteredExperiments.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1 / -1;">
+                container.innerHTML = `
+                    <div class="empty-state">
                         <h2>No experiments found</h2>
                         <p>Try adjusting your filters</p>
                     </div>
@@ -438,65 +439,75 @@
                 return;
             }
 
-            grid.innerHTML = filteredExperiments.map(exp => {
-                const score = exp.metrics.average_score || 0;
-                const scorePercent = (score * 100).toFixed(2);
-                const date = new Date(exp.timestamp).toLocaleString();
-                const taskName = exp.task_name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            // Group experiments by task
+            const tasksMap = {};
+            filteredExperiments.forEach(exp => {
+                if (!tasksMap[exp.task_name]) {
+                    tasksMap[exp.task_name] = [];
+                }
+                tasksMap[exp.task_name].push(exp);
+            });
 
-                return `
-                    <div class="experiment-card">
-                        <div class="experiment-header">
-                            <div>
-                                <div class="task-name">${taskName}</div>
-                                <div class="experiment-id">${exp.experiment_id}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="score-container">
-                            <div class="score-value">${scorePercent}%</div>
-                        </div>
-                        <div class="score-bar">
-                            <div class="score-bar-fill" style="width: ${Math.min(score * 100, 100)}%"></div>
-                        </div>
+            // Sort each task's experiments by score (best to worst)
+            Object.keys(tasksMap).forEach(taskName => {
+                tasksMap[taskName].sort((a, b) => {
+                    return (b.metrics.average_score || 0) - (a.metrics.average_score || 0);
+                });
+            });
 
-                        <div class="experiment-details">
-                            <div class="detail-row">
-                                <span class="detail-label">Model:</span>
-                                <span class="detail-value model-badge">${exp.model_id}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Samples:</span>
-                                <span class="detail-value">${exp.metrics.total_samples || 0}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Success Rate:</span>
-                                <span class="detail-value">${((exp.metrics.success_rate || 0) * 100).toFixed(1)}%</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Score Range:</span>
-                                <span class="detail-value">${((exp.metrics.min_score || 0) * 100).toFixed(1)}% - ${((exp.metrics.max_score || 0) * 100).toFixed(1)}%</span>
-                            </div>
-                            ${exp.system_instructions ? `
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
-                                <div class="detail-label" style="margin-bottom: 5px;">System Instructions:</div>
-                                <div style="font-size: 0.85em; color: #666; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
-                                    ${exp.system_instructions.substring(0, 150)}${exp.system_instructions.length > 150 ? '...' : ''}
-                                </div>
-                            </div>
-                            ` : ''}
-                        </div>
-
-                        <div class="timestamp">${date}</div>
+            // Generate HTML for each task table
+            let html = '';
+            Object.keys(tasksMap).sort().forEach(taskName => {
+                const experiments = tasksMap[taskName];
+                const taskDisplayName = taskName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                html += `
+                    <div class="task-section">
+                        <div class="task-header">${taskDisplayName}</div>
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th class="rank">Rank</th>
+                                    <th>Score</th>
+                                    <th>Model</th>
+                                    <th>Samples</th>
+                                    <th>Success Rate</th>
+                                    <th>Score Range</th>
+                                    <th>Experiment ID</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${experiments.map((exp, index) => {
+                                    const rank = index + 1;
+                                    const score = exp.metrics.average_score || 0;
+                                    const scorePercent = (score * 100).toFixed(2);
+                                    const date = new Date(exp.timestamp).toLocaleDateString();
+                                    
+                                    return `
+                                        <tr>
+                                            <td class="rank ${getRankClass(rank)}">${rank}</td>
+                                            <td class="score-cell ${getScoreClass(score)}">${scorePercent}%</td>
+                                            <td class="model-cell">${exp.model_id}</td>
+                                            <td>${exp.metrics.total_samples || 0}</td>
+                                            <td>${((exp.metrics.success_rate || 0) * 100).toFixed(1)}%</td>
+                                            <td>${((exp.metrics.min_score || 0) * 100).toFixed(1)}% - ${((exp.metrics.max_score || 0) * 100).toFixed(1)}%</td>
+                                            <td class="experiment-id-cell">${exp.experiment_id}</td>
+                                            <td class="timestamp-cell">${date}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 `;
-            }).join('');
+            });
+
+            container.innerHTML = html;
         }
 
         // Event listeners
-        document.getElementById('taskFilter').addEventListener('change', filterAndDisplay);
         document.getElementById('modelFilter').addEventListener('change', filterAndDisplay);
-        document.getElementById('sortBy').addEventListener('change', filterAndDisplay);
 
         // Load on page load
         loadExperiments();
