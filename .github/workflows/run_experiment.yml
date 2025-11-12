@@ -122,13 +122,16 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          # Add results directory (the actual experiment results)
-          git add results/
-          # Add docs/results/ (for GitHub Pages)
+          # Add docs/results/ (for GitHub Pages - this is allowed by .gitignore)
           git add docs/results/
-          # Commit if there are changes
-          git diff --staged --quiet || git commit -m "Save experiment results [skip ci]"
-          git push
+          # Check if there are any changes to commit
+          if ! git diff --staged --quiet; then
+            git commit -m "Update GitHub Pages with experiment results [skip ci]"
+            git push
+            echo "✅ Results committed and pushed to repository"
+          else
+            echo "⚠️ No changes to commit (results may already be up to date)"
+          fi
       
       - name: Upload results
         if: always()
