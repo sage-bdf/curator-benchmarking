@@ -373,6 +373,9 @@
                 allExperiments = Array.from(experimentMap.values());
                 
                 console.log(`After deduplication: ${allExperiments.length} unique experiments`);
+                
+                // Log experiment IDs for debugging
+                console.log('Experiment IDs:', allExperiments.map(e => e.experiment_id));
 
                 console.log(`Parsed ${allExperiments.length} valid experiments`);
 
@@ -485,13 +488,25 @@
         function calculateOverallPerformance(experiments) {
             // Filter experiments where all tasks have 100% success rate
             const validExperiments = experiments.filter(exp => {
-                if (!exp.task_results) return false;
-                for (const taskResult of Object.values(exp.task_results)) {
-                    if (taskResult.error) return false;
-                    if ((taskResult.metrics?.success_rate || 0) < 1.0) return false;
+                if (!exp.task_results) {
+                    console.log(`Experiment ${exp.experiment_id}: No task_results`);
+                    return false;
+                }
+                for (const [taskName, taskResult] of Object.entries(exp.task_results)) {
+                    if (taskResult.error) {
+                        console.log(`Experiment ${exp.experiment_id}, task ${taskName}: Has error`);
+                        return false;
+                    }
+                    const successRate = taskResult.metrics?.success_rate || 0;
+                    if (successRate < 1.0) {
+                        console.log(`Experiment ${exp.experiment_id}, task ${taskName}: Success rate ${successRate} < 1.0`);
+                        return false;
+                    }
                 }
                 return true;
             });
+            
+            console.log(`Valid experiments after filtering: ${validExperiments.length}`);
             
             // Sort by average accuracy (best to worst)
             validExperiments.sort((a, b) => {
