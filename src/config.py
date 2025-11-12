@@ -2,7 +2,7 @@
 import os
 import yaml
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 class Config:
@@ -16,6 +16,20 @@ class Config:
         self.config_path = Path(config_path)
         with open(self.config_path, 'r') as f:
             self._config = yaml.safe_load(f)
+        
+        # Load credentials from .aws/creds.yaml if it exists
+        self._creds = self._load_creds()
+    
+    def _load_creds(self) -> Optional[Dict[str, Any]]:
+        """Load credentials from .aws/creds.yaml if it exists."""
+        creds_path = Path(__file__).parent.parent / ".aws" / "creds.yaml"
+        if creds_path.exists():
+            try:
+                with open(creds_path, 'r') as f:
+                    return yaml.safe_load(f)
+            except Exception:
+                return None
+        return None
     
     @property
     def aws_region(self) -> str:
@@ -44,4 +58,17 @@ class Config:
     def get_aws_secret_key(self) -> str:
         """Get AWS secret key from environment."""
         return os.getenv('AWS_SECRET_ACCESS_KEY', '')
+    
+    def get_bearer_token(self) -> Optional[str]:
+        """Get AWS Bedrock bearer token from .aws/creds.yaml or environment."""
+        # First check environment variable
+        env_token = os.getenv('AWS_BEARER_TOKEN_BEDROCK')
+        if env_token:
+            return env_token
+        
+        # Then check creds file
+        if self._creds and 'AWS_BEARER_TOKEN_BEDROCK' in self._creds:
+            return self._creds['AWS_BEARER_TOKEN_BEDROCK']
+        
+        return None
 

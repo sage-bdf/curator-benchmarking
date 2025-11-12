@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Metadata Curation Benchmarking - Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .experiments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .experiment-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .experiment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .experiment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .experiment-id {
+            font-size: 0.85em;
+            color: #999;
+            font-family: 'Courier New', monospace;
+        }
+
+        .task-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-transform: capitalize;
+        }
+
+        .score-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .score-percentage {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .experiment-details {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .timestamp {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .empty-state h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .model-badge {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 LLM Metadata Curation Benchmarking</h1>
+            <p class="subtitle">Experiment Results Dashboard</p>
+        </header>
+
+        <div id="loading" class="loading">Loading experiments...</div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="content" style="display: none;">
+            <div class="stats" id="stats"></div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label>Filter by Task</label>
+                    <select id="taskFilter">
+                        <option value="">All Tasks</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Filter by Model</label>
+                    <select id="modelFilter">
+                        <option value="">All Models</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Sort by</label>
+                    <select id="sortBy">
+                        <option value="timestamp-desc">Date (Newest First)</option>
+                        <option value="timestamp-asc">Date (Oldest First)</option>
+                        <option value="score-desc">Score (Highest First)</option>
+                        <option value="score-asc">Score (Lowest First)</option>
+                        <option value="task-asc">Task (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="experiments-grid" id="experimentsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        let allExperiments = [];
+        let filteredExperiments = [];
+
+        async function loadExperiments() {
+            try {
+                const response = await fetch('results/experiments_log.jsonl');
+                if (!response.ok) {
+                    throw new Error(`Failed to load experiments: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                const lines = text.trim().split('\n').filter(line => line.trim());
+                
+                allExperiments = lines.map(line => {
+                    try {
+                        return JSON.parse(line);
+                    } catch (e) {
+                        console.error('Error parsing line:', line, e);
+                        return null;
+                    }
+                }).filter(exp => exp !== null);
+
+                // Also try to load detailed results for additional info
+                await loadDetailedResults();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                updateStats();
+                populateFilters();
+                filterAndDisplay();
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = `Error loading experiments: ${error.message}`;
+            }
+        }
+
+        async function loadDetailedResults() {
+            // Load detailed results to get system_instructions and prompt
+            for (let exp of allExperiments) {
+                try {
+                    const response = await fetch(`results/${exp.experiment_id}_results.json`);
+                    if (response.ok) {
+                        const detailed = await response.json();
+                        exp.system_instructions = detailed.system_instructions || '';
+                        exp.prompt = detailed.prompt || '';
+                    }
+                } catch (e) {
+                    // Ignore errors for individual detailed results
+                }
+            }
+        }
+
+        function updateStats() {
+            const stats = {
+                total: allExperiments.length,
+                tasks: new Set(allExperiments.map(e => e.task_name)).size,
+                avgScore: allExperiments.reduce((sum, e) => sum + (e.metrics.average_score || 0), 0) / allExperiments.length,
+                successRate: allExperiments.reduce((sum, e) => sum + (e.metrics.success_rate || 0), 0) / allExperiments.length
+            };
+
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.total}</div>
+                    <div class="stat-label">Total Experiments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.tasks}</div>
+                    <div class="stat-label">Unique Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${(stats.avgScore * 100).toFixed(2)}%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${(stats.successRate * 100).toFixed(1)}%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            `;
+        }
+
+        function populateFilters() {
+            const tasks = [...new Set(allExperiments.map(e => e.task_name))].sort();
+            const models = [...new Set(allExperiments.map(e => e.model_id))].sort();
+
+            const taskFilter = document.getElementById('taskFilter');
+            tasks.forEach(task => {
+                const option = document.createElement('option');
+                option.value = task;
+                option.textContent = task.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                taskFilter.appendChild(option);
+            });
+
+            const modelFilter = document.getElementById('modelFilter');
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelFilter.appendChild(option);
+            });
+        }
+
+        function filterAndDisplay() {
+            const taskFilter = document.getElementById('taskFilter').value;
+            const modelFilter = document.getElementById('modelFilter').value;
+            const sortBy = document.getElementById('sortBy').value;
+
+            filteredExperiments = allExperiments.filter(exp => {
+                if (taskFilter && exp.task_name !== taskFilter) return false;
+                if (modelFilter && exp.model_id !== modelFilter) return false;
+                return true;
+            });
+
+            // Sort
+            filteredExperiments.sort((a, b) => {
+                switch (sortBy) {
+                    case 'timestamp-desc':
+                        return new Date(b.timestamp) - new Date(a.timestamp);
+                    case 'timestamp-asc':
+                        return new Date(a.timestamp) - new Date(b.timestamp);
+                    case 'score-desc':
+                        return (b.metrics.average_score || 0) - (a.metrics.average_score || 0);
+                    case 'score-asc':
+                        return (a.metrics.average_score || 0) - (b.metrics.average_score || 0);
+                    case 'task-asc':
+                        return a.task_name.localeCompare(b.task_name);
+                    default:
+                        return 0;
+                }
+            });
+
+            displayExperiments();
+        }
+
+        function displayExperiments() {
+            const grid = document.getElementById('experimentsGrid');
+            
+            if (filteredExperiments.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <h2>No experiments found</h2>
+                        <p>Try adjusting your filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredExperiments.map(exp => {
+                const score = exp.metrics.average_score || 0;
+                const scorePercent = (score * 100).toFixed(2);
+                const date = new Date(exp.timestamp).toLocaleString();
+                const taskName = exp.task_name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+                return `
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <div>
+                                <div class="task-name">${taskName}</div>
+                                <div class="experiment-id">${exp.experiment_id}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="score-container">
+                            <div class="score-value">${scorePercent}%</div>
+                        </div>
+                        <div class="score-bar">
+                            <div class="score-bar-fill" style="width: ${Math.min(score * 100, 100)}%"></div>
+                        </div>
+
+                        <div class="experiment-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Model:</span>
+                                <span class="detail-value model-badge">${exp.model_id}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Samples:</span>
+                                <span class="detail-value">${exp.metrics.total_samples || 0}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Success Rate:</span>
+                                <span class="detail-value">${((exp.metrics.success_rate || 0) * 100).toFixed(1)}%</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Score Range:</span>
+                                <span class="detail-value">${((exp.metrics.min_score || 0) * 100).toFixed(1)}% - ${((exp.metrics.max_score || 0) * 100).toFixed(1)}%</span>
+                            </div>
+                            ${exp.system_instructions ? `
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+                                <div class="detail-label" style="margin-bottom: 5px;">System Instructions:</div>
+                                <div style="font-size: 0.85em; color: #666; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
+                                    ${exp.system_instructions.substring(0, 150)}${exp.system_instructions.length > 150 ? '...' : ''}
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="timestamp">${date}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Event listeners
+        document.getElementById('taskFilter').addEventListener('change', filterAndDisplay);
+        document.getElementById('modelFilter').addEventListener('change', filterAndDisplay);
+        document.getElementById('sortBy').addEventListener('change', filterAndDisplay);
+
+        // Load on page load
+        loadExperiments();
+    </script>
+</body>
+</html>
+

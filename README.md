@@ -33,6 +33,9 @@ This framework allows you to:
 │   ├── cli.py
 │   ├── issue_processor.py
 │   └── issue_processor_github.py
+├── docs/                        # GitHub Pages dashboard
+│   ├── index.html              # Main dashboard interface
+│   └── results/                # Results copied for web access
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
 │   │   └── experiment.yml       # GitHub issue template for experiments
@@ -150,6 +153,34 @@ Each experiment result includes:
 - Experiment metadata (ID, timestamp, parameters)
 - Individual sample results
 - Aggregate metrics (success rate, average score, etc.)
+
+### GitHub Pages Dashboard
+
+A web-based dashboard is available to explore experiment results:
+
+1. **Update results for GitHub Pages:**
+   ```bash
+   ./scripts/update_gh_pages.sh
+   # or
+   python scripts/update_gh_pages.py
+   ```
+
+2. **Enable GitHub Pages** in repository settings:
+   - Settings → Pages
+   - Source: Deploy from a branch
+   - Branch: `main` (or your default branch)
+   - Folder: `/docs`
+
+3. **Access the dashboard** at: `https://<username>.github.io/curator-benchmarking/`
+
+The dashboard provides:
+- Visual overview of all experiments
+- Filtering by task or model
+- Sorting by date, score, or task name
+- Key metrics and experimental parameters
+- Responsive, modern interface
+
+See `docs/README.md` for more details.
 
 ## Configuration
 

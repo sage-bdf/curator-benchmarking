@@ -6,9 +6,8 @@ The `run_experiment.yml` workflow automatically processes GitHub issues labeled 
 
 ### Setup
 
-1. **Repository Secrets**: Add the following secrets to your repository:
-   - `AWS_ACCESS_KEY_ID`: Your AWS access key
-   - `AWS_SECRET_ACCESS_KEY`: Your AWS secret key
+1. **Repository Secrets**: Add the following secret to your repository:
+   - `AWS_BEARER_TOKEN_BEDROCK`: Your AWS Bedrock API key
 
 2. **Permissions**: The workflow needs the following permissions:
    - `issues: write` - To comment on and close issues
@@ -23,7 +22,7 @@ Settings → Actions → General → Workflow permissions
 2. The workflow:
    - Checks out the repository
    - Sets up Python and installs dependencies
-   - Configures AWS credentials from secrets
+   - Configures AWS Bedrock API key from secrets
    - Runs the experiment based on the issue body
    - Posts results as a comment on the issue
    - Closes the issue if successful

@@ -2,6 +2,7 @@
 import json
 import time
 import boto3
+import requests
 from typing import Dict, Any, Optional
 from botocore.exceptions import ClientError
 from .config import Config
@@ -13,18 +14,29 @@ class BedrockClient:
     def __init__(self, config: Config):
         """Initialize Bedrock client with configuration."""
         self.config = config
+        self.bearer_token = config.get_bearer_token()
         
-        # Build client kwargs - use credentials from env if available, otherwise use default chain
-        client_kwargs = {'region_name': config.aws_region}
-        
-        aws_key = config.get_aws_access_key()
-        aws_secret = config.get_aws_secret_key()
-        
-        if aws_key and aws_secret:
-            client_kwargs['aws_access_key_id'] = aws_key
-            client_kwargs['aws_secret_access_key'] = aws_secret
-        
-        self.bedrock_runtime = boto3.client('bedrock-runtime', **client_kwargs)
+        # If bearer token is available, we'll use direct HTTP requests
+        # Otherwise, use boto3 with AWS credentials
+        if not self.bearer_token:
+            # Build client kwargs - use credentials from env if available, otherwise use default chain
+            client_kwargs = {'region_name': config.aws_region}
+            
+            aws_key = config.get_aws_access_key()
+            aws_secret = config.get_aws_secret_key()
+            
+            if aws_key and aws_secret:
+                client_kwargs['aws_access_key_id'] = aws_key
+                client_kwargs['aws_secret_access_key'] = aws_secret
+            
+            self.bedrock_runtime = boto3.client('bedrock-runtime', **client_kwargs)
+            self.use_bearer_token = False
+        else:
+            # Use bearer token for authentication
+            self.use_bearer_token = True
+            self.bedrock_runtime = None
+            # Construct the Bedrock endpoint URL
+            self.bedrock_endpoint = f"https://bedrock-runtime.{config.aws_region}.amazonaws.com"
     
     def invoke_model(
         self,
@@ -70,12 +82,24 @@ class BedrockClient:
         
         for attempt in range(max_retries):
             try:
-                response = self.bedrock_runtime.invoke_model(
-                    modelId=model_id,
-                    body=json.dumps(body)
-                )
-                
-                response_body = json.loads(response['body'].read())
+                if self.use_bearer_token:
+                    # Use bearer token authentication with direct HTTP request
+                    url = f"{self.bedrock_endpoint}/model/{model_id}/invoke"
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': f'Bearer {self.bearer_token}'
+                    }
+                    
+                    response = requests.post(url, headers=headers, json=body, timeout=300)
+                    response.raise_for_status()
+                    response_body = response.json()
+                else:
+                    # Use boto3 with AWS credentials
+                    response = self.bedrock_runtime.invoke_model(
+                        modelId=model_id,
+                        body=json.dumps(body)
+                    )
+                    response_body = json.loads(response['body'].read())
                 
                 return {
                     'success': True,
@@ -99,6 +123,29 @@ class BedrockClient:
                         'model_id': model_id,
                         'attempt': attempt + 1
                     }
+            
+            except requests.exceptions.HTTPError as e:
+                # Handle HTTP errors from bearer token requests
+                error_code = None
+                try:
+                    error_body = e.response.json()
+                    error_code = error_body.get('__type', '')
+                except:
+                    pass
+                
+                if 'Throttling' in str(e) or '429' in str(e.response.status_code):
+                    if attempt < max_retries - 1:
+                        wait_time = 2 ** attempt
+                        time.sleep(wait_time)
+                        continue
+                
+                return {
+                    'success': False,
+                    'error': str(e),
+                    'error_code': error_code or f'HTTP_{e.response.status_code}',
+                    'model_id': model_id,
+                    'attempt': attempt + 1
+                }
             
             except Exception as e:
                 return {
