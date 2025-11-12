@@ -63,21 +63,40 @@ class BedrockClient:
         if system_instructions is None:
             system_instructions = self.config.default_system_instructions
         
-        # Prepare the request body for Claude models
-        body = {
-            "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-        }
-        
-        if system_instructions:
-            body["system"] = system_instructions
+        # Detect model provider and prepare appropriate request body
+        if model_id.startswith('openai.'):
+            # OpenAI format
+            body = {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "max_tokens": max_tokens,
+                "temperature": temperature
+            }
+            if system_instructions:
+                # Add system message as first message
+                body["messages"].insert(0, {
+                    "role": "system",
+                    "content": system_instructions
+                })
+        else:
+            # Anthropic format (default)
+            body = {
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            }
+            if system_instructions:
+                body["system"] = system_instructions
         
         for attempt in range(max_retries):
             try:
