@@ -30,21 +30,7 @@ class IssueProcessor:
         """
         params = {}
         
-        # Extract task (from dropdown or custom)
-        # Try dropdown first
-        task_match = re.search(r'### Task\s*\n\n([^\n]+)', issue_body)
-        if task_match:
-            task_value = task_match.group(1).strip()
-            # Skip if it's the placeholder or empty
-            if task_value and task_value not in ['', '-']:
-                params['task'] = task_value
-        
-        # Override with custom task if provided
-        custom_task_match = re.search(r'### Custom Task Name\s*\n\n([^\n]+)', issue_body)
-        if custom_task_match:
-            custom_task = custom_task_match.group(1).strip()
-            if custom_task and custom_task not in ['', '-']:
-                params['task'] = custom_task
+        # Task selection removed - experiments now run all tasks automatically
         
         # Extract model
         model_match = re.search(r'### Model Endpoint\s*\n\n([^\n]+)', issue_body)
