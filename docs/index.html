@@ -384,6 +384,7 @@
 
         async function loadDetailedResults() {
             // Load detailed results to get task_results
+            let loadedCount = 0;
             for (let exp of allExperiments) {
                 try {
                     const response = await fetch(`results/${exp.experiment_id}_results.json`);
@@ -391,11 +392,15 @@
                         const detailed = await response.json();
                         exp.task_results = detailed.task_results || {};
                         exp.system_instructions = detailed.system_instructions || '';
+                        loadedCount++;
+                    } else {
+                        console.warn(`Failed to load detailed results for ${exp.experiment_id}: ${response.status} ${response.statusText}`);
                     }
                 } catch (e) {
-                    // Ignore errors for individual detailed results
+                    console.warn(`Error loading detailed results for ${exp.experiment_id}:`, e);
                 }
             }
+            console.log(`Loaded detailed results for ${loadedCount}/${allExperiments.length} experiments`);
         }
 
         function updateStats() {
