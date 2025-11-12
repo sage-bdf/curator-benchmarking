@@ -36,8 +36,14 @@ class IssueProcessor:
         model_match = re.search(r'### Model Endpoint\s*\n\n([^\n]+)', issue_body)
         if model_match:
             model = model_match.group(1).strip()
-            if model and model not in ['', '-']:
-                params['model'] = model
+            # Handle "Default" option from dropdown
+            if model and model not in ['', '-', 'Default (global.anthropic.claude-sonnet-4-5-20250929-v1:0)']:
+                # Extract model ID if it's in the format "Default (model_id)"
+                if model.startswith('Default'):
+                    # Use default from config
+                    pass
+                else:
+                    params['model'] = model
         
         # Extract system instructions (may span multiple lines)
         sys_inst_match = re.search(r'### System Instructions\s*\n\n(.*?)(?=\n###|\Z)', issue_body, re.DOTALL)

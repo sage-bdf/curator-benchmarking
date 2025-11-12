@@ -82,6 +82,25 @@ class BedrockClient:
                     "role": "system",
                     "content": system_instructions
                 })
+        elif model_id.startswith('us.amazon.') or model_id.startswith('amazon.'):
+            # Amazon Nova format - use converse API format
+            # Include system instructions in the user message (Nova doesn't support system role)
+            full_prompt = prompt
+            if system_instructions:
+                full_prompt = f"{system_instructions}\n\n{prompt}"
+            # Use converse API format for Nova
+            body = {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [{"text": full_prompt}]
+                    }
+                ],
+                "inferenceConfig": {
+                    "maxTokens": max_tokens
+                }
+            }
+            # Note: Nova may not support temperature in this format
         else:
             # Anthropic format (default)
             body = {
@@ -103,22 +122,37 @@ class BedrockClient:
                 # Always use boto3 - it automatically uses bearer token from AWS_BEARER_TOKEN_BEDROCK env var
                 # if available, otherwise uses AWS credentials
                 
-                # Try invoke_model first (for older models)
-                try:
-                    response = self.bedrock_runtime.invoke_model(
-                        modelId=model_id,
-                        body=json.dumps(body)
-                    )
-                    response_body = json.loads(response['body'].read())
-                except ClientError as e:
-                    error_code = e.response.get('Error', {}).get('Code', '')
-                    error_message = e.response.get('Error', {}).get('Message', '')
-                    
-                    # If invoke_model fails with ValidationException about on-demand throughput,
-                    # try using converse API instead (for newer models)
-                    if error_code == 'ValidationException' and 'on-demand throughput' in error_message:
-                        # Convert to converse API format
-                        converse_messages = []
+                # For Amazon Nova models, use converse API directly
+                if model_id.startswith('us.amazon.') or model_id.startswith('amazon.'):
+                    try:
+                        response = self.bedrock_runtime.converse(
+                            modelId=model_id,
+                            messages=body['messages'],
+                            inferenceConfig=body.get('inferenceConfig', {})
+                        )
+                        # Converse API returns response directly
+                        response_body = response
+                    except ClientError as e:
+                        error_code = e.response.get('Error', {}).get('Code', '')
+                        error_message = e.response.get('Error', {}).get('Message', '')
+                        raise e
+                else:
+                    # Try invoke_model first (for older models)
+                    try:
+                        response = self.bedrock_runtime.invoke_model(
+                            modelId=model_id,
+                            body=json.dumps(body)
+                        )
+                        response_body = json.loads(response['body'].read())
+                    except ClientError as e:
+                        error_code = e.response.get('Error', {}).get('Code', '')
+                        error_message = e.response.get('Error', {}).get('Message', '')
+                        
+                        # If invoke_model fails with ValidationException about on-demand throughput,
+                        # try using converse API instead (for newer models)
+                        if error_code == 'ValidationException' and 'on-demand throughput' in error_message:
+                            # Convert to converse API format
+                            converse_messages = []
                         for msg in body.get('messages', []):
                             converse_messages.append({
                                 'role': msg.get('role', 'user'),
