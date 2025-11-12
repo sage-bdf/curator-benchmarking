@@ -534,17 +534,24 @@
                 return bAcc - aAcc;
             });
             
-            return validExperiments.map(exp => ({
-                experiment_id: exp.experiment_id,
-                model_id: exp.model_id,
-                system_instructions: exp.system_instructions || 'Default',
-                temperature: exp.temperature !== undefined ? exp.temperature : null,
-                thinking: exp.thinking !== undefined ? exp.thinking : false,
-                averageAccuracy: exp.overall_metrics?.average_accuracy || 0,
-                tasksCompleted: exp.overall_metrics?.tasks_completed || 0,
-                totalSamples: exp.overall_metrics?.total_samples || 0,
-                task_results: exp.task_results || {}
-            }));
+            return validExperiments.map(exp => {
+                // Get task_results if available, otherwise use empty object
+                const taskResults = exp.task_results || {};
+                
+                // If no task_results but we have overall_metrics, create a placeholder
+                // so the experiment still shows up
+                return {
+                    experiment_id: exp.experiment_id,
+                    model_id: exp.model_id,
+                    system_instructions: exp.system_instructions || 'Default',
+                    temperature: exp.temperature !== undefined ? exp.temperature : null,
+                    thinking: exp.thinking !== undefined ? exp.thinking : false,
+                    averageAccuracy: exp.overall_metrics?.average_accuracy || 0,
+                    tasksCompleted: exp.overall_metrics?.tasks_completed || 0,
+                    totalSamples: exp.overall_metrics?.total_samples || 0,
+                    task_results: taskResults
+                };
+            });
         }
 
         function displayExperiments() {
@@ -621,10 +628,12 @@
             document.getElementById('overallPerformance').innerHTML = overallHtml;
 
             // Generate task-wise breakdown tables
-            // Get all unique tasks from all experiments
+            // Get all unique tasks from all experiments (only from experiments with task_results)
             const allTasks = new Set();
             overallPerformance.forEach(exp => {
-                Object.keys(exp.task_results).forEach(task => allTasks.add(task));
+                if (exp.task_results && Object.keys(exp.task_results).length > 0) {
+                    Object.keys(exp.task_results).forEach(task => allTasks.add(task));
+                }
             });
             
             let html = '';
