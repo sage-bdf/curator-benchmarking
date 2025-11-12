@@ -1,0 +1,93 @@
+"""Task management for benchmarking."""
+import pandas as pd
+from pathlib import Path
+from typing import Dict, Any, Optional
+
+
+class Task:
+    """Represents a benchmarking task."""
+    
+    def __init__(self, task_dir: Path):
+        """Initialize task from directory."""
+        self.task_dir = Path(task_dir)
+        self.name = self.task_dir.name
+        
+        # Load task configuration
+        self.config = self._load_config()
+        
+        # Load input data
+        self.input_data = self._load_input_data()
+        
+        # Load ground truth
+        self.ground_truth = self._load_ground_truth()
+        
+        # Load default prompt
+        self.default_prompt = self._load_default_prompt()
+    
+    def _load_config(self) -> Dict[str, Any]:
+        """Load task configuration if it exists."""
+        config_path = self.task_dir / "task_config.yaml"
+        if config_path.exists():
+            import yaml
+            with open(config_path, 'r') as f:
+                return yaml.safe_load(f)
+        return {}
+    
+    def _load_input_data(self) -> pd.DataFrame:
+        """Load input data from CSV or TSV files."""
+        # Look for input data files
+        input_files = list(self.task_dir.glob("input*.csv")) + \
+                     list(self.task_dir.glob("input*.tsv"))
+        
+        if not input_files:
+            # Fallback: look for any CSV/TSV that's not ground truth
+            all_files = list(self.task_dir.glob("*.csv")) + \
+                       list(self.task_dir.glob("*.tsv"))
+            ground_truth_files = list(self.task_dir.glob("*ground*truth*")) + \
+                                list(self.task_dir.glob("*Ground*Truth*"))
+            input_files = [f for f in all_files if f not in ground_truth_files]
+        
+        if not input_files:
+            raise ValueError(f"No input data found in {self.task_dir}")
+        
+        # Load the first input file found
+        input_file = input_files[0]
+        if input_file.suffix == '.tsv':
+            return pd.read_csv(input_file, sep='\t')
+        else:
+            return pd.read_csv(input_file)
+    
+    def _load_ground_truth(self) -> Optional[pd.DataFrame]:
+        """Load ground truth data."""
+        ground_truth_files = list(self.task_dir.glob("*ground*truth*")) + \
+                            list(self.task_dir.glob("*Ground*Truth*"))
+        
+        if not ground_truth_files:
+            return None
+        
+        ground_truth_file = ground_truth_files[0]
+        if ground_truth_file.suffix == '.tsv':
+            return pd.read_csv(ground_truth_file, sep='\t')
+        else:
+            return pd.read_csv(ground_truth_file)
+    
+    def _load_default_prompt(self) -> str:
+        """Load default prompt for this task."""
+        prompt_path = self.task_dir / "default_prompt.txt"
+        if prompt_path.exists():
+            with open(prompt_path, 'r') as f:
+                return f.read()
+        
+        # Return a generic prompt if none exists
+        return "Please process the following metadata according to the task requirements."
+    
+    def get_input_samples(self) -> list:
+        """Get input samples as a list of dictionaries."""
+        return self.input_data.to_dict('records')
+    
+    def get_ground_truth_samples(self) -> Optional[list]:
+        """Get ground truth samples as a list of dictionaries."""
+        if self.ground_truth is None:
+            return None
+        return self.ground_truth.to_dict('records')
+

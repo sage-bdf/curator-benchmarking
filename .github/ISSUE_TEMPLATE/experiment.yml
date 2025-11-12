@@ -1,0 +1,86 @@
+name: Experiment Submission
+description: Submit a new experiment to run on the benchmarking framework
+title: "[Experiment] "
+labels: ["experiment"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill out the following information to submit an experiment. The experiment will be run automatically and this issue will be closed when complete.
+
+  - type: dropdown
+    id: task
+    attributes:
+      label: Task
+      description: Select the task to run
+      options:
+        - example_task
+      # Note: This will need to be updated as tasks are added
+    validations:
+      required: true
+
+  - type: input
+    id: task_custom
+    attributes:
+      label: Custom Task Name
+      description: If your task is not in the dropdown, enter the task name here
+      placeholder: my_task_name
+    validations:
+      required: false
+
+  - type: input
+    id: model
+    attributes:
+      label: Model Endpoint
+      description: AWS Bedrock model endpoint ID (leave empty for default)
+      placeholder: global.anthropic.claude-sonnet-4-5-20250929-v1:0
+    validations:
+      required: false
+
+  - type: textarea
+    id: system_instructions
+    attributes:
+      label: System Instructions
+      description: Custom system instructions (leave empty to use default). You can reference a file path or paste the instructions directly.
+      placeholder: |
+        Option 1: Reference a file
+        file:path/to/instructions.txt
+        
+        Option 2: Paste instructions directly
+        Your custom system instructions here...
+    validations:
+      required: false
+
+  - type: textarea
+    id: prompt
+    attributes:
+      label: Prompt
+      description: Custom prompt (leave empty to use task default). You can reference a file path or paste the prompt directly.
+      placeholder: |
+        Option 1: Reference a file
+        file:path/to/prompt.txt
+        
+        Option 2: Paste prompt directly
+        Your custom prompt here...
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Experiment Description
+      description: Optional description of what this experiment is testing
+      placeholder: This experiment tests...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have verified that the task exists and has the required input data
+          required: true
+        - label: I understand that AWS credentials must be configured for the experiment to run
+          required: true
+
