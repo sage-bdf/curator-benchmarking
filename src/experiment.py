@@ -68,7 +68,7 @@ class Experiment:
             schema_text = f"\n\nTarget Schema (controlled terminology):\n{json.dumps(task.schema, indent=2)}"
         
         for idx, sample in enumerate(input_samples):
-            print(f"    Processing sample {idx + 1}/{len(input_samples)}")
+            print(f"    Processing sample {idx + 1}/{len(input_samples)}...", end=' ', flush=True)
             
             # Format prompt with sample data and schema
             sample_str = json.dumps(sample, indent=2)
@@ -84,13 +84,19 @@ class Experiment:
                 max_retries=experiment_config.get('max_retries', 3)
             )
             
-            # Score if ground truth available
-            score = None
-            if ground_truth_samples and idx < len(ground_truth_samples):
-                score = self.scorer.score(
-                    prediction=response.get('content', ''),
-                    ground_truth=ground_truth_samples[idx]
-                )
+            if not response.get('success', False):
+                print(f"✗ Failed: {response.get('error', 'Unknown error')}")
+            else:
+                # Score if ground truth available
+                score = None
+                if ground_truth_samples and idx < len(ground_truth_samples):
+                    score = self.scorer.score(
+                        prediction=response.get('content', ''),
+                        ground_truth=ground_truth_samples[idx]
+                    )
+                    print(f"✓ Score: {(score * 100):.2f}%")
+                else:
+                    print("✓ (no ground truth for scoring)")
             
             results.append({
                 'sample_index': idx,
@@ -112,22 +118,31 @@ class Experiment:
     
     def run(self) -> Dict[str, Any]:
         """Execute the experiment across all tasks and return results."""
+        print(f"\n{'='*60}")
         print(f"Running experiment {self.experiment_id}")
+        print(f"{'='*60}")
         print(f"  Model: {self.model_id}")
         print(f"  System Instructions: {self.system_instructions[:50]}...")
+        print(f"  Timestamp: {datetime.now().isoformat()}")
         
         tasks = self._get_all_tasks()
         if not tasks:
             raise ValueError("No tasks found to run")
         
-        print(f"  Running {len(tasks)} tasks...")
+        print(f"\n  Found {len(tasks)} tasks to run:")
+        for task in tasks:
+            print(f"    - {task.name} ({len(task.get_input_samples())} samples)")
+        
+        print(f"\n  Starting experiment execution...\n")
         
         task_results = {}
         overall_scores = []
         total_samples = 0
         
-        for task in tasks:
-            print(f"  Task: {task.name}")
+        for task_idx, task in enumerate(tasks, 1):
+            print(f"{'='*60}")
+            print(f"Task {task_idx}/{len(tasks)}: {task.name}")
+            print(f"{'='*60}")
             try:
                 task_result = self._run_task(task)
                 task_results[task.name] = task_result
@@ -137,8 +152,15 @@ class Experiment:
                     overall_scores.append(task_result['metrics']['average_score'])
                 total_samples += task_result['metrics']['total_samples']
                 
+                print(f"  ✓ Task {task.name} completed successfully")
+                print(f"    Accuracy: {(task_result['metrics'].get('average_score', 0) * 100):.2f}%")
+                print(f"    Samples: {task_result['metrics']['total_samples']}")
+                print()
+                
             except Exception as e:
-                print(f"    Error running task {task.name}: {e}")
+                print(f"  ✗ Error running task {task.name}: {e}")
+                import traceback
+                traceback.print_exc()
                 task_results[task.name] = {
                     'task_name': task.name,
                     'error': str(e),
@@ -150,6 +172,7 @@ class Experiment:
                         'average_score': None
                     }
                 }
+                print()
         
         # Calculate overall metrics
         overall_metrics = {
@@ -172,6 +195,16 @@ class Experiment:
         
         # Save results
         self._save_results(experiment_result)
+        
+        print(f"\n{'='*60}")
+        print(f"Experiment {self.experiment_id} Complete!")
+        print(f"{'='*60}")
+        print(f"  Tasks completed: {overall_metrics['tasks_completed']}")
+        print(f"  Tasks failed: {overall_metrics['tasks_failed']}")
+        print(f"  Total samples: {overall_metrics['total_samples']}")
+        if overall_metrics['average_accuracy'] is not None:
+            print(f"  Average accuracy: {(overall_metrics['average_accuracy'] * 100):.2f}%")
+        print(f"{'='*60}\n")
         
         return experiment_result
     
@@ -221,4 +254,4 @@ class Experiment:
             f.write(json.dumps(summary) + '\n')
         
         print(f"  Results saved to {results_file}")
-        print(f"  Overall Metrics: {experiment_result['overall_metrics']}")
+        print(f"  Log entry added to experiments_log.jsonl")
