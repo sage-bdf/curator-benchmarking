@@ -124,6 +124,26 @@ class BedrockClient:
             # Add system instructions if provided (DeepSeek supports system role in Converse API)
             if system_instructions:
                 body["system"] = [{"text": system_instructions}]
+        elif model_id.startswith('us.meta.') or model_id.startswith('meta.'):
+            # Meta Llama format - use converse API format
+            # Meta Llama models support system instructions via the system parameter in Converse API
+            inference_config = {
+                "maxTokens": max_tokens,
+                "temperature": temperature
+            }
+            
+            body = {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [{"text": prompt}]
+                    }
+                ],
+                "inferenceConfig": inference_config
+            }
+            # Add system instructions if provided (Meta Llama supports system role in Converse API)
+            if system_instructions:
+                body["system"] = [{"text": system_instructions}]
         else:
             # Anthropic format (default)
             body = {
@@ -162,11 +182,18 @@ class BedrockClient:
                 # Always use boto3 - it automatically uses bearer token from AWS_BEARER_TOKEN_BEDROCK env var
                 # if available, otherwise uses AWS credentials
                 
-                # For Amazon Nova and DeepSeek models, use converse API directly
-                if model_id.startswith('us.amazon.') or model_id.startswith('amazon.') or model_id.startswith('us.deepseek.') or model_id.startswith('deepseek.'):
+                # For Amazon Nova, DeepSeek, and Meta models, use converse API directly
+                if model_id.startswith('us.amazon.') or model_id.startswith('amazon.') or model_id.startswith('us.deepseek.') or model_id.startswith('deepseek.') or model_id.startswith('us.meta.') or model_id.startswith('meta.'):
                     try:
                         # Debug: print the request structure
-                        model_type = "Nova" if (model_id.startswith('us.amazon.') or model_id.startswith('amazon.')) else "DeepSeek"
+                        if model_id.startswith('us.amazon.') or model_id.startswith('amazon.'):
+                            model_type = "Nova"
+                        elif model_id.startswith('us.deepseek.') or model_id.startswith('deepseek.'):
+                            model_type = "DeepSeek"
+                        elif model_id.startswith('us.meta.') or model_id.startswith('meta.'):
+                            model_type = "Meta"
+                        else:
+                            model_type = "Unknown"
                         print(f"    [DEBUG] Calling {model_type} model: {model_id}")
                         print(f"    [DEBUG] Messages: {len(body['messages'])} message(s)")
                         print(f"    [DEBUG] InferenceConfig: {body.get('inferenceConfig', {})}")
