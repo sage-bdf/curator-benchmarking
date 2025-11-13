@@ -130,29 +130,45 @@ def update_all_experiments(
     
     # Load experiments from the log file
     log_file = results_dir / "experiments_log.jsonl"
+    print(f"Looking for experiments log at: {log_file}")
+    print(f"Results directory exists: {results_dir.exists()}")
+    print(f"Log file exists: {log_file.exists()}")
+    
     if not log_file.exists():
-        print("No experiments log found. No experiments to update.")
+        print(f"No experiments log found at {log_file}. No experiments to update.")
         return
     
     experiments = []
+    lines_read = 0
+    lines_skipped = 0
     try:
         with open(log_file, 'r') as f:
             for line in f:
+                lines_read += 1
                 line = line.strip()
-                if not line or line.startswith('<<<<<<<') or line.startswith('=======') or line.startswith('>>>>>>>'):
+                if not line:
+                    continue
+                # Skip merge conflict markers
+                if line.startswith('<<<<<<<') or line.startswith('=======') or line.startswith('>>>>>>>'):
+                    lines_skipped += 1
                     continue
                 try:
                     entry = json.loads(line)
                     if entry.get('experiment_id'):
                         experiments.append(entry)
+                    else:
+                        lines_skipped += 1
                 except Exception as parse_error:
                     # Skip invalid JSON lines
+                    lines_skipped += 1
                     continue
     except Exception as e:
         print(f"Error reading experiments log: {e}")
         import traceback
         traceback.print_exc()
         return
+    
+    print(f"  Read {lines_read} lines, parsed {len(experiments)} valid experiments, skipped {lines_skipped} lines")
     
     if not experiments:
         print("No existing experiments found in log.")
