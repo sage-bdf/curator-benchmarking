@@ -558,6 +558,7 @@
                     tasksCompleted: exp.overall_metrics?.tasks_completed || 0,
                     totalSamples: exp.overall_metrics?.total_samples || 0,
                     durationSeconds: exp.overall_metrics?.duration_seconds || 0,
+                    tokenUsage: exp.overall_metrics?.token_usage || { input_tokens: 0, output_tokens: 0, total_tokens: 0 },
                     task_results: taskResults
                 };
             });
@@ -601,6 +602,7 @@
                                     <th>Tasks Completed</th>
                                     <th>Total Samples</th>
                                     <th>Duration</th>
+                                    <th>Total Tokens</th>
                                     <th>Experiment ID</th>
                                 </tr>
                             </thead>
@@ -621,6 +623,11 @@
                                             ? `${durationSeconds.toFixed(1)}s`
                                             : `${Math.floor(durationSeconds / 60)}m ${(durationSeconds % 60).toFixed(0)}s`
                                         : 'N/A';
+                                    const tokenUsage = perf.tokenUsage || {};
+                                    const totalTokens = tokenUsage.total_tokens || 0;
+                                    const tokensDisplay = totalTokens > 0 
+                                        ? totalTokens.toLocaleString() 
+                                        : 'N/A';
                                     return `
                                         <tr>
                                             <td class="rank ${getRankClass(rank)}">${rank}</td>
@@ -632,6 +639,7 @@
                                             <td>${perf.tasksCompleted}</td>
                                             <td>${perf.totalSamples}</td>
                                             <td>${durationDisplay}</td>
+                                            <td>${tokensDisplay}</td>
                                             <td class="experiment-id-cell">${perf.experiment_id}</td>
                                         </tr>
                                     `;
@@ -670,7 +678,8 @@
                         thinking: exp.thinking,
                         accuracy: exp.task_results[taskName].metrics?.average_score || 0,
                         samples: exp.task_results[taskName].metrics?.total_samples || 0,
-                        durationSeconds: exp.task_results[taskName].duration_seconds || 0
+                        durationSeconds: exp.task_results[taskName].duration_seconds || 0,
+                        tokenUsage: exp.task_results[taskName].token_usage || { input_tokens: 0, output_tokens: 0, total_tokens: 0 }
                     }))
                     .sort((a, b) => b.accuracy - a.accuracy);
                 
@@ -690,44 +699,51 @@
                                        <th>Accuracy</th>
                                        <th>Model</th>
                                        <th>System Instructions</th>
-                                       <th>Temperature</th>
-                                       <th>Thinking</th>
-                                       <th>Samples</th>
-                                       <th>Duration</th>
-                                       <th>Experiment ID</th>
-                                   </tr>
-                               </thead>
-                               <tbody>
-                                   ${taskExperiments.map((exp, index) => {
-                                       const rank = index + 1;
-                                       const accuracyPercent = (exp.accuracy * 100).toFixed(2);
-                                       const sysInstPreview = exp.system_instructions.length > 50 
-                                           ? exp.system_instructions.substring(0, 50) + '...'
-                                           : exp.system_instructions;
-                                       const tempDisplay = exp.temperature !== null && exp.temperature !== undefined 
-                                           ? exp.temperature.toFixed(2) 
-                                           : 'N/A';
-                                       const thinkingDisplay = exp.thinking ? 'Yes' : 'No';
-                                       const durationSeconds = exp.durationSeconds || 0;
-                                       const durationDisplay = durationSeconds > 0 
-                                           ? durationSeconds < 60 
-                                               ? `${durationSeconds.toFixed(1)}s`
-                                               : `${Math.floor(durationSeconds / 60)}m ${(durationSeconds % 60).toFixed(0)}s`
-                                           : 'N/A';
-                                       return `
-                                           <tr>
-                                               <td class="rank ${getRankClass(rank)}">${rank}</td>
-                                               <td class="accuracy-cell ${getScoreClass(exp.accuracy)}">${accuracyPercent}%</td>
-                                               <td class="model-cell">${exp.model_id}</td>
-                                               <td title="${exp.system_instructions}">${sysInstPreview}</td>
-                                               <td>${tempDisplay}</td>
-                                               <td>${thinkingDisplay}</td>
-                                               <td>${exp.samples}</td>
-                                               <td>${durationDisplay}</td>
-                                               <td class="experiment-id-cell">${exp.experiment_id}</td>
-                                           </tr>
-                                       `;
-                                   }).join('')}
+                                        <th>Temperature</th>
+                                        <th>Thinking</th>
+                                        <th>Samples</th>
+                                        <th>Duration</th>
+                                        <th>Tokens</th>
+                                        <th>Experiment ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${taskExperiments.map((exp, index) => {
+                                        const rank = index + 1;
+                                        const accuracyPercent = (exp.accuracy * 100).toFixed(2);
+                                        const sysInstPreview = exp.system_instructions.length > 50 
+                                            ? exp.system_instructions.substring(0, 50) + '...'
+                                            : exp.system_instructions;
+                                        const tempDisplay = exp.temperature !== null && exp.temperature !== undefined 
+                                            ? exp.temperature.toFixed(2) 
+                                            : 'N/A';
+                                        const thinkingDisplay = exp.thinking ? 'Yes' : 'No';
+                                        const durationSeconds = exp.durationSeconds || 0;
+                                        const durationDisplay = durationSeconds > 0 
+                                            ? durationSeconds < 60 
+                                                ? `${durationSeconds.toFixed(1)}s`
+                                                : `${Math.floor(durationSeconds / 60)}m ${(durationSeconds % 60).toFixed(0)}s`
+                                            : 'N/A';
+                                        const tokenUsage = exp.tokenUsage || {};
+                                        const totalTokens = tokenUsage.total_tokens || 0;
+                                        const tokensDisplay = totalTokens > 0 
+                                            ? totalTokens.toLocaleString() 
+                                            : 'N/A';
+                                        return `
+                                            <tr>
+                                                <td class="rank ${getRankClass(rank)}">${rank}</td>
+                                                <td class="accuracy-cell ${getScoreClass(exp.accuracy)}">${accuracyPercent}%</td>
+                                                <td class="model-cell">${exp.model_id}</td>
+                                                <td title="${exp.system_instructions}">${sysInstPreview}</td>
+                                                <td>${tempDisplay}</td>
+                                                <td>${thinkingDisplay}</td>
+                                                <td>${exp.samples}</td>
+                                                <td>${durationDisplay}</td>
+                                                <td>${tokensDisplay}</td>
+                                                <td class="experiment-id-cell">${exp.experiment_id}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
                                </tbody>
                            </table>
                     </div>

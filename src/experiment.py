@@ -168,16 +168,32 @@ class Experiment:
                 else:
                     print("✓ (no ground truth for scoring)")
             
+            # Extract token usage from response
+            usage = response.get('usage', {})
+            input_tokens = usage.get('inputTokens') or usage.get('input_tokens') or 0
+            output_tokens = usage.get('outputTokens') or usage.get('output_tokens') or 0
+            total_tokens = usage.get('totalTokens') or usage.get('total_tokens') or (input_tokens + output_tokens)
+            
             results.append({
                 'sample_index': idx,
                 'input': sample,
                 'response': response,
                 'score': score,
-                'ground_truth': ground_truth_samples[idx] if ground_truth_samples else None
+                'ground_truth': ground_truth_samples[idx] if ground_truth_samples else None,
+                'token_usage': {
+                    'input_tokens': input_tokens,
+                    'output_tokens': output_tokens,
+                    'total_tokens': total_tokens
+                }
             })
         
         # Calculate metrics for this task
         metrics = self._calculate_metrics(results)
+        
+        # Aggregate token usage for this task
+        total_input_tokens = sum(r.get('token_usage', {}).get('input_tokens', 0) for r in results)
+        total_output_tokens = sum(r.get('token_usage', {}).get('output_tokens', 0) for r in results)
+        total_tokens = sum(r.get('token_usage', {}).get('total_tokens', 0) for r in results)
         
         task_end_time = time.time()
         task_duration_seconds = task_end_time - task_start_time
@@ -187,7 +203,12 @@ class Experiment:
             'num_samples': len(input_samples),
             'results': results,
             'metrics': metrics,
-            'duration_seconds': task_duration_seconds
+            'duration_seconds': task_duration_seconds,
+            'token_usage': {
+                'input_tokens': total_input_tokens,
+                'output_tokens': total_output_tokens,
+                'total_tokens': total_tokens
+            }
         }
     
     def run(self) -> Dict[str, Any]:
@@ -262,6 +283,9 @@ class Experiment:
                 print(f"    Samples: {task_result['metrics']['total_samples']}")
                 duration = task_result.get('duration_seconds', 0)
                 print(f"    Duration: {duration:.2f}s")
+                token_usage = task_result.get('token_usage', {})
+                if token_usage.get('total_tokens', 0) > 0:
+                    print(f"    Tokens: {token_usage.get('total_tokens', 0):,} total ({token_usage.get('input_tokens', 0):,} in, {token_usage.get('output_tokens', 0):,} out)")
                 print()
                 
             except Exception as e:
@@ -299,6 +323,8 @@ class Experiment:
         
         print(f"\n{'='*60}")
         print(f"Experiment completed in {experiment_duration_seconds:.2f} seconds")
+        if total_tokens > 0:
+            print(f"Total tokens: {total_tokens:,} ({total_input_tokens:,} input, {total_output_tokens:,} output)")
         print(f"{'='*60}\n")
         
         # Prepare experiment result
@@ -324,6 +350,9 @@ class Experiment:
         print(f"  Total samples: {overall_metrics['total_samples']}")
         if overall_metrics['average_accuracy'] is not None:
             print(f"  Average accuracy: {(overall_metrics['average_accuracy'] * 100):.2f}%")
+        token_usage = overall_metrics.get('token_usage', {})
+        if token_usage.get('total_tokens', 0) > 0:
+            print(f"  Total tokens: {token_usage.get('total_tokens', 0):,} ({token_usage.get('input_tokens', 0):,} input, {token_usage.get('output_tokens', 0):,} output)")
         print(f"{'='*60}\n")
         
         return experiment_result
