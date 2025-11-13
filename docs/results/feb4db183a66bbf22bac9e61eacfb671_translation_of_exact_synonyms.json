@@ -1,12 +1,12 @@
 {
   "experiment_id": "feb4db183a66bbf22bac9e61eacfb671",
   "task_name": "translation_of_exact_synonyms",
-  "task_hash": "e70903103527f9e99c6bc8f5bdf69349",
+  "task_hash": "8ad16d30616e7d6242f8204a96cf0019",
   "model_id": "openai.gpt-oss-20b-1:0",
   "system_instructions": "You are a metadata curation assistant. Your task is to help improve and correct metadata \naccording to the specific instructions provided for each task. Be precise, accurate, and \nfollow the guidelines carefully.\n",
   "temperature": 0.0,
   "thinking": false,
-  "timestamp": "2025-11-13T03:59:01.347242",
+  "timestamp": "2025-11-13T05:07:02.398274",
   "task_result": {
     "task_name": "translation_of_exact_synonyms",
     "num_samples": 10,
@@ -45,8 +45,8 @@
                 }
               }
             ],
-            "created": 1763006310,
-            "id": "chatcmpl-80673c28-524d-418f-94c3-e40e7c43076c",
+            "created": 1763010408,
+            "id": "chatcmpl-3d9392fa-ac8d-4d1f-9c5e-e4567fe1b04c",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
@@ -107,8 +107,8 @@
                 }
               }
             ],
-            "created": 1763006312,
-            "id": "chatcmpl-1bdb1599-f1ad-41da-8cb8-e25ea9268e16",
+            "created": 1763010409,
+            "id": "chatcmpl-e66fb244-ab04-4c57-aae9-a8f93b8b8322",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
@@ -144,16 +144,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"ORPHA:636\". That likely refers to \"Schwannomatosis\" maybe? ORPHA:636 is \"Schwannomatosis\". So map to \"Schwannomatosis\". Assay \"WGS\" stands for Whole Genome Sequencing. Controlled list includes \"whole genome sequencing\". So map to \"whole genome sequencing\". TumorType \"MPN tumor\" likely \"Malignant Peripheral Nerve Sheath Tumor\" or \"Recurrent MPNST\"? MPN stands for Malignant Peripheral Nerve Sheath Tumor. Controlled list includes \"Malignant Peripheral Nerve Sheath Tumor\". So map to that. Output JSON with same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Schwannomatosis\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+          "content": "<reasoning>We need to translate synonyms to standard controlled terms. Input has diagnosis \"ORPHA:636\". That likely refers to a diagnosis code. We need to map to one of the enum values. ORPHA:636 is the Orphanet code for \"Schwannomatosis\". Let's confirm: ORPHA:636 is \"Schwannomatosis\". So we should replace diagnosis with \"Schwannomatosis\". Next assay \"WGS\" stands for Whole Genome Sequencing. In the assay enum, we have \"whole genome sequencing\". So replace with \"whole genome sequencing\". TumorType \"MPN tumor\" likely refers to Malignant Peripheral Nerve Sheath Tumor? MPN stands for Malignant Peripheral Nerve Sheath Tumor? Actually MPNST is Malignant Peripheral Nerve Sheath Tumor. MPN tumor might be \"Malignant Peripheral Nerve Sheath Tumor\". In enum, we have \"Malignant Peripheral Nerve Sheath Tumor\". So replace tumorType with that.\n\nThus output JSON:\n\n{\n  \"diagnosis\": \"Schwannomatosis\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nCheck that all values are exactly in enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Schwannomatosis\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 204,
+            "completion_tokens": 320,
             "prompt_tokens": 2466,
             "prompt_tokens_details": {
               "audio_tokens": 0,
-              "cached_tokens": 2416
+              "cached_tokens": 96
             },
-            "total_tokens": 2670
+            "total_tokens": 2786
           },
           "attempt": 1,
           "raw_response": {
@@ -163,29 +163,29 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"ORPHA:636\". That likely refers to \"Schwannomatosis\" maybe? ORPHA:636 is \"Schwannomatosis\". So map to \"Schwannomatosis\". Assay \"WGS\" stands for Whole Genome Sequencing. Controlled list includes \"whole genome sequencing\". So map to \"whole genome sequencing\". TumorType \"MPN tumor\" likely \"Malignant Peripheral Nerve Sheath Tumor\" or \"Recurrent MPNST\"? MPN stands for Malignant Peripheral Nerve Sheath Tumor. Controlled list includes \"Malignant Peripheral Nerve Sheath Tumor\". So map to that. Output JSON with same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Schwannomatosis\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+                  "content": "<reasoning>We need to translate synonyms to standard controlled terms. Input has diagnosis \"ORPHA:636\". That likely refers to a diagnosis code. We need to map to one of the enum values. ORPHA:636 is the Orphanet code for \"Schwannomatosis\". Let's confirm: ORPHA:636 is \"Schwannomatosis\". So we should replace diagnosis with \"Schwannomatosis\". Next assay \"WGS\" stands for Whole Genome Sequencing. In the assay enum, we have \"whole genome sequencing\". So replace with \"whole genome sequencing\". TumorType \"MPN tumor\" likely refers to Malignant Peripheral Nerve Sheath Tumor? MPN stands for Malignant Peripheral Nerve Sheath Tumor? Actually MPNST is Malignant Peripheral Nerve Sheath Tumor. MPN tumor might be \"Malignant Peripheral Nerve Sheath Tumor\". In enum, we have \"Malignant Peripheral Nerve Sheath Tumor\". So replace tumorType with that.\n\nThus output JSON:\n\n{\n  \"diagnosis\": \"Schwannomatosis\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nCheck that all values are exactly in enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Schwannomatosis\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006314,
-            "id": "chatcmpl-92e97ded-10a7-4fcc-86b9-689dda1348a8",
+            "created": 1763010410,
+            "id": "chatcmpl-71feb838-8400-42cd-a928-cb6a2cee2786",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 204,
+              "completion_tokens": 320,
               "prompt_tokens": 2466,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
-                "cached_tokens": 2416
+                "cached_tokens": 96
               },
-              "total_tokens": 2670
+              "total_tokens": 2786
             }
           }
         },
-        "score": 0.6666666666666666,
+        "score": 0.0,
         "ground_truth": {
           "diagnosis": "Neurofibromatosis type 1",
           "assay": "whole genome sequencing",
@@ -194,7 +194,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2670
+          "total_tokens": 2786
         }
       },
       {
@@ -206,16 +206,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Von Recklinghausen's neurofibromatosis\" is a synonym for \"Neurofibromatosis type 1\" (NF1). In schema, diagnosis enum includes \"Neurofibromatosis type 1\". So replace.\n\nAssay: \"MRS\" likely stands for \"magnetic resonance spectroscopy\". In schema, assay enum includes \"magnetic resonance spectroscopy\". So replace.\n\nTumorType: \"NOS\" is abbreviation for \"Not Otherwise Specified\". In schema, tumorType enum includes \"Not Applicable\" and \"Unknown\" and \"tumor\" etc. But \"NOS\" is not present. There's \"Not Applicable\" and \"Unknown\". Which is correct? The input \"NOS\" likely means \"Not Otherwise Specified\" which is not in enum. The closest is \"Not Applicable\" or \"Unknown\". But \"Not Applicable\" is used for not applicable. \"Unknown\" is unknown. \"NOS\" is a common abbreviation for \"Not Otherwise Specified\". The schema doesn't have that. We need to choose one. The instruction: \"When translating values, you must use the exact controlled terminology values from the Target Schema provided below.\" So we must map synonyms to one of the exact values. \"NOS\" is a synonym for \"Not Otherwise Specified\" which is not in the list. But maybe \"Not Applicable\" is used for unspecified? But \"Not Applicable\" is a different concept. \"Unknown\" might be used for unknown. \"NOS\" is not in list. We need to choose the best match. The schema includes \"Not Applicable\" and \"Unknown\". Which is more appropriate? \"NOS\" indicates unspecified type. That might be \"Unknown\". So we map to \"Unknown\". That seems plausible.\n\nThus output JSON:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n\nCheck that \"magnetic resonance spectroscopy\" is exactly in enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n```",
+          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Von Recklinghausen's neurofibromatosis\" is a synonym for \"Neurofibromatosis type 1\". So replace with that.\n\nAssay \"MRS\" likely stands for \"magnetic resonance spectroscopy\" which is in the enum. So replace with \"magnetic resonance spectroscopy\".\n\nTumorType \"NOS\" is ambiguous. In enum, there is \"Not Applicable\", \"Unknown\", \"metastatic tumor\", \"metastatic/recurrent tumor\", \"recurrent tumor\", \"tumor\". \"NOS\" stands for \"Not Otherwise Specified\". In the enum, there is \"High-Grade Glioma NOS\" and \"Low-Grade Glioma NOS\" but not generic \"NOS\". There's \"Not Applicable\" and \"Unknown\". Which is best? The input \"NOS\" likely refers to \"Not Otherwise Specified\" generic. The controlled list doesn't have generic \"NOS\". The closest is \"Not Applicable\" or \"Unknown\". But \"Not Applicable\" is for fields not applicable. \"Unknown\" is for unknown. \"NOS\" indicates unspecified type. I'd choose \"Unknown\" maybe. But maybe \"tumor\" is generic. But \"NOS\" is a suffix to a tumor type. Since the input is just \"NOS\", maybe they want \"Unknown\". Let's choose \"Unknown\".\n\nReturn JSON with same structure.\n\nThus:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n\nCheck that \"magnetic resonance spectroscopy\" is exactly in enum: yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 479,
+            "completion_tokens": 395,
             "prompt_tokens": 2470,
             "prompt_tokens_details": {
               "audio_tokens": 0,
-              "cached_tokens": 96
+              "cached_tokens": 2416
             },
-            "total_tokens": 2949
+            "total_tokens": 2865
           },
           "attempt": 1,
           "raw_response": {
@@ -225,25 +225,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Von Recklinghausen's neurofibromatosis\" is a synonym for \"Neurofibromatosis type 1\" (NF1). In schema, diagnosis enum includes \"Neurofibromatosis type 1\". So replace.\n\nAssay: \"MRS\" likely stands for \"magnetic resonance spectroscopy\". In schema, assay enum includes \"magnetic resonance spectroscopy\". So replace.\n\nTumorType: \"NOS\" is abbreviation for \"Not Otherwise Specified\". In schema, tumorType enum includes \"Not Applicable\" and \"Unknown\" and \"tumor\" etc. But \"NOS\" is not present. There's \"Not Applicable\" and \"Unknown\". Which is correct? The input \"NOS\" likely means \"Not Otherwise Specified\" which is not in enum. The closest is \"Not Applicable\" or \"Unknown\". But \"Not Applicable\" is used for not applicable. \"Unknown\" is unknown. \"NOS\" is a common abbreviation for \"Not Otherwise Specified\". The schema doesn't have that. We need to choose one. The instruction: \"When translating values, you must use the exact controlled terminology values from the Target Schema provided below.\" So we must map synonyms to one of the exact values. \"NOS\" is a synonym for \"Not Otherwise Specified\" which is not in the list. But maybe \"Not Applicable\" is used for unspecified? But \"Not Applicable\" is a different concept. \"Unknown\" might be used for unknown. \"NOS\" is not in list. We need to choose the best match. The schema includes \"Not Applicable\" and \"Unknown\". Which is more appropriate? \"NOS\" indicates unspecified type. That might be \"Unknown\". So we map to \"Unknown\". That seems plausible.\n\nThus output JSON:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n\nCheck that \"magnetic resonance spectroscopy\" is exactly in enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n```",
+                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Von Recklinghausen's neurofibromatosis\" is a synonym for \"Neurofibromatosis type 1\". So replace with that.\n\nAssay \"MRS\" likely stands for \"magnetic resonance spectroscopy\" which is in the enum. So replace with \"magnetic resonance spectroscopy\".\n\nTumorType \"NOS\" is ambiguous. In enum, there is \"Not Applicable\", \"Unknown\", \"metastatic tumor\", \"metastatic/recurrent tumor\", \"recurrent tumor\", \"tumor\". \"NOS\" stands for \"Not Otherwise Specified\". In the enum, there is \"High-Grade Glioma NOS\" and \"Low-Grade Glioma NOS\" but not generic \"NOS\". There's \"Not Applicable\" and \"Unknown\". Which is best? The input \"NOS\" likely refers to \"Not Otherwise Specified\" generic. The controlled list doesn't have generic \"NOS\". The closest is \"Not Applicable\" or \"Unknown\". But \"Not Applicable\" is for fields not applicable. \"Unknown\" is for unknown. \"NOS\" indicates unspecified type. I'd choose \"Unknown\" maybe. But maybe \"tumor\" is generic. But \"NOS\" is a suffix to a tumor type. Since the input is just \"NOS\", maybe they want \"Unknown\". Let's choose \"Unknown\".\n\nReturn JSON with same structure.\n\nThus:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n\nCheck that \"magnetic resonance spectroscopy\" is exactly in enum: yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"magnetic resonance spectroscopy\",\n  \"tumorType\": \"Unknown\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006316,
-            "id": "chatcmpl-376c62e9-76d0-4569-8820-0e9593502d8a",
+            "created": 1763010412,
+            "id": "chatcmpl-ac12803a-0943-4e7c-9741-81f6abff344f",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 479,
+              "completion_tokens": 395,
               "prompt_tokens": 2470,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
-                "cached_tokens": 96
+                "cached_tokens": 2416
               },
-              "total_tokens": 2949
+              "total_tokens": 2865
             }
           }
         },
@@ -256,7 +256,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2949
+          "total_tokens": 2865
         }
       },
       {
@@ -268,7 +268,7 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"does not apply\" -> likely \"Not Applicable\" in schema. assay \"IHC\" -> likely \"immunohistochemistry\" in schema. tumorType \"cNF\" -> likely \"Cutaneous Neurofibroma\" or \"Cutaneous Neurofibroma\"? Wait cNF stands for cutaneous neurofibroma. In schema, \"Cutaneous Neurofibroma\" is present. So map to that.\n\nReturn JSON with same structure: keys diagnosis, assay, tumorType. Use exact values.\n\nCheck that \"Not Applicable\" is in diagnosis enum. Yes. \"immunohistochemistry\" is in assay enum. Yes. \"Cutaneous Neurofibroma\" is in tumorType enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunohistochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n",
+          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"does not apply\" -> likely \"Not Applicable\" in schema. assay \"IHC\" -> likely \"immunohistochemistry\" in schema. tumorType \"cNF\" -> likely \"Cutaneous Neurofibroma\" or \"Cutaneous Neurofibroma\"? Wait cNF stands for cutaneous neurofibroma. In schema, \"Cutaneous Neurofibroma\" is an enum. So map to that.\n\nReturn JSON with same structure: keys diagnosis, assay, tumorType. Use exact values.\n\nCheck that \"Not Applicable\" is in diagnosis enum. Yes. \"immunohistochemistry\" is in assay enum. Yes. \"Cutaneous Neurofibroma\" is in tumorType enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunohistochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
             "completion_tokens": 209,
@@ -287,14 +287,14 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"does not apply\" -> likely \"Not Applicable\" in schema. assay \"IHC\" -> likely \"immunohistochemistry\" in schema. tumorType \"cNF\" -> likely \"Cutaneous Neurofibroma\" or \"Cutaneous Neurofibroma\"? Wait cNF stands for cutaneous neurofibroma. In schema, \"Cutaneous Neurofibroma\" is present. So map to that.\n\nReturn JSON with same structure: keys diagnosis, assay, tumorType. Use exact values.\n\nCheck that \"Not Applicable\" is in diagnosis enum. Yes. \"immunohistochemistry\" is in assay enum. Yes. \"Cutaneous Neurofibroma\" is in tumorType enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunohistochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n",
+                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"does not apply\" -> likely \"Not Applicable\" in schema. assay \"IHC\" -> likely \"immunohistochemistry\" in schema. tumorType \"cNF\" -> likely \"Cutaneous Neurofibroma\" or \"Cutaneous Neurofibroma\"? Wait cNF stands for cutaneous neurofibroma. In schema, \"Cutaneous Neurofibroma\" is an enum. So map to that.\n\nReturn JSON with same structure: keys diagnosis, assay, tumorType. Use exact values.\n\nCheck that \"Not Applicable\" is in diagnosis enum. Yes. \"immunohistochemistry\" is in assay enum. Yes. \"Cutaneous Neurofibroma\" is in tumorType enum. Yes.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunohistochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006328,
-            "id": "chatcmpl-ea0020d1-0209-423e-8a88-b93a16134842",
+            "created": 1763010414,
+            "id": "chatcmpl-e7928e1a-4ca6-4a27-8a49-9f8991f26858",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
@@ -330,16 +330,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF-1\" should map to \"Neurofibromatosis type 1\" (enum). assay \"cell survival assay\" synonyms? In schema, there is \"cell viability assay\" and \"cell survival assay\" maybe not present. Let's search: \"cell viability assay\" is present. \"cell survival assay\" not present. We must use exact controlled value. So we need to replace with \"cell viability assay\" if that's the intended. But the instruction: \"translate (near) exact synonyms in the provided metadata.\" So \"cell survival assay\" is near synonym of \"cell viability assay\". So we replace with \"cell viability assay\". tumorType \"dermal neurofibroma\" synonyms: \"Cutaneous Neurofibroma\" maybe? The enum includes \"Cutaneous Neurofibroma\". So replace with that. Also \"dermal\" synonyms. So output JSON with corrected values.\n\nReturn JSON with same structure. Ensure values match exactly. So:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck that \"cell viability assay\" is in enum: yes. \"Cutaneous Neurofibroma\" is in enum. Good.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
+          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF-1\" should map to \"Neurofibromatosis type 1\" (enum). assay \"cell survival assay\" synonyms? In schema, there is \"cell viability assay\" and \"cell survival assay\" maybe not present. Let's search list: \"cell viability assay\" present. \"cell survival assay\" not present. We must use exact controlled value. So we need to translate synonyms to standard. \"cell survival assay\" likely synonyms for \"cell viability assay\". So we replace with \"cell viability assay\". tumorType \"dermal neurofibroma\" synonyms: \"Cutaneous Neurofibroma\" maybe? The enum includes \"Cutaneous Neurofibroma\". Also \"Dermal\" synonyms. So map to \"Cutaneous Neurofibroma\". Ensure JSON structure same. Output JSON with corrected values.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 328,
+            "completion_tokens": 232,
             "prompt_tokens": 2468,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2796
+            "total_tokens": 2700
           },
           "attempt": 1,
           "raw_response": {
@@ -349,29 +349,29 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF-1\" should map to \"Neurofibromatosis type 1\" (enum). assay \"cell survival assay\" synonyms? In schema, there is \"cell viability assay\" and \"cell survival assay\" maybe not present. Let's search: \"cell viability assay\" is present. \"cell survival assay\" not present. We must use exact controlled value. So we need to replace with \"cell viability assay\" if that's the intended. But the instruction: \"translate (near) exact synonyms in the provided metadata.\" So \"cell survival assay\" is near synonym of \"cell viability assay\". So we replace with \"cell viability assay\". tumorType \"dermal neurofibroma\" synonyms: \"Cutaneous Neurofibroma\" maybe? The enum includes \"Cutaneous Neurofibroma\". So replace with that. Also \"dermal\" synonyms. So output JSON with corrected values.\n\nReturn JSON with same structure. Ensure values match exactly. So:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck that \"cell viability assay\" is in enum: yes. \"Cutaneous Neurofibroma\" is in enum. Good.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
+                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF-1\" should map to \"Neurofibromatosis type 1\" (enum). assay \"cell survival assay\" synonyms? In schema, there is \"cell viability assay\" and \"cell survival assay\" maybe not present. Let's search list: \"cell viability assay\" present. \"cell survival assay\" not present. We must use exact controlled value. So we need to translate synonyms to standard. \"cell survival assay\" likely synonyms for \"cell viability assay\". So we replace with \"cell viability assay\". tumorType \"dermal neurofibroma\" synonyms: \"Cutaneous Neurofibroma\" maybe? The enum includes \"Cutaneous Neurofibroma\". Also \"Dermal\" synonyms. So map to \"Cutaneous Neurofibroma\". Ensure JSON structure same. Output JSON with corrected values.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006330,
-            "id": "chatcmpl-1e7b5790-22e7-4f78-af66-e531ec06b2a1",
+            "created": 1763010415,
+            "id": "chatcmpl-5057ddb1-3066-4b96-a371-0c2c1edd482c",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 328,
+              "completion_tokens": 232,
               "prompt_tokens": 2468,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2796
+              "total_tokens": 2700
             }
           }
         },
-        "score": 0.0,
+        "score": 1.0,
         "ground_truth": {
           "diagnosis": "Neurofibromatosis type 1",
           "assay": "cell viability assay",
@@ -380,7 +380,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2796
+          "total_tokens": 2700
         }
       },
       {
@@ -392,16 +392,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"neurofibromatosis 1\" should map to \"Neurofibromatosis type 1\" (exact). assay \"ICC\" likely stands for \"immunocytochemistry\" which is in list as \"immunocytochemistry\". tumorType \"localized neurofibroma\" should map to \"Localized Neurofibroma\" (capitalization). Ensure JSON output same structure. Provide corrected values.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Localized Neurofibroma\"\n}\n```",
+          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"neurofibromatosis 1\" should map to \"Neurofibromatosis type 1\" (exact). assay \"ICC\" likely stands for \"immunocytochemistry\" which is in list as \"immunocytochemistry\". tumorType \"localized neurofibroma\" should map to \"Localized Neurofibroma\" (capitalization). Ensure JSON output same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Localized Neurofibroma\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 149,
+            "completion_tokens": 145,
             "prompt_tokens": 2470,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2619
+            "total_tokens": 2615
           },
           "attempt": 1,
           "raw_response": {
@@ -411,25 +411,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"neurofibromatosis 1\" should map to \"Neurofibromatosis type 1\" (exact). assay \"ICC\" likely stands for \"immunocytochemistry\" which is in list as \"immunocytochemistry\". tumorType \"localized neurofibroma\" should map to \"Localized Neurofibroma\" (capitalization). Ensure JSON output same structure. Provide corrected values.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Localized Neurofibroma\"\n}\n```",
+                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"neurofibromatosis 1\" should map to \"Neurofibromatosis type 1\" (exact). assay \"ICC\" likely stands for \"immunocytochemistry\" which is in list as \"immunocytochemistry\". tumorType \"localized neurofibroma\" should map to \"Localized Neurofibroma\" (capitalization). Ensure JSON output same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Localized Neurofibroma\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006332,
-            "id": "chatcmpl-7fb7dcf8-459e-4d48-b7a4-1a254a3ccaf3",
+            "created": 1763010417,
+            "id": "chatcmpl-7b319852-56c9-495a-a393-0fd24f7b7c9a",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 149,
+              "completion_tokens": 145,
               "prompt_tokens": 2470,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2619
+              "total_tokens": 2615
             }
           }
         },
@@ -442,7 +442,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2619
+          "total_tokens": 2615
         }
       },
       {
@@ -454,16 +454,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Neurofibromatosis-1\" should map to \"Neurofibromatosis type 1\" or \"Neurofibromatosis type 1\" is in enum? The enum includes \"Neurofibromatosis type 1\". Yes. So replace.\n\nAssay: \"magnetic resonance imaging\" synonyms: \"magnetic resonance imaging\" is not in enum. The enum has \"Magnetic resonance angiography\", \"Magnetic resonance spectroscopy\", \"Magnetic resonance imaging\" is not present. There's \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"resting state functional MRI\", \"diffusion MRI\", \"diffusion MRI\" etc. \"magnetic resonance imaging\" is generic. Which controlled term matches? Probably \"conventional MRI\" or \"structural MRI\". The input \"magnetic resonance imaging\" likely maps to \"conventional MRI\" or \"structural MRI\". Which is more generic? The enum includes \"conventional MRI\" and \"structural MRI\". \"magnetic resonance imaging\" is generic, but \"conventional MRI\" is a type. I'd choose \"conventional MRI\". But check if \"magnetic resonance imaging\" synonyms: \"MRI\" stands for magnetic resonance imaging. The controlled term \"conventional MRI\" is likely the standard. So set assay to \"conventional MRI\".\n\nTumorType: \"not determined\" synonyms: \"Not Applicable\" is in enum. So set tumorType to \"Not Applicable\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Not Applicable\"\n}",
+          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Neurofibromatosis-1\" should map to \"Neurofibromatosis type 1\" or \"Neurofibromatosis type 1\" is in enum? The enum includes \"Neurofibromatosis type 1\". Yes. So replace.\n\nAssay: \"magnetic resonance imaging\" synonyms: \"magnetic resonance imaging\" is not in enum. The enum has \"Magnetic resonance angiography\", \"Magnetic resonance spectroscopy\", \"Magnetic resonance imaging\" is not present. There's \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"resting state functional MRI\", \"diffusion MRI\", \"diffusion MRI\" etc. \"magnetic resonance imaging\" is generic. Which controlled term matches? Probably \"conventional MRI\" or \"structural MRI\". The input \"magnetic resonance imaging\" likely maps to \"conventional MRI\" as generic. But we need to choose exact. The enum includes \"conventional MRI\". So we map to that.\n\nTumorType: \"not determined\" synonyms: \"Not Applicable\" is in enum. So map to \"Not Applicable\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Not Applicable\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 374,
+            "completion_tokens": 307,
             "prompt_tokens": 2471,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2845
+            "total_tokens": 2778
           },
           "attempt": 1,
           "raw_response": {
@@ -473,25 +473,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Neurofibromatosis-1\" should map to \"Neurofibromatosis type 1\" or \"Neurofibromatosis type 1\" is in enum? The enum includes \"Neurofibromatosis type 1\". Yes. So replace.\n\nAssay: \"magnetic resonance imaging\" synonyms: \"magnetic resonance imaging\" is not in enum. The enum has \"Magnetic resonance angiography\", \"Magnetic resonance spectroscopy\", \"Magnetic resonance imaging\" is not present. There's \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"resting state functional MRI\", \"diffusion MRI\", \"diffusion MRI\" etc. \"magnetic resonance imaging\" is generic. Which controlled term matches? Probably \"conventional MRI\" or \"structural MRI\". The input \"magnetic resonance imaging\" likely maps to \"conventional MRI\" or \"structural MRI\". Which is more generic? The enum includes \"conventional MRI\" and \"structural MRI\". \"magnetic resonance imaging\" is generic, but \"conventional MRI\" is a type. I'd choose \"conventional MRI\". But check if \"magnetic resonance imaging\" synonyms: \"MRI\" stands for magnetic resonance imaging. The controlled term \"conventional MRI\" is likely the standard. So set assay to \"conventional MRI\".\n\nTumorType: \"not determined\" synonyms: \"Not Applicable\" is in enum. So set tumorType to \"Not Applicable\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Not Applicable\"\n}",
+                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Neurofibromatosis-1\" should map to \"Neurofibromatosis type 1\" or \"Neurofibromatosis type 1\" is in enum? The enum includes \"Neurofibromatosis type 1\". Yes. So replace.\n\nAssay: \"magnetic resonance imaging\" synonyms: \"magnetic resonance imaging\" is not in enum. The enum has \"Magnetic resonance angiography\", \"Magnetic resonance spectroscopy\", \"Magnetic resonance imaging\" is not present. There's \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"resting state functional MRI\", \"diffusion MRI\", \"diffusion MRI\" etc. \"magnetic resonance imaging\" is generic. Which controlled term matches? Probably \"conventional MRI\" or \"structural MRI\". The input \"magnetic resonance imaging\" likely maps to \"conventional MRI\" as generic. But we need to choose exact. The enum includes \"conventional MRI\". So we map to that.\n\nTumorType: \"not determined\" synonyms: \"Not Applicable\" is in enum. So map to \"Not Applicable\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Not Applicable\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006334,
-            "id": "chatcmpl-38b06e31-a22e-46a8-9e02-3465eb7b1b2f",
+            "created": 1763010418,
+            "id": "chatcmpl-80043cd1-4a47-4be5-8c3e-aa3d6b9ecef8",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 374,
+              "completion_tokens": 307,
               "prompt_tokens": 2471,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2845
+              "total_tokens": 2778
             }
           }
         },
@@ -504,7 +504,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2845
+          "total_tokens": 2778
         }
       },
       {
@@ -516,16 +516,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF2\" should map to \"NF2-related schwannomatosis\" or \"NF2-related schwannomatosis\" is the enum. But \"NF2\" alone is not in enum. The correct term likely \"NF2-related schwannomatosis\". For assay \"RNA sequencing\" synonyms: \"RNA-seq\" is in enum. So map to \"RNA-seq\". TumorType \"benign neurilemmoma\" synonyms: \"benign neurilemmoma\" is same as \"Schwannoma\" maybe? In enum, \"Schwannoma\" is present. So map to \"Schwannoma\". Return JSON with those values. Ensure same structure.</reasoning>```json\n{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Schwannoma\"\n}\n```",
+          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF2\" should map to \"NF2-related schwannomatosis\" or \"NF2-related schwannomatosis\"? Wait controlled list includes \"NF2-related schwannomatosis\". Also \"NF2\" alone is not in list. So we replace with \"NF2-related schwannomatosis\".\n\nAssay: \"RNA sequencing\" synonyms: controlled list includes \"RNA-seq\" and \"whole transcriptome sequencing\" etc. \"RNA sequencing\" likely maps to \"RNA-seq\". So use \"RNA-seq\".\n\nTumorType: \"benign neurilemmoma\" synonyms: \"neurilemmoma\" is another term for schwannoma. Controlled list includes \"Schwannoma\". Also \"benign\" is not needed. So map to \"Schwannoma\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Schwannoma\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 206,
+            "completion_tokens": 240,
             "prompt_tokens": 2467,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2673
+            "total_tokens": 2707
           },
           "attempt": 1,
           "raw_response": {
@@ -535,25 +535,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF2\" should map to \"NF2-related schwannomatosis\" or \"NF2-related schwannomatosis\" is the enum. But \"NF2\" alone is not in enum. The correct term likely \"NF2-related schwannomatosis\". For assay \"RNA sequencing\" synonyms: \"RNA-seq\" is in enum. So map to \"RNA-seq\". TumorType \"benign neurilemmoma\" synonyms: \"benign neurilemmoma\" is same as \"Schwannoma\" maybe? In enum, \"Schwannoma\" is present. So map to \"Schwannoma\". Return JSON with those values. Ensure same structure.</reasoning>```json\n{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Schwannoma\"\n}\n```",
+                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"NF2\" should map to \"NF2-related schwannomatosis\" or \"NF2-related schwannomatosis\"? Wait controlled list includes \"NF2-related schwannomatosis\". Also \"NF2\" alone is not in list. So we replace with \"NF2-related schwannomatosis\".\n\nAssay: \"RNA sequencing\" synonyms: controlled list includes \"RNA-seq\" and \"whole transcriptome sequencing\" etc. \"RNA sequencing\" likely maps to \"RNA-seq\". So use \"RNA-seq\".\n\nTumorType: \"benign neurilemmoma\" synonyms: \"neurilemmoma\" is another term for schwannoma. Controlled list includes \"Schwannoma\". Also \"benign\" is not needed. So map to \"Schwannoma\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Schwannoma\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006337,
-            "id": "chatcmpl-a06eb733-7c5f-4cbf-8e27-2093578cf088",
+            "created": 1763010419,
+            "id": "chatcmpl-e6b11567-2ac8-4c10-b8ad-012a88ac80c0",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 206,
+              "completion_tokens": 240,
               "prompt_tokens": 2467,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2673
+              "total_tokens": 2707
             }
           }
         },
@@ -566,7 +566,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2673
+          "total_tokens": 2707
         }
       },
       {
@@ -578,16 +578,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Nonmosaic NF1\" should map to \"Neurofibromatosis type 1\" (since NF1). The controlled list includes \"Neurofibromatosis type 1\". So replace.\n\nAssay: \"3D microtissue survival assay\" synonyms? Controlled list includes \"3D microtissue viability\" maybe. The list has \"3D microtissue viability\". Also \"3D microtissue survival assay\" is not exact. So we should use \"3D microtissue viability\". That seems correct.\n\nTumorType: \"neurofibrosarcoma\" synonyms? Controlled list includes \"Malignant Peripheral Nerve Sheath Tumor\" (MPNST). Also \"neurofibrosarcoma\" is a synonym for MPNST. So use \"Malignant Peripheral Nerve Sheath Tumor\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+          "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Nonmosaic NF1\" should map to \"Neurofibromatosis type 1\" (since NF1). The controlled list includes \"Neurofibromatosis type 1\". So replace.\n\nAssay: \"3D microtissue survival assay\" synonyms? Controlled list includes \"3D microtissue viability\" maybe. The list has \"3D microtissue viability\". Also \"3D microtissue survival assay\" is not exact. So use \"3D microtissue viability\". That seems correct.\n\nTumorType: \"neurofibrosarcoma\" synonyms? Controlled list includes \"Malignant Peripheral Nerve Sheath Tumor\" (MPNST) and \"Neurofibroma\" etc. \"neurofibrosarcoma\" likely refers to malignant peripheral nerve sheath tumor. So map to \"Malignant Peripheral Nerve Sheath Tumor\". Also \"neurofibrosarcoma\" is not in list. So choose that.\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 255,
+            "completion_tokens": 281,
             "prompt_tokens": 2475,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2730
+            "total_tokens": 2756
           },
           "attempt": 1,
           "raw_response": {
@@ -597,25 +597,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Nonmosaic NF1\" should map to \"Neurofibromatosis type 1\" (since NF1). The controlled list includes \"Neurofibromatosis type 1\". So replace.\n\nAssay: \"3D microtissue survival assay\" synonyms? Controlled list includes \"3D microtissue viability\" maybe. The list has \"3D microtissue viability\". Also \"3D microtissue survival assay\" is not exact. So we should use \"3D microtissue viability\". That seems correct.\n\nTumorType: \"neurofibrosarcoma\" synonyms? Controlled list includes \"Malignant Peripheral Nerve Sheath Tumor\" (MPNST). Also \"neurofibrosarcoma\" is a synonym for MPNST. So use \"Malignant Peripheral Nerve Sheath Tumor\".\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+                  "content": "<reasoning>We need to map synonyms to controlled terms. Input: diagnosis \"Nonmosaic NF1\" should map to \"Neurofibromatosis type 1\" (since NF1). The controlled list includes \"Neurofibromatosis type 1\". So replace.\n\nAssay: \"3D microtissue survival assay\" synonyms? Controlled list includes \"3D microtissue viability\" maybe. The list has \"3D microtissue viability\". Also \"3D microtissue survival assay\" is not exact. So use \"3D microtissue viability\". That seems correct.\n\nTumorType: \"neurofibrosarcoma\" synonyms? Controlled list includes \"Malignant Peripheral Nerve Sheath Tumor\" (MPNST) and \"Neurofibroma\" etc. \"neurofibrosarcoma\" likely refers to malignant peripheral nerve sheath tumor. So map to \"Malignant Peripheral Nerve Sheath Tumor\". Also \"neurofibrosarcoma\" is not in list. So choose that.\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006339,
-            "id": "chatcmpl-e746e181-0f72-488b-94c4-e8224af95419",
+            "created": 1763010421,
+            "id": "chatcmpl-a7a0975b-84ae-4e7a-b520-0c9d02ca0816",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 255,
+              "completion_tokens": 281,
               "prompt_tokens": 2475,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2730
+              "total_tokens": 2756
             }
           }
         },
@@ -628,7 +628,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2730
+          "total_tokens": 2756
         }
       }
     ],
@@ -637,16 +637,16 @@
       "successful_runs": 10,
       "failed_runs": 0,
       "success_rate": 1.0,
-      "average_score": 0.6666666666666667,
+      "average_score": 0.7000000000000001,
       "min_score": 0.0,
       "max_score": 1.0,
       "num_scored": 10
     },
-    "duration_seconds": 31.041725635528564,
+    "duration_seconds": 14.38407301902771,
     "token_usage": {
       "input_tokens": 0,
       "output_tokens": 0,
-      "total_tokens": 27288
+      "total_tokens": 27213
     }
   }
 }

@@ -1,12 +1,12 @@
 {
   "experiment_id": "34e88f743cd741a832d4237f1f5158fc",
   "task_name": "correction_of_typos",
-  "task_hash": "df7c61c75ca898be615dea62b2aead38",
+  "task_hash": "db0f6635c9e87138b227a3827530495a",
   "model_id": "openai.gpt-oss-120b-1:0",
   "system_instructions": "You are a metadata curation assistant. Your task is to help improve and correct metadata \naccording to the specific instructions provided for each task. Be precise, accurate, and \nfollow the guidelines carefully.\n",
   "temperature": 0.0,
   "thinking": false,
-  "timestamp": "2025-11-13T03:54:29.857666",
+  "timestamp": "2025-11-13T05:00:09.908691",
   "task_result": {
     "task_name": "correction_of_typos",
     "num_samples": 10,
@@ -20,12 +20,12 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neruofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (enum includes that). Good.\n\nAssay: \"whole exme squencing\" -> \"whole exome sequencing\" (enum includes that). Yes.\n\ntumorType: \"Plexifform Neurofibroma\" -> \"Plexiform Neurofibroma\" (enum includes that). Good.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}",
+          "content": "<reasoning>We need to correct typos and ensure values match enums.\n\nDiagnosis: \"neruofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (enum present). Good.\n\nAssay: \"whole exme squencing\" typo for \"whole exome sequencing\" which is in assay enum. Yes.\n\nTumorType: \"Plexifform Neurofibroma\" typo for \"Plexiform Neurofibroma\" (enum). Yes.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
-            "completion_tokens": 157,
+            "completion_tokens": 158,
             "prompt_tokens": 2477,
-            "total_tokens": 2634
+            "total_tokens": 2635
           },
           "attempt": 1,
           "raw_response": {
@@ -35,21 +35,21 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neruofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (enum includes that). Good.\n\nAssay: \"whole exme squencing\" -> \"whole exome sequencing\" (enum includes that). Yes.\n\ntumorType: \"Plexifform Neurofibroma\" -> \"Plexiform Neurofibroma\" (enum includes that). Good.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}",
+                  "content": "<reasoning>We need to correct typos and ensure values match enums.\n\nDiagnosis: \"neruofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (enum present). Good.\n\nAssay: \"whole exme squencing\" typo for \"whole exome sequencing\" which is in assay enum. Yes.\n\nTumorType: \"Plexifform Neurofibroma\" typo for \"Plexiform Neurofibroma\" (enum). Yes.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006056,
-            "id": "chatcmpl-730758d6-432d-45ce-80c7-8363cf3d1594",
+            "created": 1763009995,
+            "id": "chatcmpl-4dc1b3f5-64cf-40b8-977b-a6438e6df552",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 157,
+              "completion_tokens": 158,
               "prompt_tokens": 2477,
-              "total_tokens": 2634
+              "total_tokens": 2635
             }
           }
         },
@@ -62,7 +62,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2634
+          "total_tokens": 2635
         }
       },
       {
@@ -74,12 +74,12 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofibromatosis type !\" should be \"Neurofibromatosis type 1\" (enum). Yes.\n\nAssay: \"whole exme seq\" likely \"whole exome sequencing\". Must match enum exactly: \"whole exome sequencing\".\n\nTumorType: \"Malignant Periferal Nerve Sheath Tumor\" typo. Enum has \"Malignant Peripheral Nerve Sheath Tumor\". So correct to that.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+          "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofibromatosis type !\" should be \"Neurofibromatosis type 1\" (enum). Yes.\n\nAssay: \"whole exme seq\" likely \"whole exome sequencing\". Must match enum: \"whole exome sequencing\". Yes.\n\nTumorType: \"Malignant Periferal Nerve Sheath Tumor\" typo. Enum: \"Malignant Peripheral Nerve Sheath Tumor\". Use that.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
-            "completion_tokens": 166,
+            "completion_tokens": 165,
             "prompt_tokens": 2478,
-            "total_tokens": 2644
+            "total_tokens": 2643
           },
           "attempt": 1,
           "raw_response": {
@@ -89,21 +89,21 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofibromatosis type !\" should be \"Neurofibromatosis type 1\" (enum). Yes.\n\nAssay: \"whole exme seq\" likely \"whole exome sequencing\". Must match enum exactly: \"whole exome sequencing\".\n\nTumorType: \"Malignant Periferal Nerve Sheath Tumor\" typo. Enum has \"Malignant Peripheral Nerve Sheath Tumor\". So correct to that.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+                  "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofibromatosis type !\" should be \"Neurofibromatosis type 1\" (enum). Yes.\n\nAssay: \"whole exme seq\" likely \"whole exome sequencing\". Must match enum: \"whole exome sequencing\". Yes.\n\nTumorType: \"Malignant Periferal Nerve Sheath Tumor\" typo. Enum: \"Malignant Peripheral Nerve Sheath Tumor\". Use that.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006057,
-            "id": "chatcmpl-f4db242f-e962-40e7-bf93-64e55c18bc6a",
+            "created": 1763009997,
+            "id": "chatcmpl-781303b1-4db3-4fd1-82f3-7de7350575d0",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 166,
+              "completion_tokens": 165,
               "prompt_tokens": 2478,
-              "total_tokens": 2644
+              "total_tokens": 2643
             }
           }
         },
@@ -116,7 +116,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2644
+          "total_tokens": 2643
         }
       },
       {
@@ -128,12 +128,12 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and ensure values match enums exactly.\n\nDiagnosis: input \"neurofibromatisis type 1\" should be \"Neurofibromatosis type 1\" (enum). Yes.\n\nAssay: \"whle genome squencing\" likely \"whole genome sequencing\". Check enum list: includes \"whole genome sequencing\". So correct to that.\n\nTumorType: \"Maliggnant Peripheral Nerve Sheath Tumor\" should be \"Malignant Peripheral Nerve Sheath Tumor\". Enum includes that exact string.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+          "content": "<reasoning>We need to correct typos and ensure values match enums exactly.\n\nDiagnosis: input \"neurofibromatisis type 1\" typo. Enum includes \"Neurofibromatosis type 1\". So correct to that.\n\nAssay: \"whle genome squishing\" actually \"whle genome squencing\". Should be \"whole genome sequencing\". Enum includes \"whole genome sequencing\". So correct.\n\nTumorType: \"Maliggnant Peripheral Nerve Sheath Tumor\" typo. Enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
-            "completion_tokens": 173,
+            "completion_tokens": 178,
             "prompt_tokens": 2480,
-            "total_tokens": 2653
+            "total_tokens": 2658
           },
           "attempt": 1,
           "raw_response": {
@@ -143,21 +143,21 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and ensure values match enums exactly.\n\nDiagnosis: input \"neurofibromatisis type 1\" should be \"Neurofibromatosis type 1\" (enum). Yes.\n\nAssay: \"whle genome squencing\" likely \"whole genome sequencing\". Check enum list: includes \"whole genome sequencing\". So correct to that.\n\nTumorType: \"Maliggnant Peripheral Nerve Sheath Tumor\" should be \"Malignant Peripheral Nerve Sheath Tumor\". Enum includes that exact string.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+                  "content": "<reasoning>We need to correct typos and ensure values match enums exactly.\n\nDiagnosis: input \"neurofibromatisis type 1\" typo. Enum includes \"Neurofibromatosis type 1\". So correct to that.\n\nAssay: \"whle genome squishing\" actually \"whle genome squencing\". Should be \"whole genome sequencing\". Enum includes \"whole genome sequencing\". So correct.\n\nTumorType: \"Maliggnant Peripheral Nerve Sheath Tumor\" typo. Enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006058,
-            "id": "chatcmpl-fcd074b4-6ca3-4263-afef-943a81e9af4b",
+            "created": 1763009998,
+            "id": "chatcmpl-83a1b170-ea96-4f58-8c2d-9724ad55f593",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 173,
+              "completion_tokens": 178,
               "prompt_tokens": 2480,
-              "total_tokens": 2653
+              "total_tokens": 2658
             }
           }
         },
@@ -170,7 +170,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2653
+          "total_tokens": 2658
         }
       },
       {
@@ -182,12 +182,12 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and map to controlled terms. Diagnosis \"FN1\" is not in enum. Likely \"Neurofibromatosis type 1\". So map to that exact string.\n\nAssay \"conventonal MRI\" typo, should be \"conventional MRI\" which is in enum.\n\ntumorType \"unknwon\" typo, should be \"Unknown\" (enum includes \"Unknown\").\n\nReturn JSON with corrected values.\n\nCheck spelling: \"Neurofibromatosis type 1\" exactly as in enum. Yes.\n\nThus output JSON.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
+          "content": "<reasoning>We need to correct typos and map to controlled terms. Input diagnosis \"FN1\" not in enum. Likely \"Neurofibromatosis type 1\". So map to that exact enum.\n\nAssay \"conventonal MRI\" typo; controlled term \"conventional MRI\". Use that.\n\ntumorType \"unknwon\" -> \"Unknown\". Use that.\n\nReturn JSON with corrected values.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
-            "completion_tokens": 163,
+            "completion_tokens": 130,
             "prompt_tokens": 2464,
-            "total_tokens": 2627
+            "total_tokens": 2594
           },
           "attempt": 1,
           "raw_response": {
@@ -197,21 +197,21 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and map to controlled terms. Diagnosis \"FN1\" is not in enum. Likely \"Neurofibromatosis type 1\". So map to that exact string.\n\nAssay \"conventonal MRI\" typo, should be \"conventional MRI\" which is in enum.\n\ntumorType \"unknwon\" typo, should be \"Unknown\" (enum includes \"Unknown\").\n\nReturn JSON with corrected values.\n\nCheck spelling: \"Neurofibromatosis type 1\" exactly as in enum. Yes.\n\nThus output JSON.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
+                  "content": "<reasoning>We need to correct typos and map to controlled terms. Input diagnosis \"FN1\" not in enum. Likely \"Neurofibromatosis type 1\". So map to that exact enum.\n\nAssay \"conventonal MRI\" typo; controlled term \"conventional MRI\". Use that.\n\ntumorType \"unknwon\" -> \"Unknown\". Use that.\n\nReturn JSON with corrected values.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006059,
-            "id": "chatcmpl-ce322cc1-8fa2-4015-bc26-f423ed1338ec",
+            "created": 1763009999,
+            "id": "chatcmpl-e69b4bae-d230-4719-ae3e-660364630138",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 163,
+              "completion_tokens": 130,
               "prompt_tokens": 2464,
-              "total_tokens": 2627
+              "total_tokens": 2594
             }
           }
         },
@@ -224,7 +224,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2627
+          "total_tokens": 2594
         }
       },
       {
@@ -261,8 +261,8 @@
                 }
               }
             ],
-            "created": 1763006060,
-            "id": "chatcmpl-253953ab-d063-4b94-8de1-4d9793c3806f",
+            "created": 1763010000,
+            "id": "chatcmpl-6d97f793-1593-4c9c-90e5-8defca54e197",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
@@ -298,16 +298,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and match controlled terms.\n\nDiagnosis: \"meurofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (exact enum). Yes.\n\nAssay: \"cell viabilty assay\" should be \"cell viability assay\" (exact enum). Check list: \"cell viability assay\" is present. Yes.\n\nTumorType: \"Cutaneous Neurfibromaa\" should be \"Cutaneous Neurofibroma\". That's in enum.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
+          "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"meurofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (exact enum). Yes.\n\nAssay: \"cell viabilty assay\" should be \"cell viability assay\" (enum). Check list: \"cell viability assay\" is present. Yes.\n\nTumorType: \"Cutaneous Neurfibromaa\" should be \"Cutaneous Neurofibroma\". Enum includes \"Cutaneous Neurofibroma\". Yes.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
-            "completion_tokens": 160,
+            "completion_tokens": 166,
             "prompt_tokens": 2476,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 80
             },
-            "total_tokens": 2636
+            "total_tokens": 2642
           },
           "attempt": 1,
           "raw_response": {
@@ -317,25 +317,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and match controlled terms.\n\nDiagnosis: \"meurofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (exact enum). Yes.\n\nAssay: \"cell viabilty assay\" should be \"cell viability assay\" (exact enum). Check list: \"cell viability assay\" is present. Yes.\n\nTumorType: \"Cutaneous Neurfibromaa\" should be \"Cutaneous Neurofibroma\". That's in enum.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
+                  "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"meurofibromatosis type 1\" should be \"Neurofibromatosis type 1\" (exact enum). Yes.\n\nAssay: \"cell viabilty assay\" should be \"cell viability assay\" (enum). Check list: \"cell viability assay\" is present. Yes.\n\nTumorType: \"Cutaneous Neurfibromaa\" should be \"Cutaneous Neurofibroma\". Enum includes \"Cutaneous Neurofibroma\". Yes.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006063,
-            "id": "chatcmpl-dfb1f124-479b-461a-91be-181027d07d90",
+            "created": 1763010001,
+            "id": "chatcmpl-ea8631cc-3842-4b5d-a813-ee082e9bedc3",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 160,
+              "completion_tokens": 166,
               "prompt_tokens": 2476,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 80
               },
-              "total_tokens": 2636
+              "total_tokens": 2642
             }
           }
         },
@@ -348,7 +348,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2636
+          "total_tokens": 2642
         }
       },
       {
@@ -360,12 +360,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofbiromatosis tpye 2\" likely \"Neurofibromatosis type 1\"? Actually type 2 is NF2-related schwannomatosis? The schema includes \"Neurofibromatosis type 1\". No \"type 2\". There's \"NF2-related schwannomatosis\". So correct to \"Neurofibromatosis type 1\"? The input says type 2, but not in enum. Could be \"NF2-related schwannomatosis\". That matches NF2. So choose that.\n\nAssay: \"immunocytochemsitry\" -> correct term \"immunocytochemistry\" (present in enum). Yes.\n\ntumorType: \"Cutanneous Neurofibroma\" -> correct \"Cutaneous Neurofibroma\" (enum).\n\nReturn JSON with corrected values.\n\nThus:\n\n{\n \"diagnosis\": \"NF2-related schwannomatosis\",\n \"assay\": \"immunocytochemistry\",\n \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck spelling: \"immunocytochemistry\" exactly as enum.\n\nReturn.</reasoning>{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
+          "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofbiromatosis tpye 2\" likely intended \"Neurofibromatosis type 2\". In schema, diagnosis enum includes \"Neurofibromatosis type 1\" but not type 2. There's \"Neurofibromatosis type 1\". No type 2. There's \"Vestibular Schwannoma\", \"Sporadic Schwannoma\", etc. \"Neurofibromatosis type 2\" is not listed. So maybe the correct term is \"Not Applicable\" or \"Unknown\". But we need to preserve intended meaning. Since type 2 not in enum, we must choose a value from enum. Could be \"Neurofibromatosis type 1\"? No. Could be \"Not Applicable\". Probably \"Not Applicable\". Or \"Unknown\". Which is more appropriate? The input is clearly a typo for NF2. Since NF2 not in list, maybe they want \"Not Applicable\". I'll choose \"Not Applicable\".\n\nAssay: \"immunocytochemsitry\" correct term is \"immunocytochemistry\" which is in enum. So set to that.\n\nTumorType: \"Cutanneous Neurofibroma\" correct is \"Cutaneous Neurofibroma\" which is in enum.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
-            "completion_tokens": 294,
+            "completion_tokens": 324,
             "prompt_tokens": 2479,
-            "total_tokens": 2773
+            "prompt_tokens_details": {
+              "audio_tokens": 0,
+              "cached_tokens": 96
+            },
+            "total_tokens": 2803
           },
           "attempt": 1,
           "raw_response": {
@@ -375,25 +379,29 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofbiromatosis tpye 2\" likely \"Neurofibromatosis type 1\"? Actually type 2 is NF2-related schwannomatosis? The schema includes \"Neurofibromatosis type 1\". No \"type 2\". There's \"NF2-related schwannomatosis\". So correct to \"Neurofibromatosis type 1\"? The input says type 2, but not in enum. Could be \"NF2-related schwannomatosis\". That matches NF2. So choose that.\n\nAssay: \"immunocytochemsitry\" -> correct term \"immunocytochemistry\" (present in enum). Yes.\n\ntumorType: \"Cutanneous Neurofibroma\" -> correct \"Cutaneous Neurofibroma\" (enum).\n\nReturn JSON with corrected values.\n\nThus:\n\n{\n \"diagnosis\": \"NF2-related schwannomatosis\",\n \"assay\": \"immunocytochemistry\",\n \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck spelling: \"immunocytochemistry\" exactly as enum.\n\nReturn.</reasoning>{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
+                  "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: \"neurofbiromatosis tpye 2\" likely intended \"Neurofibromatosis type 2\". In schema, diagnosis enum includes \"Neurofibromatosis type 1\" but not type 2. There's \"Neurofibromatosis type 1\". No type 2. There's \"Vestibular Schwannoma\", \"Sporadic Schwannoma\", etc. \"Neurofibromatosis type 2\" is not listed. So maybe the correct term is \"Not Applicable\" or \"Unknown\". But we need to preserve intended meaning. Since type 2 not in enum, we must choose a value from enum. Could be \"Neurofibromatosis type 1\"? No. Could be \"Not Applicable\". Probably \"Not Applicable\". Or \"Unknown\". Which is more appropriate? The input is clearly a typo for NF2. Since NF2 not in list, maybe they want \"Not Applicable\". I'll choose \"Not Applicable\".\n\nAssay: \"immunocytochemsitry\" correct term is \"immunocytochemistry\" which is in enum. So set to that.\n\nTumorType: \"Cutanneous Neurofibroma\" correct is \"Cutaneous Neurofibroma\" which is in enum.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006065,
-            "id": "chatcmpl-01b94859-81ac-4522-9a32-1ac37fbea914",
+            "created": 1763010002,
+            "id": "chatcmpl-7489edf3-74d3-4b7b-84fa-61927e73a5c2",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 294,
+              "completion_tokens": 324,
               "prompt_tokens": 2479,
-              "total_tokens": 2773
+              "prompt_tokens_details": {
+                "audio_tokens": 0,
+                "cached_tokens": 96
+              },
+              "total_tokens": 2803
             }
           }
         },
-        "score": 0.0,
+        "score": 0.6666666666666666,
         "ground_truth": {
           "diagnosis": "Neurofibromatosis type 1",
           "assay": "immunocytochemistry",
@@ -402,7 +410,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2773
+          "total_tokens": 2803
         }
       },
       {
@@ -414,7 +422,7 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and ensure values match enums.\n\nDiagnosis: \"Neurofibromatosis type 47\" should be \"Neurofibromatosis type 1\" (enum). So correct to that.\n\nAssay: \"conventioal MRI\" should be \"conventional MRI\" (enum). Yes.\n\nTumorType: \"un known\" should be \"Unknown\" (enum). Also there is \"Unknown\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
+          "content": "<reasoning>We need to correct typos and ensure values match enums.\n\nDiagnosis: \"Neurofibromatosis type 47\" should be \"Neurofibromatosis type 1\" (enum). So correct to that.\n\nAssay: \"conventioal MRI\" should be \"conventional MRI\" (enum). Yes.\n\ntumorType: \"un known\" should be \"Unknown\" (enum). Also there is \"Unknown\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
             "completion_tokens": 146,
@@ -429,14 +437,14 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and ensure values match enums.\n\nDiagnosis: \"Neurofibromatosis type 47\" should be \"Neurofibromatosis type 1\" (enum). So correct to that.\n\nAssay: \"conventioal MRI\" should be \"conventional MRI\" (enum). Yes.\n\nTumorType: \"un known\" should be \"Unknown\" (enum). Also there is \"Unknown\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
+                  "content": "<reasoning>We need to correct typos and ensure values match enums.\n\nDiagnosis: \"Neurofibromatosis type 47\" should be \"Neurofibromatosis type 1\" (enum). So correct to that.\n\nAssay: \"conventioal MRI\" should be \"conventional MRI\" (enum). Yes.\n\ntumorType: \"un known\" should be \"Unknown\" (enum). Also there is \"Unknown\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006066,
-            "id": "chatcmpl-c7a64e9a-a570-4ed3-85e3-5bfc4ae3b20d",
+            "created": 1763010005,
+            "id": "chatcmpl-7d667c02-5dca-48d2-bd24-fd31a5db96ee",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
@@ -473,10 +481,6 @@
           "usage": {
             "completion_tokens": 148,
             "prompt_tokens": 2471,
-            "prompt_tokens_details": {
-              "audio_tokens": 0,
-              "cached_tokens": 96
-            },
             "total_tokens": 2619
           },
           "attempt": 1,
@@ -493,18 +497,14 @@
                 }
               }
             ],
-            "created": 1763006067,
-            "id": "chatcmpl-d97790ee-7f8a-4694-b486-62737c7b0a0a",
+            "created": 1763010008,
+            "id": "chatcmpl-5efe2343-013f-4234-90ff-1370468d528e",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
               "completion_tokens": 148,
               "prompt_tokens": 2471,
-              "prompt_tokens_details": {
-                "audio_tokens": 0,
-                "cached_tokens": 96
-              },
               "total_tokens": 2619
             }
           }
@@ -530,16 +530,12 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to correct typos and map to controlled terms.\n\nDiagnosis: input \"nf1\". Controlled enum includes \"Neurofibromatosis type 1\". So map to that exact string.\n\nAssay: \"#D microtissue viability\". Controlled enum includes \"3D microtissue viability\". So correct to that.\n\nTumorType: \"Malignant Peripheral Nerve Sheath Tumorr\". Controlled enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+          "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: input \"nf1\". Controlled enum includes \"Neurofibromatosis type 1\". So map to that exact string.\n\nAssay: \"#D microtissue viability\". Controlled enum includes \"3D microtissue viability\". So correct to that.\n\nTumorType: \"Malignant Peripheral Nerve Sheath Tumorr\". Controlled enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
           "model_id": "openai.gpt-oss-120b-1:0",
           "usage": {
-            "completion_tokens": 162,
+            "completion_tokens": 161,
             "prompt_tokens": 2471,
-            "prompt_tokens_details": {
-              "audio_tokens": 0,
-              "cached_tokens": 80
-            },
-            "total_tokens": 2633
+            "total_tokens": 2632
           },
           "attempt": 1,
           "raw_response": {
@@ -549,25 +545,21 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to correct typos and map to controlled terms.\n\nDiagnosis: input \"nf1\". Controlled enum includes \"Neurofibromatosis type 1\". So map to that exact string.\n\nAssay: \"#D microtissue viability\". Controlled enum includes \"3D microtissue viability\". So correct to that.\n\nTumorType: \"Malignant Peripheral Nerve Sheath Tumorr\". Controlled enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
+                  "content": "<reasoning>We need to correct typos and match controlled terminology.\n\nDiagnosis: input \"nf1\". Controlled enum includes \"Neurofibromatosis type 1\". So map to that exact string.\n\nAssay: \"#D microtissue viability\". Controlled enum includes \"3D microtissue viability\". So correct to that.\n\nTumorType: \"Malignant Peripheral Nerve Sheath Tumorr\". Controlled enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So correct.\n\nReturn JSON with corrected values.\n\n</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006069,
-            "id": "chatcmpl-adf41586-6c1a-4e5e-8343-76eefbf0f54d",
+            "created": 1763010009,
+            "id": "chatcmpl-b7726f31-1e98-40b6-8c53-8d8ac770beed",
             "model": "openai.gpt-oss-120b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 162,
+              "completion_tokens": 161,
               "prompt_tokens": 2471,
-              "prompt_tokens_details": {
-                "audio_tokens": 0,
-                "cached_tokens": 80
-              },
-              "total_tokens": 2633
+              "total_tokens": 2632
             }
           }
         },
@@ -580,7 +572,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2633
+          "total_tokens": 2632
         }
       }
     ],
@@ -589,16 +581,16 @@
       "successful_runs": 10,
       "failed_runs": 0,
       "success_rate": 1.0,
-      "average_score": 0.8666666666666668,
-      "min_score": 0.0,
+      "average_score": 0.9333333333333333,
+      "min_score": 0.6666666666666666,
       "max_score": 1.0,
       "num_scored": 10
     },
-    "duration_seconds": 13.409013032913208,
+    "duration_seconds": 14.932224035263062,
     "token_usage": {
       "input_tokens": 0,
       "output_tokens": 0,
-      "total_tokens": 26480
+      "total_tokens": 26487
     }
   }
 }

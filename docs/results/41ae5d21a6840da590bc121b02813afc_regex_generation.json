@@ -1,12 +1,12 @@
 {
   "experiment_id": "41ae5d21a6840da590bc121b02813afc",
   "task_name": "regex_generation",
-  "task_hash": "40caa9e3367f50585640f2cc3211e7f1",
+  "task_hash": "7f39c14b085115083089fd7b42e3b282",
   "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
   "system_instructions": "You are a metadata curation assistant. Your task is to help improve and correct metadata \naccording to the specific instructions provided for each task. Be precise, accurate, and \nfollow the guidelines carefully.\n",
   "temperature": 0.0,
   "thinking": false,
-  "timestamp": "2025-11-13T03:55:09.205210",
+  "timestamp": "2025-11-13T05:03:50.935925",
   "task_result": {
     "task_name": "regex_generation",
     "num_samples": 4,
@@ -18,44 +18,44 @@
         },
         "response": {
           "success": true,
-          "content": "```json\n{\n  \"regex\": \"^(swn_patient_\\\\d+_tumor_\\\\d+)\"\n}\n```\n\nThis regex pattern:\n- `^` - Anchors to the start of the filename\n- `(swn_patient_\\\\d+_tumor_\\\\d+)` - Captures the main identifier portion:\n  - `swn_patient_` - Literal text\n  - `\\\\d+` - One or more digits (patient number)\n  - `_tumor_` - Literal text\n  - `\\\\d+` - One or more digits (tumor number)\n\nWhen used with `re.findall()`, this will extract the base filename identifier before the `.markdup.sorted.bam` extension from all files in the list.",
+          "content": "```json\n{\n  \"regex\": \"swn_patient_\\\\d+_tumor_\\\\d+\"\n}\n```\n\nThis regex pattern:\n- `swn_patient_` - matches the literal prefix\n- `\\\\d+` - matches one or more digits (the patient number)\n- `_tumor_` - matches the literal middle part\n- `\\\\d+` - matches one or more digits (the tumor number)\n\nThis will extract the base filename without the `.markdup.sorted.bam` extension, capturing exactly what is shown in the examples.",
           "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
           "usage": {
-            "input_tokens": 582,
+            "input_tokens": 616,
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 0,
-            "output_tokens": 179
+            "output_tokens": 128
           },
           "attempt": 1,
           "raw_response": {
             "model": "claude-haiku-4-5-20251001",
-            "id": "msg_bdrk_01K75Xbp411eZXC2aDyrTjP7",
+            "id": "msg_bdrk_01LJ4vKkexA2emDgSczskjDe",
             "type": "message",
             "role": "assistant",
             "content": [
               {
                 "type": "text",
-                "text": "```json\n{\n  \"regex\": \"^(swn_patient_\\\\d+_tumor_\\\\d+)\"\n}\n```\n\nThis regex pattern:\n- `^` - Anchors to the start of the filename\n- `(swn_patient_\\\\d+_tumor_\\\\d+)` - Captures the main identifier portion:\n  - `swn_patient_` - Literal text\n  - `\\\\d+` - One or more digits (patient number)\n  - `_tumor_` - Literal text\n  - `\\\\d+` - One or more digits (tumor number)\n\nWhen used with `re.findall()`, this will extract the base filename identifier before the `.markdup.sorted.bam` extension from all files in the list."
+                "text": "```json\n{\n  \"regex\": \"swn_patient_\\\\d+_tumor_\\\\d+\"\n}\n```\n\nThis regex pattern:\n- `swn_patient_` - matches the literal prefix\n- `\\\\d+` - matches one or more digits (the patient number)\n- `_tumor_` - matches the literal middle part\n- `\\\\d+` - matches one or more digits (the tumor number)\n\nThis will extract the base filename without the `.markdup.sorted.bam` extension, capturing exactly what is shown in the examples."
               }
             ],
             "stop_reason": "end_turn",
             "stop_sequence": null,
             "usage": {
-              "input_tokens": 582,
+              "input_tokens": 616,
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 0,
-              "output_tokens": 179
+              "output_tokens": 128
             }
           }
         },
-        "score": 0.0,
+        "score": 1.0,
         "ground_truth": {
           "matches": "[\"swn_patient_55_tumor_118\", \"swn_patient_64_tumor_125\", \"swn_patient_3_tumor_32\", \"swn_patient_10_tumor_110\", \"swn_patient_51_tumor_2\", \"swn_patient_38_tumor_90\", \"swn_patient_10_tumor_109\", \"swn_patient_59_tumor_136\", \"swn_patient_62_tumor_120\", \"swn_patient_63_tumor_123\", \"swn_patient_51_tumor_3\", \"swn_patient_60_tumor_5\", \"swn_patient_17_tumor_31\", \"swn_patient_19_tumor_29\"]"
         },
         "token_usage": {
-          "input_tokens": 582,
-          "output_tokens": 179,
-          "total_tokens": 761
+          "input_tokens": 616,
+          "output_tokens": 128,
+          "total_tokens": 744
         }
       },
       {
@@ -65,44 +65,44 @@
         },
         "response": {
           "success": true,
-          "content": "Looking at the filenames and examples, I need to extract the sample identifier that appears after the first underscore and before the next underscore.\n\nThe pattern is: `UPN####_[SAMPLE_ID]_[Stage]_...`\n\nFrom the examples:\n- `UPN3050_HM5282_Post_S5_L001_R2_001.fastq.gz` \u2192 extract `HM5282`\n- `UPN2987_HM5523_Post_S9_L001_R1_001.fastq.gz` \u2192 extract `HM5523`\n\nThe sample IDs can be:\n- `HM####` (most common)\n- `MP##-####` (like `MP21-3643`)\n\nThe regex pattern should match the second field (after the first underscore, before the second underscore):\n\n```json\n{\n  \"regex\": \"UPN\\\\d+_([A-Z0-9-]+)_\"\n}\n```\n\nThis pattern:\n- `UPN\\\\d+` - matches \"UPN\" followed by digits\n- `_` - matches the first underscore\n- `([A-Z0-9-]+)` - captures one or more uppercase letters, digits, or hyphens (the sample ID)\n- `_` - matches the second underscore\n\nThis will correctly extract `HM5282`, `HM5523`, `MP21-3643`, etc. from all filenames.",
+          "content": "Looking at the filenames and examples, I need to extract the sample identifier that appears after the UPN code and before the sample type (Post/Pre/Dx).\n\nLet me analyze the pattern:\n- `UPN3050_HM5282_Post_S5_L001_R2_001.fastq.gz` \u2192 extract `HM5282`\n- `UPN2987_HM5523_Post_S9_L001_R1_001.fastq.gz` \u2192 extract `HM5523`\n- `UPN2987_HM5523_Post_S9_L001_R2_001.fastq.gz` \u2192 extract `HM5523`\n\nThe pattern is:\n1. Start with `UPN` followed by digits\n2. Underscore separator\n3. **Sample ID** (what we want to extract) - can be:\n   - `HM` followed by digits (e.g., `HM5282`, `HM5523`)\n   - `MP` followed by digits, hyphen, and more digits (e.g., `MP21-3643`)\n4. Followed by underscore and the rest of the filename\n\nThe regex should capture the sample identifier between the first underscore (after UPN code) and the second underscore (before the sample type).\n\n```json\n{\n  \"regex\": \"UPN\\\\d+_([A-Z]+\\\\d+(?:-\\\\d+)?)_\"\n}\n```\n\nThis regex:\n- `UPN\\\\d+` - matches \"UPN\" followed by one or more digits\n- `_` - matches the underscore separator\n- `([A-Z]+\\\\d+(?:-\\\\d+)?)` - captures the sample ID:\n  - `[A-Z]+` - one or more uppercase letters (HM, MP, etc.)\n  - `\\\\d+` - one or more digits\n  - `(?:-\\\\d+)?` - optional hyphen followed by digits (for cases like MP21-3643)\n- `_` - matches the underscore that follows the sample ID",
           "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
           "usage": {
-            "input_tokens": 1380,
+            "input_tokens": 1417,
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 0,
-            "output_tokens": 337
+            "output_tokens": 482
           },
           "attempt": 1,
           "raw_response": {
             "model": "claude-haiku-4-5-20251001",
-            "id": "msg_bdrk_01HgCwkQX6oWvULyjyJ917WP",
+            "id": "msg_bdrk_012yLDyWQ8LmqR86FGAERnmY",
             "type": "message",
             "role": "assistant",
             "content": [
               {
                 "type": "text",
-                "text": "Looking at the filenames and examples, I need to extract the sample identifier that appears after the first underscore and before the next underscore.\n\nThe pattern is: `UPN####_[SAMPLE_ID]_[Stage]_...`\n\nFrom the examples:\n- `UPN3050_HM5282_Post_S5_L001_R2_001.fastq.gz` \u2192 extract `HM5282`\n- `UPN2987_HM5523_Post_S9_L001_R1_001.fastq.gz` \u2192 extract `HM5523`\n\nThe sample IDs can be:\n- `HM####` (most common)\n- `MP##-####` (like `MP21-3643`)\n\nThe regex pattern should match the second field (after the first underscore, before the second underscore):\n\n```json\n{\n  \"regex\": \"UPN\\\\d+_([A-Z0-9-]+)_\"\n}\n```\n\nThis pattern:\n- `UPN\\\\d+` - matches \"UPN\" followed by digits\n- `_` - matches the first underscore\n- `([A-Z0-9-]+)` - captures one or more uppercase letters, digits, or hyphens (the sample ID)\n- `_` - matches the second underscore\n\nThis will correctly extract `HM5282`, `HM5523`, `MP21-3643`, etc. from all filenames."
+                "text": "Looking at the filenames and examples, I need to extract the sample identifier that appears after the UPN code and before the sample type (Post/Pre/Dx).\n\nLet me analyze the pattern:\n- `UPN3050_HM5282_Post_S5_L001_R2_001.fastq.gz` \u2192 extract `HM5282`\n- `UPN2987_HM5523_Post_S9_L001_R1_001.fastq.gz` \u2192 extract `HM5523`\n- `UPN2987_HM5523_Post_S9_L001_R2_001.fastq.gz` \u2192 extract `HM5523`\n\nThe pattern is:\n1. Start with `UPN` followed by digits\n2. Underscore separator\n3. **Sample ID** (what we want to extract) - can be:\n   - `HM` followed by digits (e.g., `HM5282`, `HM5523`)\n   - `MP` followed by digits, hyphen, and more digits (e.g., `MP21-3643`)\n4. Followed by underscore and the rest of the filename\n\nThe regex should capture the sample identifier between the first underscore (after UPN code) and the second underscore (before the sample type).\n\n```json\n{\n  \"regex\": \"UPN\\\\d+_([A-Z]+\\\\d+(?:-\\\\d+)?)_\"\n}\n```\n\nThis regex:\n- `UPN\\\\d+` - matches \"UPN\" followed by one or more digits\n- `_` - matches the underscore separator\n- `([A-Z]+\\\\d+(?:-\\\\d+)?)` - captures the sample ID:\n  - `[A-Z]+` - one or more uppercase letters (HM, MP, etc.)\n  - `\\\\d+` - one or more digits\n  - `(?:-\\\\d+)?` - optional hyphen followed by digits (for cases like MP21-3643)\n- `_` - matches the underscore that follows the sample ID"
               }
             ],
             "stop_reason": "end_turn",
             "stop_sequence": null,
             "usage": {
-              "input_tokens": 1380,
+              "input_tokens": 1417,
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 0,
-              "output_tokens": 337
+              "output_tokens": 482
             }
           }
         },
-        "score": 0.0,
+        "score": 1.0,
         "ground_truth": {
           "matches": "[\"HM5282\", \"HM5523\", \"HM5523\", \"HM5541\", \"HM5541\", \"HM5547\", \"HM5547\", \"HM5550\", \"HM5550\", \"HM5556\", \"HM5556\", \"HM5574\", \"HM5574\", \"HM5698\", \"HM5698\", \"HM5723\", \"HM5723\", \"HM5807\", \"HM5807\", \"HM5818\", \"HM5818\", \"MP21-3643\", \"MP21-3643\", \"HM5496\", \"HM5496\", \"HM4959\", \"HM4959\", \"HM5085\", \"HM5085\", \"HM5231\", \"HM5231\", \"HM5244\", \"HM5244\", \"HM5435\", \"HM5446\", \"HM5446\", \"HM5490\", \"HM5490\"]"
         },
         "token_usage": {
-          "input_tokens": 1380,
-          "output_tokens": 337,
-          "total_tokens": 1717
+          "input_tokens": 1417,
+          "output_tokens": 482,
+          "total_tokens": 1899
         }
       },
       {
@@ -112,33 +112,33 @@
         },
         "response": {
           "success": true,
-          "content": "Looking at the example matches, I need to extract:\n- The sample ID (e.g., \"NF0014\", \"NF0030\")\n- The timepoint (e.g., \"T1\")\n- Join them with a hyphen\n\nThe pattern is: `(SAMPLE_ID)_(TIMEPOINT)_...`\n\nWhere:\n- Sample ID can be alphanumeric (e.g., \"NF0014\", \"SARCO361\")\n- Timepoint is \"T\" followed by a number (e.g., \"T1\", \"T2\", \"T6\")\n\nThe regex should capture these two groups and format them as \"SAMPLE_ID-TIMEPOINT\".\n\n```json\n{\n  \"regex\": \"^([A-Z0-9]+)_(T\\\\d+)_\"\n}\n```\n\nThis regex:\n- `^` - starts at the beginning of the filename\n- `([A-Z0-9]+)` - captures one or more alphanumeric characters (the sample ID)\n- `_` - matches the underscore separator\n- `(T\\\\d+)` - captures \"T\" followed by one or more digits (the timepoint)\n- `_` - matches the next underscore separator\n\nWhen used with `re.findall()`, this will return tuples of (sample_id, timepoint) which can be joined with a hyphen to produce the desired output format like \"NF0014-T1\".",
+          "content": "Looking at the example matches, I need to extract:\n1. The sample ID (e.g., \"NF0014\", \"NF0030\", \"SARCO361\")\n2. The timepoint (e.g., \"T1\", \"T2\", \"T6\")\n3. Join them with a hyphen\n\nThe pattern is: `{SampleID}_{Timepoint}_{...rest...}`\n\nAnd the output should be: `{SampleID}-{Timepoint}`\n\nThe regex pattern to extract this is:\n\n```json\n{\n  \"regex\": \"^([A-Z0-9]+)_(T\\\\d+)_\"\n}\n```\n\nThis pattern:\n- `^` - Start of string\n- `([A-Z0-9]+)` - Capture group 1: One or more alphanumeric characters (the sample ID like \"NF0014\" or \"SARCO361\")\n- `_` - Literal underscore\n- `(T\\\\d+)` - Capture group 2: Letter \"T\" followed by one or more digits (the timepoint like \"T1\", \"T2\", \"T6\")\n- `_` - Literal underscore (to anchor the pattern and ensure we're matching the right section)\n\nWhen used with `re.findall()`, this will return tuples of the two capture groups, which can then be joined with a hyphen to produce the desired output format like \"NF0014-T1\".",
           "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
           "usage": {
-            "input_tokens": 5366,
+            "input_tokens": 5401,
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 0,
-            "output_tokens": 336
+            "output_tokens": 340
           },
           "attempt": 1,
           "raw_response": {
             "model": "claude-haiku-4-5-20251001",
-            "id": "msg_bdrk_01WLQRwqk671C8GA9tLtB3aT",
+            "id": "msg_bdrk_01AayBuzg6yS6pKZ7RujwVDu",
             "type": "message",
             "role": "assistant",
             "content": [
               {
                 "type": "text",
-                "text": "Looking at the example matches, I need to extract:\n- The sample ID (e.g., \"NF0014\", \"NF0030\")\n- The timepoint (e.g., \"T1\")\n- Join them with a hyphen\n\nThe pattern is: `(SAMPLE_ID)_(TIMEPOINT)_...`\n\nWhere:\n- Sample ID can be alphanumeric (e.g., \"NF0014\", \"SARCO361\")\n- Timepoint is \"T\" followed by a number (e.g., \"T1\", \"T2\", \"T6\")\n\nThe regex should capture these two groups and format them as \"SAMPLE_ID-TIMEPOINT\".\n\n```json\n{\n  \"regex\": \"^([A-Z0-9]+)_(T\\\\d+)_\"\n}\n```\n\nThis regex:\n- `^` - starts at the beginning of the filename\n- `([A-Z0-9]+)` - captures one or more alphanumeric characters (the sample ID)\n- `_` - matches the underscore separator\n- `(T\\\\d+)` - captures \"T\" followed by one or more digits (the timepoint)\n- `_` - matches the next underscore separator\n\nWhen used with `re.findall()`, this will return tuples of (sample_id, timepoint) which can be joined with a hyphen to produce the desired output format like \"NF0014-T1\"."
+                "text": "Looking at the example matches, I need to extract:\n1. The sample ID (e.g., \"NF0014\", \"NF0030\", \"SARCO361\")\n2. The timepoint (e.g., \"T1\", \"T2\", \"T6\")\n3. Join them with a hyphen\n\nThe pattern is: `{SampleID}_{Timepoint}_{...rest...}`\n\nAnd the output should be: `{SampleID}-{Timepoint}`\n\nThe regex pattern to extract this is:\n\n```json\n{\n  \"regex\": \"^([A-Z0-9]+)_(T\\\\d+)_\"\n}\n```\n\nThis pattern:\n- `^` - Start of string\n- `([A-Z0-9]+)` - Capture group 1: One or more alphanumeric characters (the sample ID like \"NF0014\" or \"SARCO361\")\n- `_` - Literal underscore\n- `(T\\\\d+)` - Capture group 2: Letter \"T\" followed by one or more digits (the timepoint like \"T1\", \"T2\", \"T6\")\n- `_` - Literal underscore (to anchor the pattern and ensure we're matching the right section)\n\nWhen used with `re.findall()`, this will return tuples of the two capture groups, which can then be joined with a hyphen to produce the desired output format like \"NF0014-T1\"."
               }
             ],
             "stop_reason": "end_turn",
             "stop_sequence": null,
             "usage": {
-              "input_tokens": 5366,
+              "input_tokens": 5401,
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 0,
-              "output_tokens": 336
+              "output_tokens": 340
             }
           }
         },
@@ -147,9 +147,9 @@
           "matches": "[\"NF0014-T1\", \"NF0030-T1\", \"SARCO361-T1\", \"NF0014-T1\", \"NF0014-T1\", \"NF0021-T1\", \"SARCO219-T2\", \"NF0040-T1\", \"NF0016-T1\", \"NF0014-T1\", \"SARCO361-T1\", \"NF0040-T1\", \"SARCO219-T2\", \"NF0030-T1\", \"NF0030-T1\", \"NF0016-T1\", \"SARCO361-T1\", \"NF0030-T1\", \"SARCO219-T2\", \"NF0014-T1\", \"SARCO361-T1\", \"NF0014-T1\", \"SARCO219-T2\", \"NF0040-T1\", \"NF0016-T1\", \"NF0016-T1\", \"NF0018-T6\", \"SARCO219-T2\", \"NF0014-T1\", \"NF0021-T1\", \"NF0040-T1\", \"NF0040-T1\", \"SARCO361-T1\", \"SARCO361-T1\", \"NF0018-T6\", \"NF0040-T1\", \"NF0016-T1\", \"NF0016-T1\", \"SARCO219-T2\", \"NF0018-T6\", \"NF0030-T1\", \"NF0040-T1\", \"NF0030-T1\", \"NF0014-T1\", \"SARCO361-T1\", \"SARCO361-T1\", \"NF0018-T6\", \"NF0040-T1\", \"NF0016-T1\", \"NF0030-T1\", \"NF0021-T1\", \"NF0018-T6\", \"SARCO361-T1\", \"NF0016-T1\", \"NF0016-T1\", \"SARCO219-T2\", \"NF0018-T6\", \"NF0021-T1\", \"NF0030-T1\", \"NF0021-T1\", \"NF0014-T1\", \"SARCO219-T2\", \"SARCO361-T1\", \"NF0016-T1\", \"NF0014-T1\", \"NF0018-T6\", \"SARCO219-T2\", \"NF0030-T1\", \"NF0014-T1\", \"NF0040-T1\", \"SARCO219-T2\", \"NF0014-T1\", \"NF0018-T6\", \"NF0040-T1\", \"NF0030-T1\", \"NF0021-T1\", \"NF0014-T1\", \"NF0014-T1\", \"SARCO219-T2\", \"SARCO361-T1\", \"NF0016-T1\", \"NF0014-T1\", \"NF0018-T6\", \"SARCO219-T2\", \"NF0030-T1\", \"NF0021-T1\", \"SARCO219-T2\", \"NF0040-T1\", \"NF0018-T6\", \"NF0014-T1\", \"NF0040-T1\", \"SARCO361-T1\", \"NF0021-T1\", \"SARCO361-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0021-T1\", \"NF0018-T6\", \"NF0030-T1\", \"NF0014-T1\", \"NF0014-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0040-T1\", \"SARCO361-T1\", \"SARCO361-T1\", \"NF0014-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0030-T1\", \"NF0030-T1\", \"NF0014-T1\", \"SARCO219-T2\", \"NF0016-T1\", \"NF0021-T1\", \"NF0040-T1\", \"NF0016-T1\", \"SARCO219-T2\", \"SARCO219-T2\", \"NF0016-T1\", \"SARCO361-T1\", \"SARCO219-T2\", \"NF0014-T1\", \"NF0021-T1\", \"NF0016-T1\", \"NF0018-T6\", \"NF0030-T1\", \"NF0014-T1\", \"NF0014-T1\", \"NF0018-T6\", \"SARCO219-T2\", \"NF0030-T1\", \"NF0030-T1\", \"NF0014-T1\", \"SARCO219-T2\", \"NF0040-T1\", \"NF0018-T6\", \"NF0014-T1\", \"NF0040-T1\", \"SARCO361-T1\", \"NF0021-T1\", \"SARCO361-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0014-T1\", \"NF0021-T1\", \"NF0040-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0021-T1\", \"SARCO219-T2\", \"SARCO219-T2\", \"NF0016-T1\", \"SARCO361-T1\", \"SARCO219-T2\", \"NF0014-T1\", \"NF0021-T1\", \"NF0016-T1\", \"NF0018-T6\", \"NF0030-T1\", \"NF0014-T1\", \"NF0014-T1\", \"NF0018-T6\", \"SARCO219-T2\", \"NF0030-T1\", \"NF0030-T1\", \"NF0014-T1\", \"SARCO219-T2\", \"NF0040-T1\", \"NF0018-T6\", \"NF0014-T1\", \"NF0040-T1\", \"SARCO361-T1\", \"NF0021-T1\", \"SARCO361-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0014-T1\", \"NF0021-T1\", \"NF0040-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0021-T1\", \"SARCO219-T2\", \"SARCO219-T2\", \"NF0016-T1\", \"SARCO361-T1\", \"SARCO219-T2\", \"NF0014-T1\", \"NF0021-T1\", \"NF0016-T1\", \"NF0018-T6\", \"NF0030-T1\", \"NF0014-T1\", \"NF0014-T1\", \"NF0018-T6\", \"SARCO219-T2\", \"NF0030-T1\", \"NF0030-T1\", \"NF0014-T1\", \"SARCO219-T2\", \"NF0040-T1\", \"NF0018-T6\", \"NF0014-T1\", \"NF0040-T1\", \"SARCO361-T1\", \"NF0021-T1\", \"SARCO361-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0014-T1\", \"NF0021-T1\", \"NF0040-T1\", \"NF0018-T6\", \"NF0021-T1\", \"NF0021-T1\", \"SARCO219-T2\", \"SARCO219-T2\", \"NF0016-T1\", \"SARCO361-T1\", \"SARCO219-T2\", \"NF0014-T1\", \"NF0021-T1\", \"NF0016-T1\", \"NF0018-T6\", \"NF0030-T1\", \"NF0014-T1\", \"NF0014-T1\", \"NF0018-T6\", \"SARCO219-T2\", \"NF0030-T1\", \"NF0030-T1\"]"
         },
         "token_usage": {
-          "input_tokens": 5366,
-          "output_tokens": 336,
-          "total_tokens": 5702
+          "input_tokens": 5401,
+          "output_tokens": 340,
+          "total_tokens": 5741
         }
       },
       {
@@ -159,44 +159,44 @@
         },
         "response": {
           "success": true,
-          "content": "```json\n{\n  \"regex\": \"^([A-Za-z0-9.]+(?:\\\\s\\\\([^)]+\\\\))?_\\\\d+)_quant\\\\.sf$\"\n}\n```\n\nThis regex pattern:\n- `^` - Start of string\n- `([A-Za-z0-9.]+(?:\\\\s\\\\([^)]+\\\\))?)` - Captures the sample identifier (letters, numbers, dots) optionally followed by a space and parenthetical content like \"(mixed clone)\"\n- `_\\\\d+` - Matches underscore followed by one or more digits (the replicate number)\n- `_quant\\\\.sf$` - Matches the fixed suffix \"_quant.sf\" at the end\n\nThe capturing group extracts everything before \"_quant.sf\", which includes the sample name and replicate number (e.g., \"HS01_1\", \"ipNF05.5\", \"ipNF05.5 (mixed clone)_1\").",
+          "content": "```json\n{\n  \"regex\": \"^([A-Za-z0-9.()\\\\s]+?)_quant\\\\.sf$\"\n}\n```\n\nThis regex pattern:\n- `^` - Anchors to the start of the filename\n- `([A-Za-z0-9.()\\\\s]+?)` - Captures one or more alphanumeric characters, dots, parentheses, or spaces (non-greedy) in a group\n- `_quant\\\\.sf$` - Matches the literal suffix `_quant.sf` at the end of the filename\n\nWhen used with `re.findall()`, this will extract everything before `_quant.sf`, which matches the expected outputs:\n- `HS01_1` from `HS01_1_quant.sf`\n- `HS01_10` from `HS01_10_quant.sf`\n- `ipNF05.5 (mixed clone)` from `ipNF05.5 (mixed clone)_quant.sf`",
           "model_id": "us.anthropic.claude-haiku-4-5-20251001-v1:0",
           "usage": {
-            "input_tokens": 1352,
+            "input_tokens": 1373,
             "cache_creation_input_tokens": 0,
             "cache_read_input_tokens": 0,
-            "output_tokens": 231
+            "output_tokens": 246
           },
           "attempt": 1,
           "raw_response": {
             "model": "claude-haiku-4-5-20251001",
-            "id": "msg_bdrk_01V7ZwwrHtQXGu9KbQvHeZEp",
+            "id": "msg_bdrk_01BxcWkfvMq8Y7AbzNSPGLzH",
             "type": "message",
             "role": "assistant",
             "content": [
               {
                 "type": "text",
-                "text": "```json\n{\n  \"regex\": \"^([A-Za-z0-9.]+(?:\\\\s\\\\([^)]+\\\\))?_\\\\d+)_quant\\\\.sf$\"\n}\n```\n\nThis regex pattern:\n- `^` - Start of string\n- `([A-Za-z0-9.]+(?:\\\\s\\\\([^)]+\\\\))?)` - Captures the sample identifier (letters, numbers, dots) optionally followed by a space and parenthetical content like \"(mixed clone)\"\n- `_\\\\d+` - Matches underscore followed by one or more digits (the replicate number)\n- `_quant\\\\.sf$` - Matches the fixed suffix \"_quant.sf\" at the end\n\nThe capturing group extracts everything before \"_quant.sf\", which includes the sample name and replicate number (e.g., \"HS01_1\", \"ipNF05.5\", \"ipNF05.5 (mixed clone)_1\")."
+                "text": "```json\n{\n  \"regex\": \"^([A-Za-z0-9.()\\\\s]+?)_quant\\\\.sf$\"\n}\n```\n\nThis regex pattern:\n- `^` - Anchors to the start of the filename\n- `([A-Za-z0-9.()\\\\s]+?)` - Captures one or more alphanumeric characters, dots, parentheses, or spaces (non-greedy) in a group\n- `_quant\\\\.sf$` - Matches the literal suffix `_quant.sf` at the end of the filename\n\nWhen used with `re.findall()`, this will extract everything before `_quant.sf`, which matches the expected outputs:\n- `HS01_1` from `HS01_1_quant.sf`\n- `HS01_10` from `HS01_10_quant.sf`\n- `ipNF05.5 (mixed clone)` from `ipNF05.5 (mixed clone)_quant.sf`"
               }
             ],
             "stop_reason": "end_turn",
             "stop_sequence": null,
             "usage": {
-              "input_tokens": 1352,
+              "input_tokens": 1373,
               "cache_creation_input_tokens": 0,
               "cache_read_input_tokens": 0,
-              "output_tokens": 231
+              "output_tokens": 246
             }
           }
         },
-        "score": 0.0,
+        "score": 0.056179775280898875,
         "ground_truth": {
           "matches": "[\"HS01_1\", \"HS01_10\", \"HS01_11\", \"HS01_12\", \"HS01_13\", \"HS01_14\", \"HS01_15\", \"HS01_16\", \"HS01_17\", \"HS01_18\", \"HS01_2\", \"HS01_3\", \"HS01_4\", \"HS01_5\", \"HS01_6\", \"HS01_7\", \"HS01_8\", \"HS01_9\", \"HS11_1\", \"HS11_10\", \"HS11_11\", \"HS11_12\", \"HS11_13\", \"HS11_14\", \"HS11_15\", \"HS11_16\", \"HS11_17\", \"HS11_18\", \"HS11_2\", \"HS11_3\", \"HS11_4\", \"HS11_5\", \"HS11_6\", \"HS11_7\", \"HS11_8\", \"HS11_9\", \"Syn1_1\", \"Syn1_10\", \"Syn1_11\", \"Syn1_12\", \"Syn1_13\", \"Syn1_14\", \"Syn1_15\", \"Syn1_16\", \"Syn1_17\", \"Syn1_18\", \"Syn1_19\", \"Syn1_2\", \"Syn1_20\", \"Syn1_21\", \"Syn1_22\", \"Syn1_23\", \"Syn1_24\", \"Syn1_3\", \"Syn1_4\", \"Syn1_5\", \"Syn1_6\", \"Syn1_7\", \"Syn1_8\", \"Syn1_9\", \"Syn5_1\", \"Syn5_10\", \"Syn5_11\", \"Syn5_12\", \"Syn5_13\", \"Syn5_14\", \"Syn5_15\", \"Syn5_16\", \"Syn5_17\", \"Syn5_18\", \"Syn5_19\", \"Syn5_2\", \"Syn5_20\", \"Syn5_21\", \"Syn5_22\", \"Syn5_23\", \"Syn5_24\", \"Syn5_3\", \"Syn5_4\", \"Syn5_5\", \"Syn5_6\", \"Syn5_7\", \"Syn5_8\", \"Syn5_9\", \"ipNF05.5\", \"ipNF04.4\", \"ipNF05.5 (mixed clone)\", \"ipn02.3\", \"ipn97.4\"]"
         },
         "token_usage": {
-          "input_tokens": 1352,
-          "output_tokens": 231,
-          "total_tokens": 1583
+          "input_tokens": 1373,
+          "output_tokens": 246,
+          "total_tokens": 1619
         }
       }
     ],
@@ -205,16 +205,16 @@
       "successful_runs": 4,
       "failed_runs": 0,
       "success_rate": 1.0,
-      "average_score": 0.0,
+      "average_score": 0.5140449438202247,
       "min_score": 0.0,
-      "max_score": 0.0,
+      "max_score": 1.0,
       "num_scored": 4
     },
-    "duration_seconds": 11.415115356445312,
+    "duration_seconds": 11.950661897659302,
     "token_usage": {
-      "input_tokens": 8680,
-      "output_tokens": 1083,
-      "total_tokens": 9763
+      "input_tokens": 8807,
+      "output_tokens": 1196,
+      "total_tokens": 10003
     }
   }
 }

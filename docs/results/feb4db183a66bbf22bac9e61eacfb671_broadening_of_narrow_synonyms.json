@@ -1,12 +1,12 @@
 {
   "experiment_id": "feb4db183a66bbf22bac9e61eacfb671",
   "task_name": "broadening_of_narrow_synonyms",
-  "task_hash": "9082f66c620d0bc6fea9232b665ebcbe",
+  "task_hash": "a2c885aa2a82bb5b150f213062bbeb89",
   "model_id": "openai.gpt-oss-20b-1:0",
   "system_instructions": "You are a metadata curation assistant. Your task is to help improve and correct metadata \naccording to the specific instructions provided for each task. Be precise, accurate, and \nfollow the guidelines carefully.\n",
   "temperature": 0.0,
   "thinking": false,
-  "timestamp": "2025-11-13T03:54:00.993246",
+  "timestamp": "2025-11-13T05:05:16.035859",
   "task_result": {
     "task_name": "broadening_of_narrow_synonyms",
     "num_samples": 10,
@@ -20,12 +20,12 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Neurofibromatosis type 1 microdeletion syndrome\" which is a specific subtype. The target schema has \"Neurofibromatosis type 1\" as a value. So we replace with that.\n\nAssay: \"clinical whole-exome sequencing\" is not exactly in enum. The enum has \"whole exome sequencing\" and \"clinical data\" etc. So we should use \"whole exome sequencing\". The \"clinical\" qualifier is removed.\n\nTumorType: \"Plexiform neurofibroma (morphologic abnormality)\" should be broadened to \"Plexiform Neurofibroma\" which is in enum. So replace with that.\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Neurofibromatosis type 1 microdeletion syndrome\" which is a specific subtype. The target schema has \"Neurofibromatosis type 1\" as a value. So we replace with that.\n\nAssay: \"clinical whole-exome sequencing\" is not exactly in the list. The list has \"whole exome sequencing\" as a value. So we replace with that.\n\nTumorType: \"Plexiform neurofibroma (morphologic abnormality)\" is not exactly in list. The list has \"Plexiform Neurofibroma\". So we replace with that.\n\nReturn JSON with same structure. Ensure values match exactly. Also note case sensitivity: \"Plexiform Neurofibroma\" capital N. The input had \"Plexiform neurofibroma\" lower n. Use correct case.\n\nAlso \"Neurofibromatosis type 1\" is exactly in list. Good.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 215,
+            "completion_tokens": 257,
             "prompt_tokens": 2488,
-            "total_tokens": 2703
+            "total_tokens": 2745
           },
           "attempt": 1,
           "raw_response": {
@@ -35,21 +35,21 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Neurofibromatosis type 1 microdeletion syndrome\" which is a specific subtype. The target schema has \"Neurofibromatosis type 1\" as a value. So we replace with that.\n\nAssay: \"clinical whole-exome sequencing\" is not exactly in enum. The enum has \"whole exome sequencing\" and \"clinical data\" etc. So we should use \"whole exome sequencing\". The \"clinical\" qualifier is removed.\n\nTumorType: \"Plexiform neurofibroma (morphologic abnormality)\" should be broadened to \"Plexiform Neurofibroma\" which is in enum. So replace with that.\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Neurofibromatosis type 1 microdeletion syndrome\" which is a specific subtype. The target schema has \"Neurofibromatosis type 1\" as a value. So we replace with that.\n\nAssay: \"clinical whole-exome sequencing\" is not exactly in the list. The list has \"whole exome sequencing\" as a value. So we replace with that.\n\nTumorType: \"Plexiform neurofibroma (morphologic abnormality)\" is not exactly in list. The list has \"Plexiform Neurofibroma\". So we replace with that.\n\nReturn JSON with same structure. Ensure values match exactly. Also note case sensitivity: \"Plexiform Neurofibroma\" capital N. The input had \"Plexiform neurofibroma\" lower n. Use correct case.\n\nAlso \"Neurofibromatosis type 1\" is exactly in list. Good.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006001,
-            "id": "chatcmpl-1f753507-3d3a-4333-81e7-63f5b2b7abe3",
+            "created": 1763010298,
+            "id": "chatcmpl-7e09cfa3-070f-498a-90f7-148570be45e7",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 215,
+              "completion_tokens": 257,
               "prompt_tokens": 2488,
-              "total_tokens": 2703
+              "total_tokens": 2745
             }
           }
         },
@@ -62,7 +62,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2703
+          "total_tokens": 2745
         }
       },
       {
@@ -74,16 +74,12 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with optic pathway glioma\". The target schema has diagnosis options: includes \"Neurofibromatosis type 1\" and \"Optic Pathway Glioma\" is a tumor type. But diagnosis field expects a diagnosis or condition. The input includes a combined phrase. We need to choose a single value from enum. The best match is \"Neurofibromatosis type 1\" maybe. But the phrase includes optic pathway glioma, but diagnosis field likely should be \"Neurofibromatosis type 1\". So we replace with that.\n\nAssay: \"Illumina whole exome sequencing\". The enum includes \"whole exome sequencing\". So we use that exact value. Remove trailing space.\n\nTumorType: \"malignant triton tumor\". The enum includes \"Malignant Peripheral Nerve Sheath Tumor\" and \"Triton tumor\" is a type of malignant peripheral nerve sheath tumor. The broader term is \"Malignant Peripheral Nerve Sheath Tumor\". So we replace with that.\n\nReturn JSON with same structure.\n\nThus:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nCheck case: enum values are case-sensitive. Use exactly as in enum. \"Neurofibromatosis type 1\" matches. \"whole exome sequencing\" matches. \"Malignant Peripheral Nerve Sheath Tumor\" matches.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with optic pathway glioma\". The target schema has \"Neurofibromatosis type 1\" as a diagnosis. Also \"Optic Pathway Glioma\" is a tumorType. So diagnosis should be \"Neurofibromatosis type 1\". assay: \"Illumina whole exome sequencing\" - target has \"whole exome sequencing\" as an enum. So we need to match exactly \"whole exome sequencing\". tumorType: \"malignant triton tumor\" - not in enum. There's \"Malignant Peripheral Nerve Sheath Tumor\" maybe? \"Triton tumor\" is a type of malignant peripheral nerve sheath tumor. So broaden to \"Malignant Peripheral Nerve Sheath Tumor\". Also \"malignant triton tumor\" maybe \"Malignant Peripheral Nerve Sheath Tumor\". So output JSON with corrected values.\n\nCheck that \"Malignant Peripheral Nerve Sheath Tumor\" is in tumorType enum. Yes.\n\nAlso ensure no trailing spaces. So final JSON:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nReturn as JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 396,
+            "completion_tokens": 338,
             "prompt_tokens": 2484,
-            "prompt_tokens_details": {
-              "audio_tokens": 0,
-              "cached_tokens": 2416
-            },
-            "total_tokens": 2880
+            "total_tokens": 2822
           },
           "attempt": 1,
           "raw_response": {
@@ -93,25 +89,21 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with optic pathway glioma\". The target schema has diagnosis options: includes \"Neurofibromatosis type 1\" and \"Optic Pathway Glioma\" is a tumor type. But diagnosis field expects a diagnosis or condition. The input includes a combined phrase. We need to choose a single value from enum. The best match is \"Neurofibromatosis type 1\" maybe. But the phrase includes optic pathway glioma, but diagnosis field likely should be \"Neurofibromatosis type 1\". So we replace with that.\n\nAssay: \"Illumina whole exome sequencing\". The enum includes \"whole exome sequencing\". So we use that exact value. Remove trailing space.\n\nTumorType: \"malignant triton tumor\". The enum includes \"Malignant Peripheral Nerve Sheath Tumor\" and \"Triton tumor\" is a type of malignant peripheral nerve sheath tumor. The broader term is \"Malignant Peripheral Nerve Sheath Tumor\". So we replace with that.\n\nReturn JSON with same structure.\n\nThus:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nCheck case: enum values are case-sensitive. Use exactly as in enum. \"Neurofibromatosis type 1\" matches. \"whole exome sequencing\" matches. \"Malignant Peripheral Nerve Sheath Tumor\" matches.\n\nReturn JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with optic pathway glioma\". The target schema has \"Neurofibromatosis type 1\" as a diagnosis. Also \"Optic Pathway Glioma\" is a tumorType. So diagnosis should be \"Neurofibromatosis type 1\". assay: \"Illumina whole exome sequencing\" - target has \"whole exome sequencing\" as an enum. So we need to match exactly \"whole exome sequencing\". tumorType: \"malignant triton tumor\" - not in enum. There's \"Malignant Peripheral Nerve Sheath Tumor\" maybe? \"Triton tumor\" is a type of malignant peripheral nerve sheath tumor. So broaden to \"Malignant Peripheral Nerve Sheath Tumor\". Also \"malignant triton tumor\" maybe \"Malignant Peripheral Nerve Sheath Tumor\". So output JSON with corrected values.\n\nCheck that \"Malignant Peripheral Nerve Sheath Tumor\" is in tumorType enum. Yes.\n\nAlso ensure no trailing spaces. So final JSON:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nReturn as JSON.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006009,
-            "id": "chatcmpl-8a9dfe19-9442-4e93-88b8-3b89657906b9",
+            "created": 1763010300,
+            "id": "chatcmpl-da52fa6a-b347-400c-adb2-70fcdad74a35",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 396,
+              "completion_tokens": 338,
               "prompt_tokens": 2484,
-              "prompt_tokens_details": {
-                "audio_tokens": 0,
-                "cached_tokens": 2416
-              },
-              "total_tokens": 2880
+              "total_tokens": 2822
             }
           }
         },
@@ -124,7 +116,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2880
+          "total_tokens": 2822
         }
       },
       {
@@ -136,12 +128,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Watson Syndrome\" which is not in enum. We need to replace with a broader standard term. Watson Syndrome likely is a type of neurofibromatosis? Actually Watson syndrome is a rare neurocutaneous syndrome? Might be a variant of neurofibromatosis type 1? But the target schema includes \"Neurofibromatosis type 1\" as a diagnosis. So we should replace \"Watson Syndrome\" with \"Neurofibromatosis type 1\" (the broader term). Next assay: \"MGI whole genome sequencing\" is not in enum. The enum includes \"whole genome sequencing\". So we should replace with \"whole genome sequencing\". TumorType: \"Malignant Peripheral Nerve Sheath Tumor with Mesenchymal Differentiation\" not in enum. The enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that. Return JSON with same structure. Ensure values match exactly.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Watson Syndrome\" which is not in enum. We need to replace with a broader standard term. Watson Syndrome likely is a type of neurofibromatosis? Actually Watson syndrome is a rare neurocutaneous syndrome? Might be a variant of neurofibromatosis type 1? But the target schema includes \"Neurofibromatosis type 1\" as a diagnosis. So we should replace \"Watson Syndrome\" with \"Neurofibromatosis type 1\" (the broader term). Next assay: \"MGI whole genome sequencing\" is not in enum. The enum includes \"whole genome sequencing\". So we should replace with \"whole genome sequencing\". TumorType: \"Malignant Peripheral Nerve Sheath Tumor with Mesenchymal Differentiation\" not in enum. The enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that. Return JSON with same structure. Ensure values match exactly. So output:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nCheck that \"whole genome sequencing\" is exactly in enum. Yes. \"Malignant Peripheral Nerve Sheath Tumor\" is in enum. \"Neurofibromatosis type 1\" is in enum. Good.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 262,
+            "completion_tokens": 356,
             "prompt_tokens": 2482,
-            "total_tokens": 2744
+            "prompt_tokens_details": {
+              "audio_tokens": 0,
+              "cached_tokens": 2416
+            },
+            "total_tokens": 2838
           },
           "attempt": 1,
           "raw_response": {
@@ -151,25 +147,29 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Watson Syndrome\" which is not in enum. We need to replace with a broader standard term. Watson Syndrome likely is a type of neurofibromatosis? Actually Watson syndrome is a rare neurocutaneous syndrome? Might be a variant of neurofibromatosis type 1? But the target schema includes \"Neurofibromatosis type 1\" as a diagnosis. So we should replace \"Watson Syndrome\" with \"Neurofibromatosis type 1\" (the broader term). Next assay: \"MGI whole genome sequencing\" is not in enum. The enum includes \"whole genome sequencing\". So we should replace with \"whole genome sequencing\". TumorType: \"Malignant Peripheral Nerve Sheath Tumor with Mesenchymal Differentiation\" not in enum. The enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that. Return JSON with same structure. Ensure values match exactly.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"Watson Syndrome\" which is not in enum. We need to replace with a broader standard term. Watson Syndrome likely is a type of neurofibromatosis? Actually Watson syndrome is a rare neurocutaneous syndrome? Might be a variant of neurofibromatosis type 1? But the target schema includes \"Neurofibromatosis type 1\" as a diagnosis. So we should replace \"Watson Syndrome\" with \"Neurofibromatosis type 1\" (the broader term). Next assay: \"MGI whole genome sequencing\" is not in enum. The enum includes \"whole genome sequencing\". So we should replace with \"whole genome sequencing\". TumorType: \"Malignant Peripheral Nerve Sheath Tumor with Mesenchymal Differentiation\" not in enum. The enum includes \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that. Return JSON with same structure. Ensure values match exactly. So output:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n\nCheck that \"whole genome sequencing\" is exactly in enum. Yes. \"Malignant Peripheral Nerve Sheath Tumor\" is in enum. \"Neurofibromatosis type 1\" is in enum. Good.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006014,
-            "id": "chatcmpl-022cacd3-2177-4d6b-8eb0-5b28084adaca",
+            "created": 1763010302,
+            "id": "chatcmpl-bb768048-d70f-4154-9f41-ba57d1e8cc51",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 262,
+              "completion_tokens": 356,
               "prompt_tokens": 2482,
-              "total_tokens": 2744
+              "prompt_tokens_details": {
+                "audio_tokens": 0,
+                "cached_tokens": 2416
+              },
+              "total_tokens": 2838
             }
           }
         },
-        "score": 1.0,
+        "score": 0.0,
         "ground_truth": {
           "diagnosis": "Neurofibromatosis type 1",
           "assay": "whole genome sequencing",
@@ -178,7 +178,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2744
+          "total_tokens": 2838
         }
       },
       {
@@ -190,16 +190,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"neurofibromatosis, familial spinal\" which is a narrow term. The target schema has \"Neurofibromatosis type 1\" and \"Neurofibromatosis type 2\" maybe? Actually schema includes \"Neurofibromatosis type 1\" but not \"familial spinal\". There's also \"NF1-Associated Tumor\" etc. For diagnosis, we need to choose the best match. \"neurofibromatosis, familial spinal\" likely refers to NF1? Actually familial spinal neurofibromatosis is NF1? NF1 is neurofibromatosis type 1, which includes plexiform neurofibromas, etc. So we should use \"Neurofibromatosis type 1\". The schema also has \"Noonan Syndrome\", \"Not Applicable\", \"Unknown\". So we choose \"Neurofibromatosis type 1\".\n\nAssay: \"open MRI\" is not in the list. The list includes \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"diffusion MRI\", \"magnetic resonance angiography\", \"magnetic resonance spectroscopy\", \"Magnetization-Prepared Rapid Gradient Echo MRI\". \"open MRI\" is a type of MRI but not in list. The broader term is \"conventional MRI\" maybe. So we replace with \"conventional MRI\".\n\nTumorType: \"unknown - no information available\" should be \"Unknown\" as per schema.\n\nThus output JSON with those values.\n\nCheck that \"Neurofibromatosis type 1\" is exactly in enum. Yes.\n\nReturn JSON with same structure.\n\n</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"neurofibromatosis, familial spinal\" which is a narrow term. The target schema has \"Neurofibromatosis type 1\" and \"Neurofibromatosis type 2\" maybe? Actually schema includes \"Neurofibromatosis type 1\" but not \"familial spinal\". There's also \"NF1-Associated Tumor\" etc. For diagnosis, we need to choose the best match. \"neurofibromatosis, familial spinal\" likely refers to NF1? Actually familial spinal neurofibromatosis is NF1? NF1 is neurofibromatosis type 1, which is autosomal dominant, with neurofibromas, caf\u00e9-au-lait spots, etc. NF2 is bilateral vestibular schwannomas. So \"familial spinal\" might be NF1. So we should set diagnosis to \"Neurofibromatosis type 1\". Next assay: \"open MRI\" is not in list. The list includes \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"resting state functional MRI\", \"diffusion MRI\", \"magnetic resonance angiography\", \"magnetic resonance spectroscopy\", \"magnetic resonance imaging\" not present. \"open MRI\" is a type of conventional MRI. So we should use \"conventional MRI\". Next tumorType: \"unknown - no information available\" should be \"Unknown\" from list. So output JSON with those values. Ensure same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 394,
+            "completion_tokens": 363,
             "prompt_tokens": 2474,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2868
+            "total_tokens": 2837
           },
           "attempt": 1,
           "raw_response": {
@@ -209,25 +209,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"neurofibromatosis, familial spinal\" which is a narrow term. The target schema has \"Neurofibromatosis type 1\" and \"Neurofibromatosis type 2\" maybe? Actually schema includes \"Neurofibromatosis type 1\" but not \"familial spinal\". There's also \"NF1-Associated Tumor\" etc. For diagnosis, we need to choose the best match. \"neurofibromatosis, familial spinal\" likely refers to NF1? Actually familial spinal neurofibromatosis is NF1? NF1 is neurofibromatosis type 1, which includes plexiform neurofibromas, etc. So we should use \"Neurofibromatosis type 1\". The schema also has \"Noonan Syndrome\", \"Not Applicable\", \"Unknown\". So we choose \"Neurofibromatosis type 1\".\n\nAssay: \"open MRI\" is not in the list. The list includes \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"diffusion MRI\", \"magnetic resonance angiography\", \"magnetic resonance spectroscopy\", \"Magnetization-Prepared Rapid Gradient Echo MRI\". \"open MRI\" is a type of MRI but not in list. The broader term is \"conventional MRI\" maybe. So we replace with \"conventional MRI\".\n\nTumorType: \"unknown - no information available\" should be \"Unknown\" as per schema.\n\nThus output JSON with those values.\n\nCheck that \"Neurofibromatosis type 1\" is exactly in enum. Yes.\n\nReturn JSON with same structure.\n\n</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis \"neurofibromatosis, familial spinal\" which is a narrow term. The target schema has \"Neurofibromatosis type 1\" and \"Neurofibromatosis type 2\" maybe? Actually schema includes \"Neurofibromatosis type 1\" but not \"familial spinal\". There's also \"NF1-Associated Tumor\" etc. For diagnosis, we need to choose the best match. \"neurofibromatosis, familial spinal\" likely refers to NF1? Actually familial spinal neurofibromatosis is NF1? NF1 is neurofibromatosis type 1, which is autosomal dominant, with neurofibromas, caf\u00e9-au-lait spots, etc. NF2 is bilateral vestibular schwannomas. So \"familial spinal\" might be NF1. So we should set diagnosis to \"Neurofibromatosis type 1\". Next assay: \"open MRI\" is not in list. The list includes \"conventional MRI\", \"structural MRI\", \"functional MRI\", \"resting state functional MRI\", \"diffusion MRI\", \"magnetic resonance angiography\", \"magnetic resonance spectroscopy\", \"magnetic resonance imaging\" not present. \"open MRI\" is a type of conventional MRI. So we should use \"conventional MRI\". Next tumorType: \"unknown - no information available\" should be \"Unknown\" from list. So output JSON with those values. Ensure same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006020,
-            "id": "chatcmpl-1e3f4ed9-1f2d-4d6a-97f0-b7f523f5413c",
+            "created": 1763010304,
+            "id": "chatcmpl-a3e3ce84-b323-478e-9198-1a72151c8e0f",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 394,
+              "completion_tokens": 363,
               "prompt_tokens": 2474,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2868
+              "total_tokens": 2837
             }
           }
         },
@@ -240,7 +240,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2868
+          "total_tokens": 2837
         }
       },
       {
@@ -277,8 +277,8 @@
                 }
               }
             ],
-            "created": 1763006025,
-            "id": "chatcmpl-16e3573d-0bd6-4c9e-bea8-4539ca8d026e",
+            "created": 1763010307,
+            "id": "chatcmpl-65bb49c9-9c93-4ccb-9d51-f6ca34717caf",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
@@ -314,16 +314,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"chromosome 17q11.2 deletion syndrome, 1.4Mb\". That likely refers to Neurofibromatosis type 1 (NF1) because deletion at 17q11.2 is NF1 gene. The controlled terms include \"Neurofibromatosis type 1\". So replace diagnosis with that.\n\nAssay: \"cell viability assay using Annexin V staining\". Controlled terms include \"cell viability assay\" and \"Annexin V staining\" is a method for apoptosis detection. But we need to match exact controlled value. The list includes \"cell viability assay\" as a value. So we should use \"cell viability assay\". The phrase \"using Annexin V staining\" is not in list. So we replace with \"cell viability assay\".\n\nTumorType: \"Pedunculated Cutaneous Neurofibroma\". Controlled terms include \"Cutaneous Neurofibroma\" and \"Localized Neurofibroma\" etc. \"Pedunculated\" is a descriptor. So broaden to \"Cutaneous Neurofibroma\". So output JSON with those values.\n\nReturn JSON with same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"chromosome 17q11.2 deletion syndrome, 1.4Mb\". That likely refers to Neurofibromatosis type 1 (NF1) because deletion at 17q11.2 includes NF1 gene. The controlled terms include \"Neurofibromatosis type 1\". So replace diagnosis with that.\n\nAssay: \"cell viability assay using Annexin V staining\". Controlled terms include \"cell viability assay\" and \"Annexin V staining\" is a method for apoptosis detection. But we need to match exact controlled value. The list includes \"cell viability assay\". So we should use that. The phrase \"cell viability assay using Annexin V staining\" is too specific. So replace with \"cell viability assay\".\n\nTumorType: \"Pedunculated Cutaneous Neurofibroma\". Controlled terms include \"Cutaneous Neurofibroma\" and \"Localized Neurofibroma\" etc. \"Pedunculated\" is a descriptor. So broaden to \"Cutaneous Neurofibroma\". So output JSON with those values.\n\nReturn JSON with same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 289,
+            "completion_tokens": 283,
             "prompt_tokens": 2490,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2779
+            "total_tokens": 2773
           },
           "attempt": 1,
           "raw_response": {
@@ -333,25 +333,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"chromosome 17q11.2 deletion syndrome, 1.4Mb\". That likely refers to Neurofibromatosis type 1 (NF1) because deletion at 17q11.2 is NF1 gene. The controlled terms include \"Neurofibromatosis type 1\". So replace diagnosis with that.\n\nAssay: \"cell viability assay using Annexin V staining\". Controlled terms include \"cell viability assay\" and \"Annexin V staining\" is a method for apoptosis detection. But we need to match exact controlled value. The list includes \"cell viability assay\" as a value. So we should use \"cell viability assay\". The phrase \"using Annexin V staining\" is not in list. So we replace with \"cell viability assay\".\n\nTumorType: \"Pedunculated Cutaneous Neurofibroma\". Controlled terms include \"Cutaneous Neurofibroma\" and \"Localized Neurofibroma\" etc. \"Pedunculated\" is a descriptor. So broaden to \"Cutaneous Neurofibroma\". So output JSON with those values.\n\nReturn JSON with same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"chromosome 17q11.2 deletion syndrome, 1.4Mb\". That likely refers to Neurofibromatosis type 1 (NF1) because deletion at 17q11.2 includes NF1 gene. The controlled terms include \"Neurofibromatosis type 1\". So replace diagnosis with that.\n\nAssay: \"cell viability assay using Annexin V staining\". Controlled terms include \"cell viability assay\" and \"Annexin V staining\" is a method for apoptosis detection. But we need to match exact controlled value. The list includes \"cell viability assay\". So we should use that. The phrase \"cell viability assay using Annexin V staining\" is too specific. So replace with \"cell viability assay\".\n\nTumorType: \"Pedunculated Cutaneous Neurofibroma\". Controlled terms include \"Cutaneous Neurofibroma\" and \"Localized Neurofibroma\" etc. \"Pedunculated\" is a descriptor. So broaden to \"Cutaneous Neurofibroma\". So output JSON with those values.\n\nReturn JSON with same structure.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006027,
-            "id": "chatcmpl-6ec6ecb6-9e3d-4778-8c8e-3bc66cbc1367",
+            "created": 1763010308,
+            "id": "chatcmpl-0323c204-2795-42f3-84a1-108158147c80",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 289,
+              "completion_tokens": 283,
               "prompt_tokens": 2490,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2779
+              "total_tokens": 2773
             }
           }
         },
@@ -364,7 +364,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2779
+          "total_tokens": 2773
         }
       },
       {
@@ -376,16 +376,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with scoliosis\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that. Also \"with scoliosis\" is extra. So correct to \"Neurofibromatosis type 1\".\n\nAssay: \"anti-tag immunocytochemistry\". The target schema has \"immunocytochemistry\" as a value. So replace with that.\n\nTumorType: \"sessile cutaneous neurofibroma\". The target schema has \"Cutaneous Neurofibroma\" as a value. So replace with that.\n\nReturn JSON with same structure. Ensure values match exactly. So:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck that \"Cutaneous Neurofibroma\" is in enum. Yes. Good.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
+          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with scoliosis\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that. Also \"with scoliosis\" is extra. So diagnosis should be \"Neurofibromatosis type 1\".\n\nAssay: \"anti-tag immunocytochemistry\". The target schema has \"immunocytochemistry\" as a value. So replace with that.\n\nTumorType: \"sessile cutaneous neurofibroma\". The target schema has \"Cutaneous Neurofibroma\" as a value. So replace with that.\n\nReturn JSON with same structure. Ensure values match exactly. So:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck that \"Cutaneous Neurofibroma\" is in enum. Yes. Good.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 260,
+            "completion_tokens": 261,
             "prompt_tokens": 2482,
             "prompt_tokens_details": {
               "audio_tokens": 0,
-              "cached_tokens": 2416
+              "cached_tokens": 2432
             },
-            "total_tokens": 2742
+            "total_tokens": 2743
           },
           "attempt": 1,
           "raw_response": {
@@ -395,25 +395,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with scoliosis\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that. Also \"with scoliosis\" is extra. So correct to \"Neurofibromatosis type 1\".\n\nAssay: \"anti-tag immunocytochemistry\". The target schema has \"immunocytochemistry\" as a value. So replace with that.\n\nTumorType: \"sessile cutaneous neurofibroma\". The target schema has \"Cutaneous Neurofibroma\" as a value. So replace with that.\n\nReturn JSON with same structure. Ensure values match exactly. So:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck that \"Cutaneous Neurofibroma\" is in enum. Yes. Good.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
+                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"Neurofibromatosis type 1 with scoliosis\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that. Also \"with scoliosis\" is extra. So diagnosis should be \"Neurofibromatosis type 1\".\n\nAssay: \"anti-tag immunocytochemistry\". The target schema has \"immunocytochemistry\" as a value. So replace with that.\n\nTumorType: \"sessile cutaneous neurofibroma\". The target schema has \"Cutaneous Neurofibroma\" as a value. So replace with that.\n\nReturn JSON with same structure. Ensure values match exactly. So:\n\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n\nCheck that \"Cutaneous Neurofibroma\" is in enum. Yes. Good.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006030,
-            "id": "chatcmpl-0753270f-a806-4427-9fb8-445ff616d6c7",
+            "created": 1763010309,
+            "id": "chatcmpl-bdd5eb03-3385-459b-ab5e-466bfb1b9088",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 260,
+              "completion_tokens": 261,
               "prompt_tokens": 2482,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
-                "cached_tokens": 2416
+                "cached_tokens": 2432
               },
-              "total_tokens": 2742
+              "total_tokens": 2743
             }
           }
         },
@@ -426,7 +426,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2742
+          "total_tokens": 2743
         }
       },
       {
@@ -438,16 +438,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms to standard terms. Input has diagnosis \"neurofibromatosis, peripheral type\" which likely maps to \"Neurofibromatosis type 1\" or \"Neurofibromatosis type 2\"? Peripheral type refers to NF1? Actually NF1 is neurofibromatosis type 1, associated with neurofibromas. NF2 is vestibular schwannoma. So \"neurofibromatosis, peripheral type\" likely NF1. So we replace with \"Neurofibromatosis type 1\".\n\nAssay \"wide bore MRI\" should be \"conventional MRI\" or \"structural MRI\"? The schema has \"conventional MRI\" and \"structural MRI\". Wide bore MRI is a type of conventional MRI. So use \"conventional MRI\".\n\nTumorType \"no clear diagnosis\" should be \"Not Applicable\" or \"Unknown\"? The schema has \"Not Applicable\" and \"Unknown\". \"no clear diagnosis\" likely \"Not Applicable\" or \"Unknown\". I'd choose \"Not Applicable\" maybe. But \"no clear diagnosis\" indicates no tumor type known. \"Unknown\" might be better. The schema includes \"Unknown\". So use \"Unknown\".\n\nReturn JSON with same structure. Ensure values match exactly.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms. Input: diagnosis \"neurofibromatosis, peripheral type\" should be broadened to a standard term from schema. The schema has \"Neurofibromatosis type 1\" and \"NF1-Associated Tumor\" etc. \"neurofibromatosis, peripheral type\" likely refers to Neurofibromatosis type 1? Actually NF1 is neurofibromatosis type 1, which is characterized by peripheral neurofibromas. So we should map to \"Neurofibromatosis type 1\". That is in enum. So set diagnosis to \"Neurofibromatosis type 1\".\n\nAssay: \"wide bore MRI\" should be broadened to \"conventional MRI\" or \"structural MRI\" or \"diffusion MRI\"? The schema has \"conventional MRI\" and \"structural MRI\". \"wide bore MRI\" is a type of conventional MRI. So use \"conventional MRI\". That is in enum.\n\nTumorType: \"no clear diagnosis\" should be broadened to \"Not Applicable\" or \"Unknown\". The schema has \"Not Applicable\" and \"Unknown\". \"no clear diagnosis\" likely means unknown. So set to \"Unknown\" or \"Not Applicable\"? \"Not Applicable\" is used when not applicable. \"Unknown\" is for unknown. So choose \"Unknown\".\n\nReturn JSON with same structure. Ensure values match exactly.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 312,
+            "completion_tokens": 340,
             "prompt_tokens": 2473,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2785
+            "total_tokens": 2813
           },
           "attempt": 1,
           "raw_response": {
@@ -457,25 +457,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms to standard terms. Input has diagnosis \"neurofibromatosis, peripheral type\" which likely maps to \"Neurofibromatosis type 1\" or \"Neurofibromatosis type 2\"? Peripheral type refers to NF1? Actually NF1 is neurofibromatosis type 1, associated with neurofibromas. NF2 is vestibular schwannoma. So \"neurofibromatosis, peripheral type\" likely NF1. So we replace with \"Neurofibromatosis type 1\".\n\nAssay \"wide bore MRI\" should be \"conventional MRI\" or \"structural MRI\"? The schema has \"conventional MRI\" and \"structural MRI\". Wide bore MRI is a type of conventional MRI. So use \"conventional MRI\".\n\nTumorType \"no clear diagnosis\" should be \"Not Applicable\" or \"Unknown\"? The schema has \"Not Applicable\" and \"Unknown\". \"no clear diagnosis\" likely \"Not Applicable\" or \"Unknown\". I'd choose \"Not Applicable\" maybe. But \"no clear diagnosis\" indicates no tumor type known. \"Unknown\" might be better. The schema includes \"Unknown\". So use \"Unknown\".\n\nReturn JSON with same structure. Ensure values match exactly.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms. Input: diagnosis \"neurofibromatosis, peripheral type\" should be broadened to a standard term from schema. The schema has \"Neurofibromatosis type 1\" and \"NF1-Associated Tumor\" etc. \"neurofibromatosis, peripheral type\" likely refers to Neurofibromatosis type 1? Actually NF1 is neurofibromatosis type 1, which is characterized by peripheral neurofibromas. So we should map to \"Neurofibromatosis type 1\". That is in enum. So set diagnosis to \"Neurofibromatosis type 1\".\n\nAssay: \"wide bore MRI\" should be broadened to \"conventional MRI\" or \"structural MRI\" or \"diffusion MRI\"? The schema has \"conventional MRI\" and \"structural MRI\". \"wide bore MRI\" is a type of conventional MRI. So use \"conventional MRI\". That is in enum.\n\nTumorType: \"no clear diagnosis\" should be broadened to \"Not Applicable\" or \"Unknown\". The schema has \"Not Applicable\" and \"Unknown\". \"no clear diagnosis\" likely means unknown. So set to \"Unknown\" or \"Not Applicable\"? \"Not Applicable\" is used when not applicable. \"Unknown\" is for unknown. So choose \"Unknown\".\n\nReturn JSON with same structure. Ensure values match exactly.</reasoning>{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006033,
-            "id": "chatcmpl-35a591d9-81f0-4f62-9e1d-d72f4ab9e2b0",
+            "created": 1763010311,
+            "id": "chatcmpl-2b2904b3-dacb-4bd5-8238-af6191341c04",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 312,
+              "completion_tokens": 340,
               "prompt_tokens": 2473,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2785
+              "total_tokens": 2813
             }
           }
         },
@@ -488,7 +488,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2785
+          "total_tokens": 2813
         }
       },
       {
@@ -500,16 +500,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms to standard terms. Input has diagnosis \"acoustic neurofibromatosis\" which likely maps to \"Vestibular Schwannoma\" or \"Schwannoma\"? The controlled terms: \"Vestibular Schwannoma\" is a type of schwannoma. \"acoustic neurofibromatosis\" is a condition? Actually acoustic neurofibromatosis is another term for vestibular schwannoma. So we should replace with \"Vestibular Schwannoma\" or \"Schwannoma\"? The diagnosis field expects a diagnosis or condition. The controlled list includes \"Vestibular Schwannoma\". So we set diagnosis: \"Vestibular Schwannoma\".\n\nAssay: \"RNA-seq with ribosomal RNA depletion\". Controlled values include \"RNA-seq\". So we set assay: \"RNA-seq\".\n\nTumorType: \"Acoustic neuroma of left vestibular nerve\". Controlled list includes \"Schwannoma\" and \"Vestibular Schwannoma\"? Actually tumorType list includes \"Schwannoma\" but not \"Vestibular Schwannoma\". The list includes \"Schwannoma\" generic. So we set tumorType: \"Schwannoma\". Or maybe \"Schwannoma\" is generic. There's also \"Schwannoma\" in list. So we set tumorType: \"Schwannoma\".\n\nReturn JSON with same structure. Ensure values match exactly.</reasoning>```json\n{\n  \"diagnosis\": \"Vestibular Schwannoma\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Schwannoma\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms to standard terms. Input has diagnosis \"acoustic neurofibromatosis\" which likely maps to \"Vestibular Schwannoma\" or \"Schwannomatosis\"? Acoustic neurofibromatosis is vestibular schwannoma. So use \"Vestibular Schwannoma\". Assay \"RNA-seq with ribosomal RNA depletion\" is a type of RNA-seq. The controlled term is \"RNA-seq\". So use that. TumorType \"Acoustic neuroma of left vestibular nerve\" is vestibular schwannoma. Controlled term \"Vestibular Schwannoma\". So output JSON with those values. Ensure fields match.</reasoning>```json\n{\n  \"diagnosis\": \"Vestibular Schwannoma\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Vestibular Schwannoma\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 339,
+            "completion_tokens": 193,
             "prompt_tokens": 2482,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2821
+            "total_tokens": 2675
           },
           "attempt": 1,
           "raw_response": {
@@ -519,25 +519,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms to standard terms. Input has diagnosis \"acoustic neurofibromatosis\" which likely maps to \"Vestibular Schwannoma\" or \"Schwannoma\"? The controlled terms: \"Vestibular Schwannoma\" is a type of schwannoma. \"acoustic neurofibromatosis\" is a condition? Actually acoustic neurofibromatosis is another term for vestibular schwannoma. So we should replace with \"Vestibular Schwannoma\" or \"Schwannoma\"? The diagnosis field expects a diagnosis or condition. The controlled list includes \"Vestibular Schwannoma\". So we set diagnosis: \"Vestibular Schwannoma\".\n\nAssay: \"RNA-seq with ribosomal RNA depletion\". Controlled values include \"RNA-seq\". So we set assay: \"RNA-seq\".\n\nTumorType: \"Acoustic neuroma of left vestibular nerve\". Controlled list includes \"Schwannoma\" and \"Vestibular Schwannoma\"? Actually tumorType list includes \"Schwannoma\" but not \"Vestibular Schwannoma\". The list includes \"Schwannoma\" generic. So we set tumorType: \"Schwannoma\". Or maybe \"Schwannoma\" is generic. There's also \"Schwannoma\" in list. So we set tumorType: \"Schwannoma\".\n\nReturn JSON with same structure. Ensure values match exactly.</reasoning>```json\n{\n  \"diagnosis\": \"Vestibular Schwannoma\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Schwannoma\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms to standard terms. Input has diagnosis \"acoustic neurofibromatosis\" which likely maps to \"Vestibular Schwannoma\" or \"Schwannomatosis\"? Acoustic neurofibromatosis is vestibular schwannoma. So use \"Vestibular Schwannoma\". Assay \"RNA-seq with ribosomal RNA depletion\" is a type of RNA-seq. The controlled term is \"RNA-seq\". So use that. TumorType \"Acoustic neuroma of left vestibular nerve\" is vestibular schwannoma. Controlled term \"Vestibular Schwannoma\". So output JSON with those values. Ensure fields match.</reasoning>```json\n{\n  \"diagnosis\": \"Vestibular Schwannoma\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Vestibular Schwannoma\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006035,
-            "id": "chatcmpl-862595e8-d19d-4ebf-8ce6-1ee996a98c21",
+            "created": 1763010313,
+            "id": "chatcmpl-44f3a8b9-d10f-4858-9a9c-3eb0ab5421ba",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 339,
+              "completion_tokens": 193,
               "prompt_tokens": 2482,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2821
+              "total_tokens": 2675
             }
           }
         },
@@ -550,7 +550,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2821
+          "total_tokens": 2675
         }
       },
       {
@@ -562,16 +562,16 @@
         },
         "response": {
           "success": true,
-          "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"neurofibromatosis type 1 due to NF1 mutation or intragenic deletion\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that exact string. For assay: \"CellTiter-Glo\u00ae 3D Cell Viability Assay\". The target schema has \"3D microtissue viability\" as a value. That seems the broad term. So replace assay with \"3D microtissue viability\". For tumorType: \"Epithelioid Malignant Peripheral Nerve Sheath Tumor\". The target schema has \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that. Ensure JSON structure same. Return corrected metadata.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+          "content": "<reasoning>We need to broaden narrow synonyms. The input has diagnosis: \"neurofibromatosis type 1 due to NF1 mutation or intragenic deletion\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that exact string.\n\nAssay: \"CellTiter-Glo\u00ae 3D Cell Viability Assay\". The target schema has \"3D microtissue viability\" as an assay. Also \"Cell viability assay\" maybe. But \"CellTiter-Glo 3D Cell Viability Assay\" is a 3D viability assay. The schema has \"3D microtissue viability\". That seems appropriate. So replace with \"3D microtissue viability\".\n\nTumorType: \"Epithelioid Malignant Peripheral Nerve Sheath Tumor\". The schema has \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that.\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
           "model_id": "openai.gpt-oss-20b-1:0",
           "usage": {
-            "completion_tokens": 224,
+            "completion_tokens": 266,
             "prompt_tokens": 2507,
             "prompt_tokens_details": {
               "audio_tokens": 0,
               "cached_tokens": 2416
             },
-            "total_tokens": 2731
+            "total_tokens": 2773
           },
           "attempt": 1,
           "raw_response": {
@@ -581,25 +581,25 @@
                 "index": 0,
                 "logprobs": null,
                 "message": {
-                  "content": "<reasoning>We need to broaden narrow synonyms. Input has diagnosis: \"neurofibromatosis type 1 due to NF1 mutation or intragenic deletion\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that exact string. For assay: \"CellTiter-Glo\u00ae 3D Cell Viability Assay\". The target schema has \"3D microtissue viability\" as a value. That seems the broad term. So replace assay with \"3D microtissue viability\". For tumorType: \"Epithelioid Malignant Peripheral Nerve Sheath Tumor\". The target schema has \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that. Ensure JSON structure same. Return corrected metadata.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
+                  "content": "<reasoning>We need to broaden narrow synonyms. The input has diagnosis: \"neurofibromatosis type 1 due to NF1 mutation or intragenic deletion\". The target schema has \"Neurofibromatosis type 1\" as a value. So we should replace with that exact string.\n\nAssay: \"CellTiter-Glo\u00ae 3D Cell Viability Assay\". The target schema has \"3D microtissue viability\" as an assay. Also \"Cell viability assay\" maybe. But \"CellTiter-Glo 3D Cell Viability Assay\" is a 3D viability assay. The schema has \"3D microtissue viability\". That seems appropriate. So replace with \"3D microtissue viability\".\n\nTumorType: \"Epithelioid Malignant Peripheral Nerve Sheath Tumor\". The schema has \"Malignant Peripheral Nerve Sheath Tumor\". So replace with that.\n\nReturn JSON with same structure. Ensure values exactly match.</reasoning>```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"3D microtissue viability\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```",
                   "refusal": null,
                   "role": "assistant"
                 }
               }
             ],
-            "created": 1763006039,
-            "id": "chatcmpl-f94c75f3-60b7-4dc1-b05f-7952278ba7ff",
+            "created": 1763010314,
+            "id": "chatcmpl-ce1d6d63-534a-4974-9136-5b32bd3e8e65",
             "model": "openai.gpt-oss-20b-1:0",
             "object": "chat.completion",
             "service_tier": "default",
             "usage": {
-              "completion_tokens": 224,
+              "completion_tokens": 266,
               "prompt_tokens": 2507,
               "prompt_tokens_details": {
                 "audio_tokens": 0,
                 "cached_tokens": 2416
               },
-              "total_tokens": 2731
+              "total_tokens": 2773
             }
           }
         },
@@ -612,7 +612,7 @@
         "token_usage": {
           "input_tokens": 0,
           "output_tokens": 0,
-          "total_tokens": 2731
+          "total_tokens": 2773
         }
       }
     ],
@@ -621,16 +621,16 @@
       "successful_runs": 10,
       "failed_runs": 0,
       "success_rate": 1.0,
-      "average_score": 0.6333333333333333,
+      "average_score": 0.5333333333333333,
       "min_score": 0.0,
       "max_score": 1.0,
       "num_scored": 10
     },
-    "duration_seconds": 40.77384924888611,
+    "duration_seconds": 17.588735580444336,
     "token_usage": {
       "input_tokens": 0,
       "output_tokens": 0,
-      "total_tokens": 27732
+      "total_tokens": 27698
     }
   }
 }
