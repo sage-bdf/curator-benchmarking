@@ -882,18 +882,18 @@
             const headerRow = table.querySelector('thead tr');
             const headers = headerRow.querySelectorAll('th');
             
+            // Get current sort direction BEFORE removing classes
+            const currentHeader = headers[columnIndex];
+            const isAscending = currentHeader.classList.contains('sorted-asc');
+            const isDescending = currentHeader.classList.contains('sorted-desc');
+            const newDirection = isAscending ? 'desc' : 'asc';
+            
             // Remove sort classes from all headers
             headers.forEach(h => {
                 h.classList.remove('sorted-asc', 'sorted-desc');
             });
             
-            // Get current sort direction
-            const currentHeader = headers[columnIndex];
-            const isAscending = currentHeader.classList.contains('sorted-asc');
-            const newDirection = isAscending ? 'desc' : 'asc';
-            
             // Add sort class to current header
-            currentHeader.classList.remove('sorted-asc', 'sorted-desc');
             currentHeader.classList.add(`sorted-${newDirection}`);
             
             // Sort rows
