@@ -26,6 +26,9 @@ class Task:
         
         # Load schema if it exists
         self.schema = self._load_schema()
+        
+        # Load custom prompt formatter if it exists
+        self.format_prompt_func = self._load_prompt_formatter()
     
     def _load_config(self) -> Dict[str, Any]:
         """Load task configuration if it exists."""
@@ -102,4 +105,47 @@ class Task:
         if self.ground_truth is None:
             return None
         return self.ground_truth.to_dict('records')
+    
+    def _load_prompt_formatter(self) -> Optional[callable]:
+        """Load custom prompt formatter if it exists."""
+        format_prompt_path = self.task_dir / "format_prompt.py"
+        if format_prompt_path.exists():
+            try:
+                import importlib.util
+                spec = importlib.util.spec_from_file_location(
+                    f"{self.name}_format_prompt",
+                    format_prompt_path
+                )
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                if hasattr(module, 'format_prompt'):
+                    return module.format_prompt
+            except Exception as e:
+                print(f"Warning: Could not load format_prompt.py for {self.name}: {e}")
+        return None
+    
+    def format_prompt(
+        self,
+        sample: Dict[str, Any],
+        ground_truth: Optional[Dict[str, Any]] = None,
+        schema_text: str = ""
+    ) -> str:
+        """
+        Format the prompt for a given sample.
+        
+        If a custom format_prompt function exists, use it.
+        Otherwise, use the default formatting.
+        """
+        if self.format_prompt_func:
+            # Use custom formatter (schema_text is ignored for custom formatters)
+            return self.format_prompt_func(
+                self.default_prompt,
+                sample,
+                ground_truth,
+                self.schema
+            )
+        else:
+            # Default formatting: prompt + schema + input data
+            sample_str = json.dumps(sample, indent=2)
+            return f"{self.default_prompt}{schema_text}\n\nInput data:\n{sample_str}"
 

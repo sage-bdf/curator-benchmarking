@@ -117,7 +117,6 @@ class Experiment:
         """Run a single task and return results."""
         task_start_time = time.time()
         
-        prompt = task.default_prompt
         input_samples = task.get_input_samples()
         ground_truth_samples = task.get_ground_truth_samples()
         
@@ -161,53 +160,17 @@ class Experiment:
         for idx, sample in enumerate(input_samples):
             print(f"    Processing sample {idx + 1}/{len(input_samples)}...", end=' ', flush=True)
             
-            # Special handling for regex_generation task
-            if task.name == 'regex_generation':
-                # Parse filenames from input
-                filenames_str = sample.get('filenames', '[]')
-                try:
-                    if isinstance(filenames_str, str):
-                        filenames = json.loads(filenames_str)
-                    else:
-                        filenames = filenames_str
-                except (json.JSONDecodeError, TypeError):
-                    filenames = []
-                
-                # Get ground truth matches for examples
-                if ground_truth_samples and idx < len(ground_truth_samples):
-                    gt_matches_str = ground_truth_samples[idx].get('matches', '[]')
-                    try:
-                        if isinstance(gt_matches_str, str):
-                            gt_matches = json.loads(gt_matches_str)
-                        else:
-                            gt_matches = gt_matches_str
-                    except (json.JSONDecodeError, TypeError):
-                        gt_matches = []
-                    
-                    # Provide 3 example matches
-                    num_examples = min(3, len(gt_matches))
-                    example_matches = gt_matches[:num_examples] if gt_matches else []
-                    
-                    # Format prompt with all filenames and examples
-                    formatted_prompt = f"{prompt}\n\nAll filenames:\n"
-                    for filename in filenames:
-                        formatted_prompt += f"- {filename}\n"
-                    
-                    if example_matches:
-                        formatted_prompt += f"\nExample matches (showing what should be extracted):\n"
-                        for i, match in enumerate(example_matches):
-                            # Find the corresponding filename
-                            if i < len(filenames):
-                                formatted_prompt += f"- From '{filenames[i]}': {json.dumps(match)}\n"
-                else:
-                    # No ground truth, just show filenames
-                    formatted_prompt = f"{prompt}\n\nAll filenames:\n"
-                    for filename in filenames:
-                        formatted_prompt += f"- {filename}\n"
-            else:
-                # Format prompt with sample data and schema (normal tasks)
-                sample_str = json.dumps(sample, indent=2)
-                formatted_prompt = f"{prompt}{schema_text}\n\nInput data:\n{sample_str}"
+            # Get ground truth for this sample if available
+            ground_truth = None
+            if ground_truth_samples and idx < len(ground_truth_samples):
+                ground_truth = ground_truth_samples[idx]
+            
+            # Use task's format_prompt method (handles custom formatters if they exist)
+            formatted_prompt = task.format_prompt(
+                sample=sample,
+                ground_truth=ground_truth,
+                schema_text=schema_text
+            )
             
             # Invoke model
             response = self.bedrock_client.invoke_model(
