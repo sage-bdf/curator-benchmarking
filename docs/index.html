@@ -380,13 +380,13 @@
                 console.log(`Parsed ${allExperiments.length} valid experiments`);
 
                 // Also try to load detailed results for additional info
-                await loadDetailedResults();
+                const loadResult = await loadDetailedResults();
                 
                 console.log(`Loaded detailed results. Experiments with task_results: ${allExperiments.filter(e => e.task_results).length}`);
                 
                 // Log experiment IDs that failed to load detailed results for debugging
-                if (experimentsToRemove.length > 0) {
-                    console.warn(`Experiments without detailed results files:`, experimentsToRemove.map(e => e.experiment_id));
+                if (loadResult.experimentsToRemove.length > 0) {
+                    console.warn(`Experiments without detailed results files:`, loadResult.experimentsToRemove.map(e => e.experiment_id));
                 }
                 
                 // Log all experiment IDs for debugging
@@ -450,6 +450,11 @@
             // Don't remove experiments without detailed results - just log a warning
             // They might still have valid summary data from the log file
             console.log(`Loaded detailed results for ${loadedCount} experiments. ${experimentsToRemove.length} experiments without detailed results files (may still have summary data).`);
+            
+            return {
+                loadedCount,
+                experimentsToRemove
+            };
         }
 
         function updateStats() {
