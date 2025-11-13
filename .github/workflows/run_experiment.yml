@@ -46,16 +46,17 @@ jobs:
             
             let comment = '## Experiment Results\n\n';
             
-            // Try to read results file
+            // Try to read results file using experiment_summary.json to get the correct experiment_id
             const resultsDir = path.join(process.cwd(), 'docs', 'results');
-            if (fs.existsSync(resultsDir)) {
-              const files = fs.readdirSync(resultsDir);
-              const resultFiles = files.filter(f => f.endsWith('_results.json'));
+            const summaryPath = path.join(resultsDir, 'experiment_summary.json');
+            
+            if (fs.existsSync(summaryPath)) {
+              const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+              const experimentId = summary.experiment_id;
+              const resultFile = `${experimentId}_results.json`;
+              const resultPath = path.join(resultsDir, resultFile);
               
-              if (resultFiles.length > 0) {
-                // Get the most recent result
-                const latestFile = resultFiles.sort().reverse()[0];
-                const resultPath = path.join(resultsDir, latestFile);
+              if (fs.existsSync(resultPath)) {
                 const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
                 
                 comment += `✅ Experiment completed successfully!\n\n`;
@@ -80,12 +81,57 @@ jobs:
                   }
                 }
                 
-                comment += `\n**Results saved to:** \`docs/results/${latestFile}\`\n`;
+                comment += `\n**Results saved to:** \`docs/results/${resultFile}\`\n`;
               } else {
-                comment += '⚠️ Experiment completed but results file not found.\n';
+                comment += `⚠️ Results file not found for experiment ${experimentId}.\n`;
               }
             } else {
-              comment += '⚠️ Results directory not found.\n';
+              // Fallback: try to find the most recent result file
+              if (fs.existsSync(resultsDir)) {
+                const files = fs.readdirSync(resultsDir);
+                const resultFiles = files.filter(f => f.endsWith('_results.json'));
+                
+                if (resultFiles.length > 0) {
+                  // Get the most recent result by modification time
+                  const fileStats = resultFiles.map(f => ({
+                    name: f,
+                    mtime: fs.statSync(path.join(resultsDir, f)).mtime
+                  }));
+                  fileStats.sort((a, b) => b.mtime - a.mtime);
+                  const latestFile = fileStats[0].name;
+                  const resultPath = path.join(resultsDir, latestFile);
+                  const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+                  
+                  comment += `✅ Experiment completed successfully!\n\n`;
+                  comment += `**Experiment ID:** ${result.experiment_id}\n\n`;
+                  comment += `**Overall Metrics:**\n`;
+                  comment += `- Tasks completed: ${result.overall_metrics.tasks_completed}\n`;
+                  comment += `- Total samples: ${result.overall_metrics.total_samples}\n`;
+                  
+                  if (result.overall_metrics.average_accuracy !== null) {
+                    comment += `- Average accuracy: ${(result.overall_metrics.average_accuracy * 100).toFixed(1)}%\n`;
+                  }
+                  
+                  comment += `\n**Task-wise Results:**\n`;
+                  for (const [taskName, taskResult] of Object.entries(result.task_results)) {
+                    if (taskResult.error) {
+                      comment += `- ${taskName}: ❌ Error - ${taskResult.error}\n`;
+                    } else {
+                      const accuracy = taskResult.metrics.average_score !== null 
+                        ? (taskResult.metrics.average_score * 100).toFixed(1) + '%'
+                        : 'N/A';
+                      comment += `- ${taskName}: ${accuracy} (${taskResult.metrics.total_samples} samples)\n`;
+                    }
+                  }
+                  
+                  comment += `\n**Results saved to:** \`docs/results/${latestFile}\`\n`;
+                  comment += `\n⚠️ Note: Used fallback method to find results file. Summary file not found.\n`;
+                } else {
+                  comment += '⚠️ Experiment completed but results file not found.\n';
+                }
+              } else {
+                comment += '⚠️ Results directory not found.\n';
+              }
             }
             
             github.rest.issues.createComment({
