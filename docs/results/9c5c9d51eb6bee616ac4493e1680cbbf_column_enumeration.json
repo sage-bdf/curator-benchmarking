@@ -1,0 +1,550 @@
+{
+  "experiment_id": "9c5c9d51eb6bee616ac4493e1680cbbf",
+  "task_name": "column_enumeration",
+  "task_hash": "e03487178fe34d81d9c69a8e02b71ab8",
+  "model_id": "openai.gpt-oss-120b-1:0",
+  "system_instructions": "### Temperature\n\n1.0",
+  "temperature": 1.0,
+  "thinking": false,
+  "timestamp": "2025-11-13T19:25:12.800200",
+  "task_result": {
+    "task_name": "column_enumeration",
+    "num_samples": 10,
+    "results": [
+      {
+        "sample_index": 0,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"a\", \"type\": \"integer\"}, {\"name\": \"b\", \"type\": \"string\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse the input JSON. The grid_structure is a string containing JSON: {\"columns\": [{\"name\":\"a\",\"type\":\"integer\"}, {\"name\":\"b\",\"type\":\"string\"}]}. We need to output columns list: [\"a\",\"b\"].\n\nReturn JSON with \"columns\": [...].</reasoning>{\n  \"columns\": [\"a\", \"b\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 83,
+            "prompt_tokens": 231,
+            "total_tokens": 314
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse the input JSON. The grid_structure is a string containing JSON: {\"columns\": [{\"name\":\"a\",\"type\":\"integer\"}, {\"name\":\"b\",\"type\":\"string\"}]}. We need to output columns list: [\"a\",\"b\"].\n\nReturn JSON with \"columns\": [...].</reasoning>{\n  \"columns\": [\"a\", \"b\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061904,
+            "id": "chatcmpl-2e53e155-70ac-4b5f-98df-98c3ed9394d1",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 83,
+              "prompt_tokens": 231,
+              "total_tokens": 314
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_columns": "[\"a\", \"b\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 314
+        }
+      },
+      {
+        "sample_index": 1,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"patient_id\", \"type\": \"string\"}, {\"name\": \"diagnosis\", \"type\": \"string\"}, {\"name\": \"age\", \"type\": \"integer\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse the input. The grid_structure is a stringified JSON: \"{\\\"columns\\\": [{\\\"name\\\": \\\"patient_id\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"diagnosis\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"age\\\", \\\"type\\\": \\\"integer\\\"}]}\"\n\nWe need to extract column names in order: patient_id, diagnosis, age.\n\nReturn JSON with \"columns\": [list].\n\nThus answer.</reasoning>{\n  \"columns\": [\"patient_id\", \"diagnosis\", \"age\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 120,
+            "prompt_tokens": 247,
+            "total_tokens": 367
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse the input. The grid_structure is a stringified JSON: \"{\\\"columns\\\": [{\\\"name\\\": \\\"patient_id\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"diagnosis\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"age\\\", \\\"type\\\": \\\"integer\\\"}]}\"\n\nWe need to extract column names in order: patient_id, diagnosis, age.\n\nReturn JSON with \"columns\": [list].\n\nThus answer.</reasoning>{\n  \"columns\": [\"patient_id\", \"diagnosis\", \"age\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061905,
+            "id": "chatcmpl-76466f12-99a4-42a4-9dd4-678901328b86",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 120,
+              "prompt_tokens": 247,
+              "total_tokens": 367
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_columns": "[\"patient_id\", \"diagnosis\", \"age\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 367
+        }
+      },
+      {
+        "sample_index": 2,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"sample_id\", \"type\": \"string\"}, {\"name\": \"assay\", \"type\": \"string\"}, {\"name\": \"tumor_type\", \"type\": \"string\"}, {\"name\": \"date\", \"type\": \"date\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse the JSON string grid_structure which is a JSON object with a \"columns\" array of objects each having name. So columns: [\"sample_id\",\"assay\",\"tumor_type\",\"date\"].\n\nReturn JSON accordingly.</reasoning>{\n  \"columns\": [\n    \"sample_id\",\n    \"assay\",\n    \"tumor_type\",\n    \"date\"\n  ]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 86,
+            "prompt_tokens": 263,
+            "total_tokens": 349
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse the JSON string grid_structure which is a JSON object with a \"columns\" array of objects each having name. So columns: [\"sample_id\",\"assay\",\"tumor_type\",\"date\"].\n\nReturn JSON accordingly.</reasoning>{\n  \"columns\": [\n    \"sample_id\",\n    \"assay\",\n    \"tumor_type\",\n    \"date\"\n  ]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061906,
+            "id": "chatcmpl-07438e52-a768-44b6-b3b1-9c040fe76fae",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 86,
+              "prompt_tokens": 263,
+              "total_tokens": 349
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "expected_columns": "[\"sample_id\", \"assay\", \"tumor_type\", \"date\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 349
+        }
+      },
+      {
+        "sample_index": 3,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"id\", \"type\": \"integer\"}, {\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"value\", \"type\": \"number\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse input JSON. grid_structure is a string containing JSON: {\"columns\": [{\"name\":\"id\",\"type\":\"integer\"},...]} We need to output columns list in order: [\"id\",\"name\",\"value\"]. Return JSON.</reasoning>{\n  \"columns\": [\"id\", \"name\", \"value\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 73,
+            "prompt_tokens": 245,
+            "total_tokens": 318
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse input JSON. grid_structure is a string containing JSON: {\"columns\": [{\"name\":\"id\",\"type\":\"integer\"},...]} We need to output columns list in order: [\"id\",\"name\",\"value\"]. Return JSON.</reasoning>{\n  \"columns\": [\"id\", \"name\", \"value\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061907,
+            "id": "chatcmpl-ae34e02e-d18a-4ceb-8645-5d61bb65bf7a",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 73,
+              "prompt_tokens": 245,
+              "total_tokens": 318
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_columns": "[\"id\", \"name\", \"value\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 318
+        }
+      },
+      {
+        "sample_index": 4,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"gene\", \"type\": \"string\"}, {\"name\": \"expression\", \"type\": \"number\"}, {\"name\": \"p_value\", \"type\": \"number\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>The task: parse JSON input, extract grid_structure which itself is a JSON string. Need list of column names in order: \"gene\", \"expression\", \"p_value\". Return JSON with columns array.</reasoning>{\n  \"columns\": [\"gene\", \"expression\", \"p_value\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 67,
+            "prompt_tokens": 246,
+            "total_tokens": 313
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>The task: parse JSON input, extract grid_structure which itself is a JSON string. Need list of column names in order: \"gene\", \"expression\", \"p_value\". Return JSON with columns array.</reasoning>{\n  \"columns\": [\"gene\", \"expression\", \"p_value\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061908,
+            "id": "chatcmpl-93bc3e24-2be5-4b8a-a1e7-09bfe49f4631",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 67,
+              "prompt_tokens": 246,
+              "total_tokens": 313
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "expected_columns": "[\"gene\", \"expression\", \"p_value\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 313
+        }
+      },
+      {
+        "sample_index": 5,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"file_name\", \"type\": \"string\"}, {\"name\": \"file_size\", \"type\": \"integer\"}, {\"name\": \"file_type\", \"type\": \"string\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse the input. grid_structure is a JSON string: \"{\\\"columns\\\": [{\\\"name\\\": \\\"file_name\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"file_size\\\", \\\"type\\\": \\\"integer\\\"}, {\\\"name\\\": \\\"file_type\\\", \\\"type\\\": \\\"string\\\"}]}\". So columns are file_name, file_size, file_type. Return JSON with \"columns\": [list].</reasoning>{\n  \"columns\": [\"file_name\", \"file_size\", \"file_type\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 113,
+            "prompt_tokens": 248,
+            "total_tokens": 361
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse the input. grid_structure is a JSON string: \"{\\\"columns\\\": [{\\\"name\\\": \\\"file_name\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"file_size\\\", \\\"type\\\": \\\"integer\\\"}, {\\\"name\\\": \\\"file_type\\\", \\\"type\\\": \\\"string\\\"}]}\". So columns are file_name, file_size, file_type. Return JSON with \"columns\": [list].</reasoning>{\n  \"columns\": [\"file_name\", \"file_size\", \"file_type\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061908,
+            "id": "chatcmpl-64bfecb3-c646-43bc-a3d3-750d3166987f",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 113,
+              "prompt_tokens": 248,
+              "total_tokens": 361
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_columns": "[\"file_name\", \"file_size\", \"file_type\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 361
+        }
+      },
+      {
+        "sample_index": 6,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"experiment_id\", \"type\": \"string\"}, {\"name\": \"replicate\", \"type\": \"integer\"}, {\"name\": \"condition\", \"type\": \"string\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse the input. grid_structure is a string containing JSON. It has columns list with name fields. We need to output columns array in order: experiment_id, replicate, condition. Return JSON.</reasoning>{\n  \"columns\": [\"experiment_id\", \"replicate\", \"condition\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 69,
+            "prompt_tokens": 247,
+            "total_tokens": 316
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse the input. grid_structure is a string containing JSON. It has columns list with name fields. We need to output columns array in order: experiment_id, replicate, condition. Return JSON.</reasoning>{\n  \"columns\": [\"experiment_id\", \"replicate\", \"condition\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061909,
+            "id": "chatcmpl-5ca06776-7f94-4a7b-8dc7-e584a8f791e8",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 69,
+              "prompt_tokens": 247,
+              "total_tokens": 316
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "expected_columns": "[\"experiment_id\", \"replicate\", \"condition\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 316
+        }
+      },
+      {
+        "sample_index": 7,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"subject\", \"type\": \"string\"}, {\"name\": \"treatment\", \"type\": \"string\"}, {\"name\": \"outcome\", \"type\": \"string\"}, {\"name\": \"score\", \"type\": \"number\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse grid_structure string JSON. It contains columns with names: subject, treatment, outcome, score. Return JSON with columns list in order.</reasoning>{\n  \"columns\": [\"subject\", \"treatment\", \"outcome\", \"score\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 61,
+            "prompt_tokens": 261,
+            "total_tokens": 322
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse grid_structure string JSON. It contains columns with names: subject, treatment, outcome, score. Return JSON with columns list in order.</reasoning>{\n  \"columns\": [\"subject\", \"treatment\", \"outcome\", \"score\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061910,
+            "id": "chatcmpl-4b8ec78f-14eb-4cfe-bade-e0498b1fe4a0",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 61,
+              "prompt_tokens": 261,
+              "total_tokens": 322
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "expected_columns": "[\"subject\", \"treatment\", \"outcome\", \"score\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 322
+        }
+      },
+      {
+        "sample_index": 8,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"timestamp\", \"type\": \"datetime\"}, {\"name\": \"event\", \"type\": \"string\"}, {\"name\": \"severity\", \"type\": \"string\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse grid_structure string which is JSON string containing columns array. Extract names in order. Input: grid_structure: \"{\\\"columns\\\": [{\\\"name\\\": \\\"timestamp\\\", \\\"type\\\": \\\"datetime\\\"}, {\\\"name\\\": \\\"event\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"severity\\\", \\\"type\\\": \\\"string\\\"}]}\" So columns: timestamp, event, severity. Return JSON with columns array.</reasoning>{\n  \"columns\": [\"timestamp\", \"event\", \"severity\"]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 111,
+            "prompt_tokens": 245,
+            "prompt_tokens_details": {
+              "audio_tokens": 0,
+              "cached_tokens": 48
+            },
+            "total_tokens": 356
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse grid_structure string which is JSON string containing columns array. Extract names in order. Input: grid_structure: \"{\\\"columns\\\": [{\\\"name\\\": \\\"timestamp\\\", \\\"type\\\": \\\"datetime\\\"}, {\\\"name\\\": \\\"event\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"severity\\\", \\\"type\\\": \\\"string\\\"}]}\" So columns: timestamp, event, severity. Return JSON with columns array.</reasoning>{\n  \"columns\": [\"timestamp\", \"event\", \"severity\"]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061911,
+            "id": "chatcmpl-7136e90d-ad3e-4f25-b10c-a05b571a8d7c",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 111,
+              "prompt_tokens": 245,
+              "prompt_tokens_details": {
+                "audio_tokens": 0,
+                "cached_tokens": 48
+              },
+              "total_tokens": 356
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_columns": "[\"timestamp\", \"event\", \"severity\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 356
+        }
+      },
+      {
+        "sample_index": 9,
+        "input": {
+          "grid_structure": "{\"columns\": [{\"name\": \"location\", \"type\": \"string\"}, {\"name\": \"temperature\", \"type\": \"number\"}, {\"name\": \"humidity\", \"type\": \"number\"}]}",
+          "question": "What columns are in this grid?"
+        },
+        "response": {
+          "success": true,
+          "content": "<reasoning>We need to parse grid_structure which is a string containing JSON. It has columns list. Need to return columns array.\n\nColumns: location, temperature, humidity.\n\nReturn JSON with that.</reasoning>{\n  \"columns\": [\n    \"location\",\n    \"temperature\",\n    \"humidity\"\n  ]\n}",
+          "model_id": "openai.gpt-oss-120b-1:0",
+          "usage": {
+            "completion_tokens": 68,
+            "prompt_tokens": 245,
+            "total_tokens": 313
+          },
+          "attempt": 1,
+          "raw_response": {
+            "choices": [
+              {
+                "finish_reason": "stop",
+                "index": 0,
+                "logprobs": null,
+                "message": {
+                  "content": "<reasoning>We need to parse grid_structure which is a string containing JSON. It has columns list. Need to return columns array.\n\nColumns: location, temperature, humidity.\n\nReturn JSON with that.</reasoning>{\n  \"columns\": [\n    \"location\",\n    \"temperature\",\n    \"humidity\"\n  ]\n}",
+                  "refusal": null,
+                  "role": "assistant"
+                }
+              }
+            ],
+            "created": 1763061912,
+            "id": "chatcmpl-6b688885-82d9-4df2-b851-5961baef4d80",
+            "model": "openai.gpt-oss-120b-1:0",
+            "object": "chat.completion",
+            "service_tier": "default",
+            "usage": {
+              "completion_tokens": 68,
+              "prompt_tokens": 245,
+              "total_tokens": 313
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "expected_columns": "[\"location\", \"temperature\", \"humidity\"]"
+        },
+        "token_usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 313
+        }
+      }
+    ],
+    "metrics": {
+      "total_samples": 10,
+      "successful_runs": 10,
+      "failed_runs": 0,
+      "success_rate": 1.0,
+      "average_score": 0.5,
+      "min_score": 0.0,
+      "max_score": 1.0,
+      "num_scored": 10
+    },
+    "duration_seconds": 8.289659261703491,
+    "token_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 3329
+    }
+  }
+}
