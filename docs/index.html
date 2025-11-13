@@ -417,49 +417,114 @@
         }
 
         async function loadDetailedResults() {
-            // Load detailed results to get task_results
+            // Load all experiment-task files and aggregate by experiment_id
+            // New structure: experiment_id_taskname.json files
             let loadedCount = 0;
             const experimentsToRemove = [];
+            
+            // First, try to get a list of all task files by fetching a directory listing
+            // Since we can't list directories via fetch, we'll try to load task files for each experiment
+            // by attempting common task names (we'll discover them as we go)
+            
+            // Build a map of experiment_id -> task files
+            const experimentTaskFiles = new Map();
+            
             for (let exp of allExperiments) {
-                try {
-                    const response = await fetch(`results/${exp.experiment_id}_results.json`);
-                    if (response.ok) {
-                        const detailed = await response.json();
-                        exp.task_results = detailed.task_results || {};
-                        exp.system_instructions = detailed.system_instructions || '';
-                        exp.temperature = detailed.temperature !== undefined ? detailed.temperature : null;
-                        exp.thinking = detailed.thinking !== undefined ? detailed.thinking : false;
-                        // Also update overall_metrics from detailed results if available
-                        if (detailed.overall_metrics) {
-                            exp.overall_metrics = detailed.overall_metrics;
-                        }
-                        // Update task durations and token usage from detailed results
-                        if (detailed.task_results) {
-                            for (const [taskName, taskResult] of Object.entries(detailed.task_results)) {
-                                if (exp.task_results[taskName]) {
-                                    if (taskResult.duration_seconds !== undefined) {
-                                        exp.task_results[taskName].duration_seconds = taskResult.duration_seconds;
-                                    }
-                                    if (taskResult.token_usage !== undefined) {
-                                        exp.task_results[taskName].token_usage = taskResult.token_usage;
-                                    }
+                exp.task_results = {};
+                exp.system_instructions = exp.system_instructions || '';
+                exp.temperature = exp.temperature !== undefined ? exp.temperature : null;
+                exp.thinking = exp.thinking !== undefined ? exp.thinking : false;
+                
+                // Try to discover task files for this experiment
+                // We'll try common task names, but ideally we'd have a list
+                // For now, we'll try to load known task names
+                const knownTaskNames = [
+                    'broadening_of_narrow_synonyms',
+                    'correction_of_typos',
+                    'narrowing_of_broad_synonyms',
+                    'translation_of_exact_synonyms',
+                    'regex_generation',
+                    'column_enumeration',
+                    'column_type_identification',
+                    'validation_error_counting',
+                    'row_validation_explanation',
+                    'column_value_retrieval',
+                    'row_value_retrieval'
+                ];
+                
+                let foundTasks = 0;
+                let totalSamples = 0;
+                let totalInputTokens = 0;
+                let totalOutputTokens = 0;
+                let totalTokens = 0;
+                let totalDuration = 0;
+                let allScores = [];
+                let tasksCompleted = 0;
+                let tasksFailed = 0;
+                
+                for (const taskName of knownTaskNames) {
+                    try {
+                        const response = await fetch(`results/${exp.experiment_id}_${taskName}.json`);
+                        if (response.ok) {
+                            const taskFile = await response.json();
+                            
+                            // Extract metadata from first task file
+                            if (foundTasks === 0) {
+                                exp.system_instructions = taskFile.system_instructions || exp.system_instructions;
+                                exp.temperature = taskFile.temperature !== undefined ? taskFile.temperature : exp.temperature;
+                                exp.thinking = taskFile.thinking !== undefined ? taskFile.thinking : exp.thinking;
+                            }
+                            
+                            const taskResult = taskFile.task_result || {};
+                            exp.task_results[taskName] = taskResult;
+                            foundTasks++;
+                            
+                            if (!taskResult.error) {
+                                tasksCompleted++;
+                                const metrics = taskResult.metrics || {};
+                                totalSamples += metrics.total_samples || 0;
+                                
+                                const avgScore = metrics.average_score;
+                                if (avgScore !== null && avgScore !== undefined) {
+                                    allScores.push(avgScore);
                                 }
+                                
+                                const tokenUsage = taskResult.token_usage || {};
+                                totalInputTokens += tokenUsage.input_tokens || 0;
+                                totalOutputTokens += tokenUsage.output_tokens || 0;
+                                totalTokens += tokenUsage.total_tokens || 0;
+                                totalDuration += taskResult.duration_seconds || 0;
+                            } else {
+                                tasksFailed++;
                             }
                         }
-                        loadedCount++;
-                    } else {
-                        console.warn(`Failed to load detailed results for ${exp.experiment_id}: ${response.status} ${response.statusText}`);
-                        // Mark for removal if no detailed results file exists
-                        experimentsToRemove.push(exp);
+                    } catch (e) {
+                        // Task file doesn't exist for this experiment, skip it
                     }
-                } catch (e) {
-                    console.warn(`Error loading detailed results for ${exp.experiment_id}:`, e);
+                }
+                
+                if (foundTasks > 0) {
+                    // Calculate overall metrics
+                    exp.overall_metrics = {
+                        total_samples: totalSamples,
+                        tasks_completed: tasksCompleted,
+                        tasks_failed: tasksFailed,
+                        average_accuracy: allScores.length > 0 ? allScores.reduce((a, b) => a + b, 0) / allScores.length : null,
+                        duration_seconds: totalDuration,
+                        token_usage: {
+                            input_tokens: totalInputTokens,
+                            output_tokens: totalOutputTokens,
+                            total_tokens: totalTokens
+                        }
+                    };
+                    loadedCount++;
+                } else {
+                    // No task files found for this experiment
                     experimentsToRemove.push(exp);
                 }
             }
-            // Don't remove experiments without detailed results - just log a warning
-            // They might still have valid summary data from the log file
-            console.log(`Loaded detailed results for ${loadedCount} experiments. ${experimentsToRemove.length} experiments without detailed results files (may still have summary data).`);
+            
+            console.log(`Loaded detailed results for ${loadedCount} experiments. ${experimentsToRemove.length} experiments without task result files.`);
             
             return {
                 loadedCount,

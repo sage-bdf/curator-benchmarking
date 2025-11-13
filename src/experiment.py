@@ -304,30 +304,83 @@ class Experiment:
             }
         }
     
-    def run(self) -> Dict[str, Any]:
-        """Execute the experiment across all tasks and return results."""
-        results_file = self.results_dir / f"{self.experiment_id}_results.json"
-        existing_result = None
+    def _get_experiment_task_file(self, task_name: str) -> Path:
+        """Get the file path for an experiment-task result."""
+        return self.results_dir / f"{self.experiment_id}_{task_name}.json"
+    
+    def _load_experiment_task_result(self, task_name: str) -> Optional[Dict[str, Any]]:
+        """Load an experiment-task result if it exists."""
+        task_file = self._get_experiment_task_file(task_name)
+        if task_file.exists():
+            try:
+                with open(task_file, 'r') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"  Warning: Could not load {task_file.name}: {e}")
+        return None
+    
+    def _save_experiment_task_result(self, task_name: str, task_result: Dict[str, Any], task_hash: str):
+        """Save an experiment-task result to its own file."""
+        task_file = self._get_experiment_task_file(task_name)
         
-        # Load existing results if they exist
-        if results_file.exists():
-            print(f"\n{'='*60}")
-            print(f"Experiment {self.experiment_id} already exists")
-            print(f"{'='*60}")
-            print(f"  Loading existing results from: {results_file}")
-            
-            with open(results_file, 'r') as f:
-                existing_result = json.load(f)
-            
-            print(f"  Model: {existing_result.get('model_id', 'N/A')}")
-            print(f"  Temperature: {existing_result.get('temperature', 'N/A')}")
-            print(f"  Thinking: {existing_result.get('thinking', 'N/A')}")
-            print(f"  Original timestamp: {existing_result.get('timestamp', 'N/A')}")
-            print(f"  Tasks completed: {existing_result.get('overall_metrics', {}).get('tasks_completed', 'N/A')}")
-            if existing_result.get('overall_metrics', {}).get('average_accuracy') is not None:
-                avg_acc = existing_result['overall_metrics']['average_accuracy']
-                print(f"  Average accuracy: {(avg_acc * 100):.2f}%")
+        # Prepare the result with experiment metadata
+        result_data = {
+            'experiment_id': self.experiment_id,
+            'task_name': task_name,
+            'task_hash': task_hash,
+            'model_id': self.model_id,
+            'system_instructions': self.system_instructions,
+            'temperature': self.temperature,
+            'thinking': self.thinking,
+            'timestamp': datetime.now().isoformat(),
+            'task_result': task_result
+        }
         
+        with open(task_file, 'w') as f:
+            json.dump(result_data, f, indent=2)
+    
+    def _experiment_exists_in_log(self) -> bool:
+        """Check if this experiment exists in the experiments log."""
+        log_file = self.results_dir / "experiments_log.jsonl"
+        if not log_file.exists():
+            return False
+        
+        try:
+            with open(log_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('<<<<<<<') or line.startswith('=======') or line.startswith('>>>>>>>'):
+                        continue
+                    try:
+                        entry = json.loads(line)
+                        if entry.get('experiment_id') == self.experiment_id:
+                            return True
+                    except:
+                        continue
+        except:
+            pass
+        return False
+    
+    def _log_experiment(self):
+        """Log experiment metadata to experiments_log.jsonl."""
+        log_file = self.results_dir / "experiments_log.jsonl"
+        summary = {
+            'experiment_id': self.experiment_id,
+            'timestamp': datetime.now().isoformat(),
+            'model_id': self.model_id,
+            'system_instructions': self.system_instructions,
+            'temperature': self.temperature,
+            'thinking': self.thinking
+        }
+        with open(log_file, 'a') as f:
+            f.write(json.dumps(summary) + '\n')
+    
+    def run(self, update_other_experiments: bool = True) -> Dict[str, Any]:
+        """
+        Execute the experiment across all tasks and return aggregated results.
+        
+        Each task result is stored in a separate file: experiment_id_taskname.json
+        """
         # Get all current tasks and their hashes
         tasks = self._get_all_tasks()
         if not tasks:
@@ -335,51 +388,16 @@ class Experiment:
         
         current_task_hashes = self._get_task_hashes(tasks)
         
-        # Determine which tasks need to be run
-        tasks_to_run = []
-        if existing_result:
-            # Get stored task hashes from existing results
-            stored_task_hashes = existing_result.get('task_hashes', {})
-            existing_task_names = set(existing_result.get('task_results', {}).keys())
-            current_task_names = set(current_task_hashes.keys())
-            
-            # Find changed tasks (hash mismatch)
-            for task in tasks:
-                task_name = task.name
-                current_hash = current_task_hashes.get(task_name)
-                stored_hash = stored_task_hashes.get(task_name)
-                
-                if task_name in existing_task_names:
-                    if current_hash != stored_hash:
-                        print(f"  Task '{task_name}' has changed (hash: {stored_hash[:8]} -> {current_hash[:8]})")
-                        tasks_to_run.append(task)
-                    else:
-                        print(f"  Task '{task_name}' unchanged, skipping")
-                else:
-                    # New task
-                    print(f"  Task '{task_name}' is new, will run")
-                    tasks_to_run.append(task)
-            
-            # Note: We don't remove tasks that no longer exist - they stay in results
-            removed_tasks = existing_task_names - current_task_names
-            if removed_tasks:
-                print(f"  Note: {len(removed_tasks)} task(s) no longer exist but will remain in results: {', '.join(removed_tasks)}")
-        else:
-            # New experiment - run all tasks
-            tasks_to_run = tasks
+        # Check if experiment exists in log
+        experiment_exists = self._experiment_exists_in_log()
         
-        # If no tasks need updating, return existing results
-        if existing_result and not tasks_to_run:
-            print(f"  All tasks are up to date, no re-running needed")
-            print(f"{'='*60}\n")
-            return existing_result
-        
-        # Run the experiment (either new or incremental update)
-        if existing_result:
-            print(f"\n  Updating {len(tasks_to_run)} task(s)...\n")
+        if experiment_exists:
+            print(f"\n{'='*60}")
+            print(f"Experiment {self.experiment_id} exists")
+            print(f"{'='*60}")
         else:
             print(f"\n{'='*60}")
-            print(f"Running experiment {self.experiment_id}")
+            print(f"Running new experiment {self.experiment_id}")
             print(f"{'='*60}")
             print(f"  Model: {self.model_id}")
             print(f"  System Instructions: {self.system_instructions[:50]}...")
@@ -391,38 +409,55 @@ class Experiment:
                 print(f"    - {task.name} ({len(task.get_input_samples())} samples)")
             print(f"\n  Starting experiment execution...\n")
         
-        # Start with existing task results if available
-        if existing_result:
-            task_results = existing_result.get('task_results', {}).copy()
-        else:
-            task_results = {}
+        # Determine which tasks need to be run
+        tasks_to_run = []
+        for task in tasks:
+            task_name = task.name
+            current_hash = current_task_hashes.get(task_name)
+            
+            # Load existing task result if it exists
+            existing_task_result = self._load_experiment_task_result(task_name)
+            
+            if existing_task_result:
+                stored_hash = existing_task_result.get('task_hash')
+                if current_hash == stored_hash:
+                    print(f"  Task '{task_name}' unchanged (hash: {current_hash[:8]}), skipping")
+                    continue
+                else:
+                    stored_hash_str = stored_hash[:8] if stored_hash else "none"
+                    current_hash_str = current_hash[:8] if current_hash else "none"
+                    print(f"  Task '{task_name}' has changed (hash: {stored_hash_str} -> {current_hash_str}), will re-run")
+                    tasks_to_run.append(task)
+            else:
+                # Task file doesn't exist - need to run it
+                if experiment_exists:
+                    print(f"  Task '{task_name}' missing, will run")
+                else:
+                    print(f"  Task '{task_name}' will run")
+                tasks_to_run.append(task)
         
-        experiment_start_time = time.time()
-        total_samples = sum(
-            r.get('metrics', {}).get('total_samples', 0) 
-            for r in task_results.values() 
-            if 'error' not in r
-        ) if existing_result else 0
+        if not tasks_to_run:
+            print(f"  All tasks are up to date, no re-running needed")
+            print(f"{'='*60}\n")
+            # Update experiment log if this is a new experiment
+            if not self._experiment_exists_in_log():
+                self._log_experiment()
+            # Load and return aggregated results
+            return self._aggregate_experiment_results(tasks, current_task_hashes)
         
         # Run tasks that need updating
+        print(f"\n  Running {len(tasks_to_run)} task(s)...\n")
+        
         for task_idx, task in enumerate(tasks_to_run, 1):
             print(f"{'='*60}")
-            if existing_result:
-                print(f"Updating task {task_idx}/{len(tasks_to_run)}: {task.name}")
-            else:
-                print(f"Task {task_idx}/{len(tasks_to_run)}: {task.name}")
+            print(f"Task {task_idx}/{len(tasks_to_run)}: {task.name}")
             print(f"{'='*60}")
             try:
                 task_result = self._run_task(task)
+                task_hash = current_task_hashes.get(task.name)
                 
-                # Update total samples (subtract old, add new)
-                old_samples = 0
-                if task.name in task_results:
-                    old_samples = task_results[task.name].get('metrics', {}).get('total_samples', 0)
-                
-                task_results[task.name] = task_result
-                new_samples = task_result['metrics']['total_samples']
-                total_samples = total_samples - old_samples + new_samples
+                # Save individual task result to its own file
+                self._save_experiment_task_result(task.name, task_result, task_hash)
                 
                 print(f"  ✓ Task {task.name} completed successfully")
                 avg_score = task_result['metrics'].get('average_score')
@@ -442,9 +477,8 @@ class Experiment:
                 print(f"  ✗ Error running task {task.name}: {e}")
                 import traceback
                 traceback.print_exc()
-                task_end_time = time.time()
-                task_duration_seconds = task_end_time - experiment_start_time  # Approximate
-                task_results[task.name] = {
+                # Save error result
+                error_result = {
                     'task_name': task.name,
                     'error': str(e),
                     'metrics': {
@@ -454,47 +488,68 @@ class Experiment:
                         'success_rate': 0,
                         'average_score': None
                     },
-                    'duration_seconds': task_duration_seconds
+                    'duration_seconds': 0
                 }
+                task_hash = current_task_hashes.get(task.name)
+                self._save_experiment_task_result(task.name, error_result, task_hash)
                 print()
         
-        experiment_end_time = time.time()
-        experiment_duration_seconds = experiment_end_time - experiment_start_time
+        # Update experiment log if this is a new experiment
+        # (Check again in case it was just created)
+        if not self._experiment_exists_in_log():
+            self._log_experiment()
         
-        # Aggregate token usage across all tasks
-        # For updates, we need to recalculate from all tasks (including unchanged ones)
-        total_input_tokens = sum(
-            r.get('token_usage', {}).get('input_tokens', 0) 
-            for r in task_results.values() 
-            if 'error' not in r
-        )
-        total_output_tokens = sum(
-            r.get('token_usage', {}).get('output_tokens', 0) 
-            for r in task_results.values() 
-            if 'error' not in r
-        )
-        total_tokens = sum(
-            r.get('token_usage', {}).get('total_tokens', 0) 
-            for r in task_results.values() 
-            if 'error' not in r
-        )
+        # Aggregate and return results
+        return self._aggregate_experiment_results(tasks, current_task_hashes)
+    
+    def _aggregate_experiment_results(self, tasks: List[Task], current_task_hashes: Dict[str, str]) -> Dict[str, Any]:
+        """
+        Aggregate results from all experiment-task files for this experiment.
         
-        # Recalculate overall scores from all task results
+        Returns a dictionary in the same format as before for compatibility.
+        """
+        task_results = {}
         all_scores = []
-        for task_name, task_result in task_results.items():
-            if 'error' not in task_result:
-                avg_score = task_result.get('metrics', {}).get('average_score')
-                if avg_score is not None:
-                    all_scores.append(avg_score)
+        total_samples = 0
+        total_input_tokens = 0
+        total_output_tokens = 0
+        total_tokens = 0
+        total_duration_seconds = 0
+        tasks_completed = 0
+        tasks_failed = 0
         
-        # Calculate overall metrics
+        for task in tasks:
+            task_name = task.name
+            task_file_data = self._load_experiment_task_result(task_name)
+            
+            if task_file_data:
+                task_result = task_file_data.get('task_result', {})
+                task_results[task_name] = task_result
+                
+                if 'error' not in task_result:
+                    tasks_completed += 1
+                    metrics = task_result.get('metrics', {})
+                    total_samples += metrics.get('total_samples', 0)
+                    
+                    avg_score = metrics.get('average_score')
+                    if avg_score is not None:
+                        all_scores.append(avg_score)
+                    
+                    token_usage = task_result.get('token_usage', {})
+                    total_input_tokens += token_usage.get('input_tokens', 0)
+                    total_output_tokens += token_usage.get('output_tokens', 0)
+                    total_tokens += token_usage.get('total_tokens', 0)
+                    total_duration_seconds += task_result.get('duration_seconds', 0)
+                else:
+                    tasks_failed += 1
+        
         overall_metrics = {
             'total_samples': total_samples,
-            'tasks_completed': len([r for r in task_results.values() if 'error' not in r]),
-            'tasks_failed': len([r for r in task_results.values() if 'error' in r]),
+            'tasks_completed': tasks_completed,
+            'tasks_failed': tasks_failed,
             'average_accuracy': sum(all_scores) / len(all_scores) if all_scores else None,
-            'task_metrics': {name: result['metrics'] for name, result in task_results.items()},
-            'duration_seconds': experiment_duration_seconds,
+            'task_metrics': {name: result.get('metrics', {}) for name, result in task_results.items()},
+            'duration_seconds': total_duration_seconds,
             'token_usage': {
                 'input_tokens': total_input_tokens,
                 'output_tokens': total_output_tokens,
@@ -503,13 +558,19 @@ class Experiment:
         }
         
         print(f"\n{'='*60}")
-        print(f"Experiment completed in {experiment_duration_seconds:.2f} seconds")
+        print(f"Experiment {self.experiment_id} Summary")
+        print(f"{'='*60}")
+        print(f"  Tasks completed: {tasks_completed}")
+        print(f"  Tasks failed: {tasks_failed}")
+        print(f"  Total samples: {total_samples}")
+        if overall_metrics['average_accuracy'] is not None:
+            print(f"  Average accuracy: {(overall_metrics['average_accuracy'] * 100):.2f}%")
         if total_tokens > 0:
-            print(f"Total tokens: {total_tokens:,} ({total_input_tokens:,} input, {total_output_tokens:,} output)")
+            print(f"  Total tokens: {total_tokens:,} ({total_input_tokens:,} input, {total_output_tokens:,} output)")
+        print(f"  Total duration: {total_duration_seconds:.2f}s")
         print(f"{'='*60}\n")
         
-        # Prepare experiment result
-        experiment_result = {
+        return {
             'experiment_id': self.experiment_id,
             'timestamp': datetime.now().isoformat(),
             'model_id': self.model_id,
@@ -517,32 +578,8 @@ class Experiment:
             'temperature': self.temperature,
             'thinking': self.thinking,
             'task_results': task_results,
-            'overall_metrics': overall_metrics,
-            'task_hashes': current_task_hashes  # Store current task hashes
+            'overall_metrics': overall_metrics
         }
-        
-        # Preserve original timestamp if this was an update
-        if existing_result:
-            experiment_result['original_timestamp'] = existing_result.get('timestamp')
-            experiment_result['last_updated'] = datetime.now().isoformat()
-        
-        # Save results
-        self._save_results(experiment_result)
-        
-        print(f"\n{'='*60}")
-        print(f"Experiment {self.experiment_id} Complete!")
-        print(f"{'='*60}")
-        print(f"  Tasks completed: {overall_metrics['tasks_completed']}")
-        print(f"  Tasks failed: {overall_metrics['tasks_failed']}")
-        print(f"  Total samples: {overall_metrics['total_samples']}")
-        if overall_metrics['average_accuracy'] is not None:
-            print(f"  Average accuracy: {(overall_metrics['average_accuracy'] * 100):.2f}%")
-        token_usage = overall_metrics.get('token_usage', {})
-        if token_usage.get('total_tokens', 0) > 0:
-            print(f"  Total tokens: {token_usage.get('total_tokens', 0):,} ({token_usage.get('input_tokens', 0):,} input, {token_usage.get('output_tokens', 0):,} output)")
-        print(f"{'='*60}\n")
-        
-        return experiment_result
     
     def _calculate_metrics(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Calculate aggregate metrics from results."""
@@ -569,33 +606,79 @@ class Experiment:
         
         return metrics
     
-    def _save_results(self, experiment_result: Dict[str, Any]):
-        """Save experiment results to disk."""
-        # Save full results as JSON
-        results_file = self.results_dir / f"{self.experiment_id}_results.json"
-        with open(results_file, 'w') as f:
-            json.dump(experiment_result, f, indent=2)
+    def _update_other_experiments_for_new_tasks(
+        self,
+        new_task_names: List[str],
+        current_task_hashes: Dict[str, str]
+    ):
+        """
+        Update all other existing experiments to include new tasks.
         
-        # Save summary to experiments log (one entry per experiment)
-        # Include temperature and thinking for dashboard
-        summary = {
-            'experiment_id': experiment_result['experiment_id'],
-            'timestamp': experiment_result['timestamp'],
-            'model_id': experiment_result['model_id'],
-            'system_instructions': experiment_result['system_instructions'],
-            'temperature': experiment_result.get('temperature'),
-            'thinking': experiment_result.get('thinking'),
-            'overall_metrics': experiment_result['overall_metrics']
-        }
+        Args:
+            new_task_names: List of task names that are new
+            current_task_hashes: Current task hashes for all tasks
+        """
+        if not new_task_names:
+            return
         
-        # Add update metadata if this was an update
-        if 'original_timestamp' in experiment_result:
-            summary['original_timestamp'] = experiment_result['original_timestamp']
-            summary['last_updated'] = experiment_result.get('last_updated')
+        print(f"\n{'='*60}")
+        print(f"New tasks detected: {', '.join(new_task_names)}")
+        print(f"Updating other existing experiments...")
+        print(f"{'='*60}")
         
-        log_file = self.results_dir / "experiments_log.jsonl"
-        with open(log_file, 'a') as f:
-            f.write(json.dumps(summary) + '\n')
+        # Find all other experiment result files
+        result_files = list(self.results_dir.glob("*_results.json"))
+        other_experiments = [
+            f for f in result_files 
+            if f.name != f"{self.experiment_id}_results.json"
+        ]
         
-        print(f"  Results saved to {results_file}")
-        print(f"  Log entry added to experiments_log.jsonl")
+        if not other_experiments:
+            print(f"  No other experiments found to update")
+            return
+        
+        print(f"  Found {len(other_experiments)} other experiment(s) to check")
+        
+        updated_count = 0
+        for result_file in other_experiments:
+            try:
+                with open(result_file, 'r') as f:
+                    experiment_data = json.load(f)
+                
+                other_experiment_id = experiment_data.get('experiment_id')
+                if not other_experiment_id:
+                    continue
+                
+                # Check if this experiment is missing any of the new tasks
+                existing_task_names = set(experiment_data.get('task_results', {}).keys())
+                missing_tasks = [t for t in new_task_names if t not in existing_task_names]
+                
+                if not missing_tasks:
+                    continue  # This experiment already has all new tasks
+                
+                print(f"\n  Updating experiment {other_experiment_id[:16]}... (missing: {', '.join(missing_tasks)})")
+                
+                # Recreate the experiment from stored parameters
+                other_experiment = Experiment(
+                    tasks_dir=self.tasks_dir,
+                    model_id=experiment_data.get('model_id', self.config.default_model),
+                    system_instructions=experiment_data.get('system_instructions'),
+                    temperature=experiment_data.get('temperature'),
+                    thinking=experiment_data.get('thinking', False),
+                    config=self.config
+                )
+                
+                # Run will automatically detect and add the new tasks
+                other_experiment.run(update_other_experiments=False)  # Prevent recursive updates
+                updated_count += 1
+                
+            except Exception as e:
+                print(f"  Error updating experiment {result_file.name}: {e}")
+                continue
+        
+        if updated_count > 0:
+            print(f"\n  ✓ Updated {updated_count} other experiment(s) with new tasks")
+        else:
+            print(f"\n  All other experiments already have the new tasks")
+        print(f"{'='*60}\n")
+    
