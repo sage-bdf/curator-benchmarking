@@ -311,6 +311,23 @@ class Experiment:
         experiment_end_time = time.time()
         experiment_duration_seconds = experiment_end_time - experiment_start_time
         
+        # Aggregate token usage across all tasks
+        total_input_tokens = sum(
+            r.get('token_usage', {}).get('input_tokens', 0) 
+            for r in task_results.values() 
+            if 'error' not in r
+        )
+        total_output_tokens = sum(
+            r.get('token_usage', {}).get('output_tokens', 0) 
+            for r in task_results.values() 
+            if 'error' not in r
+        )
+        total_tokens = sum(
+            r.get('token_usage', {}).get('total_tokens', 0) 
+            for r in task_results.values() 
+            if 'error' not in r
+        )
+        
         # Calculate overall metrics
         overall_metrics = {
             'total_samples': total_samples,
@@ -318,7 +335,12 @@ class Experiment:
             'tasks_failed': len([r for r in task_results.values() if 'error' in r]),
             'average_accuracy': sum(overall_scores) / len(overall_scores) if overall_scores else None,
             'task_metrics': {name: result['metrics'] for name, result in task_results.items()},
-            'duration_seconds': experiment_duration_seconds
+            'duration_seconds': experiment_duration_seconds,
+            'token_usage': {
+                'input_tokens': total_input_tokens,
+                'output_tokens': total_output_tokens,
+                'total_tokens': total_tokens
+            }
         }
         
         print(f"\n{'='*60}")
