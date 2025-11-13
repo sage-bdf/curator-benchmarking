@@ -18,7 +18,7 @@ body:
   id: model
   attributes:
     label: Model Endpoint
-    description: Select a model endpoint (or choose "Default" to use the default model)
+    description: Select a model endpoint (or choose "Default" to use the default model, or "Other" to specify a custom model)
     options:
     - Default (global.anthropic.claude-sonnet-4-5-20250929-v1:0)
     - anthropic.claude-3-haiku-20240307-v1:0
@@ -28,8 +28,18 @@ body:
     - global.anthropic.claude-sonnet-4-5-20250929-v1:0
     - us.amazon.nova-premier-v1:0
     - us.amazon.nova-micro-v1:0
+    - us.deepseek.r1-v1:0
     - openai.gpt-oss-20b-1:0
     - openai.gpt-oss-120b-1:0
+    - Other
+  validations:
+    required: false
+- type: input
+  id: custom_model
+  attributes:
+    label: Custom Model Endpoint
+    description: If you selected "Other" above, enter your custom model endpoint ID here (e.g., us.deepseek.r1-v1:0)
+    placeholder: 'us.deepseek.r1-v1:0'
   validations:
     required: false
 - type: textarea

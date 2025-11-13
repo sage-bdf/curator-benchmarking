@@ -90,6 +90,11 @@ class BedrockClient:
             if system_instructions:
                 full_prompt = f"{system_instructions}\n\n{prompt}"
             # Use converse API format for Nova
+            inference_config = {
+                "maxTokens": max_tokens,
+                "temperature": temperature
+            }
+            
             body = {
                 "messages": [
                     {
@@ -97,11 +102,28 @@ class BedrockClient:
                         "content": [{"text": full_prompt}]
                     }
                 ],
-                "inferenceConfig": {
-                    "maxTokens": max_tokens
-                }
+                "inferenceConfig": inference_config
             }
-            # Note: Nova may not support temperature in this format
+        elif model_id.startswith('us.deepseek.') or model_id.startswith('deepseek.'):
+            # DeepSeek format - use converse API format
+            # DeepSeek models support system instructions via the system parameter in Converse API
+            inference_config = {
+                "maxTokens": max_tokens,
+                "temperature": temperature
+            }
+            
+            body = {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [{"text": prompt}]
+                    }
+                ],
+                "inferenceConfig": inference_config
+            }
+            # Add system instructions if provided (DeepSeek supports system role in Converse API)
+            if system_instructions:
+                body["system"] = [{"text": system_instructions}]
         else:
             # Anthropic format (default)
             body = {
@@ -140,19 +162,48 @@ class BedrockClient:
                 # Always use boto3 - it automatically uses bearer token from AWS_BEARER_TOKEN_BEDROCK env var
                 # if available, otherwise uses AWS credentials
                 
-                # For Amazon Nova models, use converse API directly
-                if model_id.startswith('us.amazon.') or model_id.startswith('amazon.'):
+                # For Amazon Nova and DeepSeek models, use converse API directly
+                if model_id.startswith('us.amazon.') or model_id.startswith('amazon.') or model_id.startswith('us.deepseek.') or model_id.startswith('deepseek.'):
                     try:
-                        response = self.bedrock_runtime.converse(
-                            modelId=model_id,
-                            messages=body['messages'],
-                            inferenceConfig=body.get('inferenceConfig', {})
-                        )
-                        # Converse API returns response directly
+                        # Debug: print the request structure
+                        model_type = "Nova" if (model_id.startswith('us.amazon.') or model_id.startswith('amazon.')) else "DeepSeek"
+                        print(f"    [DEBUG] Calling {model_type} model: {model_id}")
+                        print(f"    [DEBUG] Messages: {len(body['messages'])} message(s)")
+                        print(f"    [DEBUG] InferenceConfig: {body.get('inferenceConfig', {})}")
+                        if 'system' in body:
+                            print(f"    [DEBUG] System instructions: {len(body['system'])} system message(s)")
+                        
+                        # Build converse API call parameters
+                        converse_kwargs = {
+                            'modelId': model_id,
+                            'messages': body['messages'],
+                            'inferenceConfig': body.get('inferenceConfig', {})
+                        }
+                        # Add system instructions if present (for DeepSeek models)
+                        if 'system' in body:
+                            converse_kwargs['system'] = body['system']
+                        
+                        response = self.bedrock_runtime.converse(**converse_kwargs)
+                        # Converse API returns response directly as a dict
                         response_body = response
+                        
+                        # Debug: print response structure
+                        print(f"    [DEBUG] Response keys: {list(response_body.keys()) if isinstance(response_body, dict) else 'Not a dict'}")
+                        if isinstance(response_body, dict) and 'output' in response_body:
+                            print(f"    [DEBUG] Output keys: {list(response_body['output'].keys()) if isinstance(response_body.get('output'), dict) else 'Not a dict'}")
                     except ClientError as e:
                         error_code = e.response.get('Error', {}).get('Code', '')
                         error_message = e.response.get('Error', {}).get('Message', '')
+                        # Print detailed error for debugging
+                        print(f"    [ERROR] Nova model invocation failed: {error_code} - {error_message}")
+                        print(f"    [ERROR] Model ID: {model_id}")
+                        print(f"    [ERROR] InferenceConfig: {body.get('inferenceConfig', {})}")
+                        print(f"    [ERROR] Full error response: {e.response}")
+                        raise e
+                    except Exception as e:
+                        # Catch any other exceptions
+                        print(f"    [ERROR] Unexpected error calling Nova model: {type(e).__name__}: {str(e)}")
+                        print(f"    [ERROR] Model ID: {model_id}")
                         raise e
                 else:
                     # Use invoke_model for Anthropic models (supports thinking mode via thinking object in body)
@@ -218,8 +269,27 @@ class BedrockClient:
                     text_parts = []
                     for item in content_list:
                         if isinstance(item, dict):
-                            # Only extract text type blocks, skip thinking blocks
+                            # Handle standard text type blocks
                             if item.get('type') == 'text' and 'text' in item:
+                                text_parts.append(item['text'])
+                            # Handle DeepSeek R1 reasoningContent format
+                            elif 'reasoningContent' in item:
+                                reasoning_content = item.get('reasoningContent', {})
+                                if 'reasoningText' in reasoning_content:
+                                    reasoning_text = reasoning_content.get('reasoningText', {})
+                                    if isinstance(reasoning_text, dict) and 'text' in reasoning_text:
+                                        text_parts.append(reasoning_text['text'])
+                                    elif isinstance(reasoning_text, str):
+                                        text_parts.append(reasoning_text)
+                            # Handle DeepSeek R1 textContent format (if present)
+                            elif 'textContent' in item:
+                                text_content = item.get('textContent', {})
+                                if isinstance(text_content, dict) and 'text' in text_content:
+                                    text_parts.append(text_content['text'])
+                                elif isinstance(text_content, str):
+                                    text_parts.append(text_content)
+                            # Fallback: if item has 'text' key directly
+                            elif 'text' in item and not item.get('type') == 'thinking':
                                 text_parts.append(item['text'])
                     return ''.join(text_parts)
                 
@@ -250,6 +320,12 @@ class BedrockClient:
                 # Fallback: try direct text field
                 if not content:
                     content = response_body.get('text', response_body.get('output', ''))
+                
+                # Warn if content is still empty after all parsing attempts
+                if not content:
+                    print(f"    [WARNING] No content extracted from response. Response structure: {list(response_body.keys()) if isinstance(response_body, dict) else type(response_body)}")
+                    if isinstance(response_body, dict):
+                        print(f"    [WARNING] Full response (truncated): {str(response_body)[:500]}")
                 
                 return {
                     'success': True,

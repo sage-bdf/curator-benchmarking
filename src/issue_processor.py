@@ -42,6 +42,13 @@ class IssueProcessor:
                 if model.startswith('Default'):
                     # Use default from config
                     pass
+                elif model == 'Other':
+                    # Check for custom model endpoint
+                    custom_model_match = re.search(r'### Custom Model Endpoint\s*\n\n([^\n]+)', issue_body)
+                    if custom_model_match:
+                        custom_model = custom_model_match.group(1).strip()
+                        if custom_model and custom_model not in ['', '-']:
+                            params['model'] = custom_model
                 else:
                     params['model'] = model
         
