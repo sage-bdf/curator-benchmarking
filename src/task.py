@@ -29,6 +29,9 @@ class Task:
         
         # Load custom prompt formatter if it exists
         self.format_prompt_func = self._load_prompt_formatter()
+        
+        # Load custom scorer if it exists
+        self.score_func = self._load_scorer()
     
     def _load_config(self) -> Dict[str, Any]:
         """Load task configuration if it exists."""
@@ -148,4 +151,22 @@ class Task:
             # Default formatting: prompt + schema + input data
             sample_str = json.dumps(sample, indent=2)
             return f"{self.default_prompt}{schema_text}\n\nInput data:\n{sample_str}"
+    
+    def _load_scorer(self) -> Optional[callable]:
+        """Load custom scorer if it exists."""
+        score_path = self.task_dir / "score.py"
+        if score_path.exists():
+            try:
+                import importlib.util
+                spec = importlib.util.spec_from_file_location(
+                    f"{self.name}_score",
+                    score_path
+                )
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                if hasattr(module, 'score'):
+                    return module.score
+            except Exception as e:
+                print(f"Warning: Could not load score.py for {self.name}: {e}")
+        return None
 

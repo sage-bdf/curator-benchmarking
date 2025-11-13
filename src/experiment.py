@@ -215,7 +215,8 @@ class Experiment:
                     score = self.scorer.score(
                         prediction=prediction_content,
                         ground_truth=ground_truth_dict,
-                        input_data=sample
+                        input_data=sample,
+                        task=task
                     )
                     if score is not None:
                         print(f"✓ Score: {(score * 100):.2f}%")
