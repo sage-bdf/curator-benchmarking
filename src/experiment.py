@@ -1,6 +1,7 @@
 """Experiment management and execution."""
 import json
 import hashlib
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -65,6 +66,8 @@ class Experiment:
     
     def _run_task(self, task: Task) -> Dict[str, Any]:
         """Run a single task and return results."""
+        task_start_time = time.time()
+        
         prompt = task.default_prompt
         input_samples = task.get_input_samples()
         ground_truth_samples = task.get_ground_truth_samples()
@@ -176,11 +179,15 @@ class Experiment:
         # Calculate metrics for this task
         metrics = self._calculate_metrics(results)
         
+        task_end_time = time.time()
+        task_duration_seconds = task_end_time - task_start_time
+        
         return {
             'task_name': task.name,
             'num_samples': len(input_samples),
             'results': results,
-            'metrics': metrics
+            'metrics': metrics,
+            'duration_seconds': task_duration_seconds
         }
     
     def run(self) -> Dict[str, Any]:
@@ -228,6 +235,7 @@ class Experiment:
         
         print(f"\n  Starting experiment execution...\n")
         
+        experiment_start_time = time.time()
         task_results = {}
         overall_scores = []
         total_samples = 0
@@ -252,12 +260,16 @@ class Experiment:
                 else:
                     print(f"    Accuracy: N/A (no scores calculated)")
                 print(f"    Samples: {task_result['metrics']['total_samples']}")
+                duration = task_result.get('duration_seconds', 0)
+                print(f"    Duration: {duration:.2f}s")
                 print()
                 
             except Exception as e:
                 print(f"  ✗ Error running task {task.name}: {e}")
                 import traceback
                 traceback.print_exc()
+                task_end_time = time.time()
+                task_duration_seconds = task_end_time - experiment_start_time  # Approximate
                 task_results[task.name] = {
                     'task_name': task.name,
                     'error': str(e),
@@ -267,9 +279,13 @@ class Experiment:
                         'failed_runs': 0,
                         'success_rate': 0,
                         'average_score': None
-                    }
+                    },
+                    'duration_seconds': task_duration_seconds
                 }
                 print()
+        
+        experiment_end_time = time.time()
+        experiment_duration_seconds = experiment_end_time - experiment_start_time
         
         # Calculate overall metrics
         overall_metrics = {
@@ -277,8 +293,13 @@ class Experiment:
             'tasks_completed': len([r for r in task_results.values() if 'error' not in r]),
             'tasks_failed': len([r for r in task_results.values() if 'error' in r]),
             'average_accuracy': sum(overall_scores) / len(overall_scores) if overall_scores else None,
-            'task_metrics': {name: result['metrics'] for name, result in task_results.items()}
+            'task_metrics': {name: result['metrics'] for name, result in task_results.items()},
+            'duration_seconds': experiment_duration_seconds
         }
+        
+        print(f"\n{'='*60}")
+        print(f"Experiment completed in {experiment_duration_seconds:.2f} seconds")
+        print(f"{'='*60}\n")
         
         # Prepare experiment result
         experiment_result = {

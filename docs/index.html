@@ -415,6 +415,14 @@
                         if (detailed.overall_metrics) {
                             exp.overall_metrics = detailed.overall_metrics;
                         }
+                        // Update task durations from detailed results
+                        if (detailed.task_results) {
+                            for (const [taskName, taskResult] of Object.entries(detailed.task_results)) {
+                                if (exp.task_results[taskName] && taskResult.duration_seconds !== undefined) {
+                                    exp.task_results[taskName].duration_seconds = taskResult.duration_seconds;
+                                }
+                            }
+                        }
                         loadedCount++;
                     } else {
                         console.warn(`Failed to load detailed results for ${exp.experiment_id}: ${response.status} ${response.statusText}`);
@@ -549,6 +557,7 @@
                     averageAccuracy: exp.overall_metrics?.average_accuracy || 0,
                     tasksCompleted: exp.overall_metrics?.tasks_completed || 0,
                     totalSamples: exp.overall_metrics?.total_samples || 0,
+                    durationSeconds: exp.overall_metrics?.duration_seconds || 0,
                     task_results: taskResults
                 };
             });
@@ -591,6 +600,7 @@
                                     <th>Thinking</th>
                                     <th>Tasks Completed</th>
                                     <th>Total Samples</th>
+                                    <th>Duration</th>
                                     <th>Experiment ID</th>
                                 </tr>
                             </thead>
@@ -605,6 +615,12 @@
                                         ? perf.temperature.toFixed(2) 
                                         : 'N/A';
                                     const thinkingDisplay = perf.thinking ? 'Yes' : 'No';
+                                    const durationSeconds = perf.durationSeconds || 0;
+                                    const durationDisplay = durationSeconds > 0 
+                                        ? durationSeconds < 60 
+                                            ? `${durationSeconds.toFixed(1)}s`
+                                            : `${Math.floor(durationSeconds / 60)}m ${(durationSeconds % 60).toFixed(0)}s`
+                                        : 'N/A';
                                     return `
                                         <tr>
                                             <td class="rank ${getRankClass(rank)}">${rank}</td>
@@ -615,6 +631,7 @@
                                             <td>${thinkingDisplay}</td>
                                             <td>${perf.tasksCompleted}</td>
                                             <td>${perf.totalSamples}</td>
+                                            <td>${durationDisplay}</td>
                                             <td class="experiment-id-cell">${perf.experiment_id}</td>
                                         </tr>
                                     `;
@@ -652,7 +669,8 @@
                         temperature: exp.temperature,
                         thinking: exp.thinking,
                         accuracy: exp.task_results[taskName].metrics?.average_score || 0,
-                        samples: exp.task_results[taskName].metrics?.total_samples || 0
+                        samples: exp.task_results[taskName].metrics?.total_samples || 0,
+                        durationSeconds: exp.task_results[taskName].duration_seconds || 0
                     }))
                     .sort((a, b) => b.accuracy - a.accuracy);
                 
