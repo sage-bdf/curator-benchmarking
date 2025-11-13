@@ -352,15 +352,25 @@
                 
                 console.log(`Loaded ${lines.length} experiment entries from log file`);
                 
-                // Parse all experiments
-                const parsedExperiments = lines.map(line => {
-                    try {
-                        return JSON.parse(line);
-                    } catch (e) {
-                        console.error('Error parsing line:', line, e);
-                        return null;
-                    }
-                }).filter(exp => exp !== null);
+                // Parse all experiments, filtering out merge conflict markers and invalid JSON
+                const parsedExperiments = lines
+                    .filter(line => {
+                        const trimmed = line.trim();
+                        // Skip merge conflict markers
+                        if (trimmed.startsWith('<<<<<<<') || trimmed.startsWith('=======') || trimmed.startsWith('>>>>>>>')) {
+                            return false;
+                        }
+                        return trimmed.length > 0;
+                    })
+                    .map(line => {
+                        try {
+                            return JSON.parse(line);
+                        } catch (e) {
+                            console.warn('Error parsing line (skipping):', line.substring(0, 100), e);
+                            return null;
+                        }
+                    })
+                    .filter(exp => exp !== null);
                 
                 // Deduplicate by experiment_id, keeping the most recent (last) entry
                 const experimentMap = new Map();
