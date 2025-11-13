@@ -15,19 +15,22 @@ def compute_task_hash(task: Task) -> str:
     """
     Compute a hash of a task's content to detect changes.
     
+    Includes all files in the task directory except README.md.
+    
     Args:
         task: The Task object to hash
         
     Returns:
         MD5 hash string representing the task's content
     """
-    # Hash all relevant task files
+    # Hash all files in the task directory except README.md
     task_dir = task.task_dir
     files_to_hash = []
     
-    # Include all files that affect task behavior
-    for pattern in ['*.tsv', '*.csv', '*.txt', '*.json', '*.yaml', '*.yml']:
-        files_to_hash.extend(list(task_dir.glob(pattern)))
+    # Include all files except README.md
+    for file_path in task_dir.iterdir():
+        if file_path.is_file() and file_path.name != 'README.md':
+            files_to_hash.append(file_path)
     
     # Sort files for consistent hashing
     files_to_hash.sort()
