@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Metadata Curation Benchmarking - Results</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -145,32 +148,68 @@
             text-transform: capitalize;
         }
 
-        .search-box {
+        .dataTables_wrapper {
             padding: 15px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
         }
 
-        .search-box input {
-            width: 100%;
+        .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        .dataTables_filter label {
+            color: #666;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .dataTables_filter input {
             padding: 10px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             font-size: 1em;
             transition: border-color 0.3s;
+            margin-left: 10px;
         }
 
-        .search-box input:focus {
+        .dataTables_filter input:focus {
             outline: none;
             border-color: #667eea;
         }
 
-        .search-box label {
-            display: block;
-            margin-bottom: 8px;
+        .dataTables_paginate {
+            margin-top: 20px;
+        }
+
+        .dataTables_paginate .paginate_button {
+            padding: 8px 12px;
+            margin: 0 2px;
+            border: 1px solid #e0e0e0;
+            background: white;
             color: #666;
-            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .dataTables_paginate .paginate_button:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+        }
+
+        .dataTables_paginate .paginate_button.current {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .dataTables_info {
+            color: #666;
             font-size: 0.9em;
+            margin-top: 10px;
         }
 
         .leaderboard-table {
@@ -328,73 +367,6 @@
             font-family: 'Courier New', monospace;
         }
 
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .pagination-info {
-            color: #666;
-            font-size: 0.9em;
-            margin: 0 10px;
-        }
-
-        .pagination-button {
-            padding: 8px 16px;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .pagination-button:hover:not(:disabled) {
-            background: #667eea;
-            color: white;
-        }
-
-        .pagination-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: #ccc;
-            color: #999;
-        }
-
-        .pagination-page-numbers {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .pagination-page-number {
-            padding: 6px 12px;
-            border: 1px solid #e0e0e0;
-            background: white;
-            color: #666;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.2s;
-        }
-
-        .pagination-page-number:hover {
-            background: #f0f0f0;
-            border-color: #667eea;
-        }
-
-        .pagination-page-number.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
     </style>
 </head>
 <body>
@@ -925,24 +897,20 @@
                 overallHtml = `
                     <div class="task-section">
                         <div class="task-header">Overall Performance</div>
-                        <div class="search-box">
-                            <label for="search-overall">Search experiments:</label>
-                            <input type="text" id="search-overall" placeholder="Search by model or experiment ID..." onkeyup="filterTable('search-overall', 'table-overall')">
-                        </div>
                         <table class="leaderboard-table" id="table-overall">
                             <thead>
                                 <tr>
-                                    <th class="rank">Rank</th>
-                                    <th class="sortable" data-column="accuracy" data-type="number">Average Accuracy</th>
-                                    <th class="sortable" data-column="model" data-type="string">Model</th>
-                                    <th class="sortable" data-column="system" data-type="string">System Instructions</th>
-                                    <th class="sortable" data-column="temperature" data-type="number">Temperature</th>
-                                    <th class="sortable" data-column="thinking" data-type="string">Thinking</th>
-                                    <th class="sortable" data-column="tasks" data-type="number">Tasks Completed</th>
-                                    <th class="sortable" data-column="samples" data-type="number">Total Samples</th>
-                                    <th class="sortable" data-column="duration" data-type="number">Duration</th>
-                                    <th class="sortable" data-column="tokens" data-type="number">Total Tokens</th>
-                                    <th class="sortable" data-column="experiment_id" data-type="string">Experiment ID</th>
+                                    <th>Rank</th>
+                                    <th>Average Accuracy</th>
+                                    <th>Model</th>
+                                    <th>System Instructions</th>
+                                    <th>Temperature</th>
+                                    <th>Thinking</th>
+                                    <th>Tasks Completed</th>
+                                    <th>Total Samples</th>
+                                    <th>Duration</th>
+                                    <th>Total Tokens</th>
+                                    <th>Experiment ID</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -969,37 +937,43 @@
                                         : 'N/A';
                                     return `
                                         <tr>
-                                            <td class="rank ${getRankClass(rank)}">${rank}</td>
-                                            <td class="accuracy-cell ${getScoreClass(perf.averageAccuracy)}">${avgAccuracy}%</td>
+                                            <td class="rank ${getRankClass(rank)}" data-order="${rank}">${rank}</td>
+                                            <td class="accuracy-cell ${getScoreClass(perf.averageAccuracy)}" data-order="${perf.averageAccuracy}">${avgAccuracy}%</td>
                                             <td class="model-cell">${perf.model_id}</td>
                                             <td title="${perf.system_instructions}">${sysInstPreview}</td>
-                                            <td>${tempDisplay}</td>
-                                            <td>${thinkingDisplay}</td>
-                                            <td>${perf.tasksCompleted}</td>
-                                            <td>${perf.totalSamples}</td>
-                                            <td>${durationDisplay}</td>
-                                            <td>${tokensDisplay}</td>
+                                            <td data-order="${perf.temperature !== null && perf.temperature !== undefined ? perf.temperature : -1}">${tempDisplay}</td>
+                                            <td data-order="${perf.thinking ? 1 : 0}">${thinkingDisplay}</td>
+                                            <td data-order="${perf.tasksCompleted}">${perf.tasksCompleted}</td>
+                                            <td data-order="${perf.totalSamples}">${perf.totalSamples}</td>
+                                            <td data-order="${durationSeconds}">${durationDisplay}</td>
+                                            <td data-order="${totalTokens}">${tokensDisplay}</td>
                                             <td class="experiment-id-cell">${perf.experiment_id}</td>
                                         </tr>
                                     `;
                                 }).join('')}
                             </tbody>
                         </table>
-                        ${createPaginationHTML('table-overall', overallPerformance.length)}
                     </div>
                 `;
             }
             
             document.getElementById('overallPerformance').innerHTML = overallHtml;
             
-            // Setup sorting for overall performance table
-            setTimeout(() => {
-                setupTableSorting();
-                // Initialize pagination - show first 5 rows
-                if (overallPerformance.length > 5) {
-                    goToPage('table-overall', 1);
-                }
-            }, 0);
+            // Initialize DataTables for overall performance table
+            if (overallPerformance.length > 0) {
+                setTimeout(() => {
+                    if ($.fn.DataTable.isDataTable('#table-overall')) {
+                        $('#table-overall').DataTable().destroy();
+                    }
+                    $('#table-overall').DataTable({
+                        pageLength: 5,
+                        order: [[1, 'desc']], // Sort by accuracy descending
+                        columnDefs: [
+                            { type: 'num', targets: [0, 1, 4, 6, 7, 8, 9] }
+                        ]
+                    });
+                }, 0);
+            }
 
             // Generate task-wise breakdown tables
             // Get all unique tasks from all experiments (only from experiments with task_results)
@@ -1037,317 +1011,84 @@
                 html += `
                     <div class="task-section">
                         <div class="task-header">${taskDisplayName}</div>
-                        <div class="search-box">
-                            <label for="${searchId}">Search experiments:</label>
-                            <input type="text" id="${searchId}" placeholder="Search by model, experiment ID..." onkeyup="filterTable('${searchId}', '${tableId}')">
-                        </div>
-                           <table class="leaderboard-table" id="${tableId}">
-                               <thead>
-                                   <tr>
-                                       <th class="rank">Rank</th>
-                                       <th class="sortable" data-column="accuracy" data-type="number">Accuracy</th>
-                                       <th class="sortable" data-column="model" data-type="string">Model</th>
-                                       <th class="sortable" data-column="system" data-type="string">System Instructions</th>
-                                        <th class="sortable" data-column="temperature" data-type="number">Temperature</th>
-                                        <th class="sortable" data-column="thinking" data-type="string">Thinking</th>
-                                        <th class="sortable" data-column="samples" data-type="number">Samples</th>
-                                        <th class="sortable" data-column="duration" data-type="number">Duration</th>
-                                        <th class="sortable" data-column="tokens" data-type="number">Tokens</th>
-                                        <th class="sortable" data-column="experiment_id" data-type="string">Experiment ID</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${taskExperiments.map((exp, index) => {
-                                        const rank = index + 1;
-                                        const accuracyPercent = (exp.accuracy * 100).toFixed(2);
-                                        const sysInstPreview = exp.system_instructions.length > 50 
-                                            ? exp.system_instructions.substring(0, 50) + '...'
-                                            : exp.system_instructions;
-                                        const tempDisplay = exp.temperature !== null && exp.temperature !== undefined 
-                                            ? exp.temperature.toFixed(2) 
-                                            : 'N/A';
-                                        const thinkingDisplay = exp.thinking ? 'Yes' : 'No';
-                                        const durationSeconds = exp.durationSeconds || 0;
-                                        const durationDisplay = durationSeconds > 0 
-                                            ? durationSeconds < 60 
-                                                ? `${durationSeconds.toFixed(1)}s`
-                                                : `${Math.floor(durationSeconds / 60)}m ${(durationSeconds % 60).toFixed(0)}s`
-                                            : 'N/A';
-                                        const tokenUsage = exp.tokenUsage || {};
-                                        const totalTokens = tokenUsage.total_tokens || 0;
-                                        const tokensDisplay = totalTokens > 0 
-                                            ? totalTokens.toLocaleString() 
-                                            : 'N/A';
-                                        return `
-                                            <tr>
-                                                <td class="rank ${getRankClass(rank)}">${rank}</td>
-                                                <td class="accuracy-cell ${getScoreClass(exp.accuracy)}">${accuracyPercent}%</td>
-                                                <td class="model-cell">${exp.model_id}</td>
-                                                <td title="${exp.system_instructions}">${sysInstPreview}</td>
-                                                <td>${tempDisplay}</td>
-                                                <td>${thinkingDisplay}</td>
-                                                <td>${exp.samples}</td>
-                                                <td>${durationDisplay}</td>
-                                                <td>${tokensDisplay}</td>
-                                                <td class="experiment-id-cell">${exp.experiment_id}</td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                               </tbody>
-                           </table>
-                           ${createPaginationHTML(tableId, taskExperiments.length)}
+                        <table class="leaderboard-table" id="${tableId}">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Accuracy</th>
+                                    <th>Model</th>
+                                    <th>System Instructions</th>
+                                    <th>Temperature</th>
+                                    <th>Thinking</th>
+                                    <th>Samples</th>
+                                    <th>Duration</th>
+                                    <th>Tokens</th>
+                                    <th>Experiment ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${taskExperiments.map((exp, index) => {
+                                    const rank = index + 1;
+                                    const accuracyPercent = (exp.accuracy * 100).toFixed(2);
+                                    const sysInstPreview = exp.system_instructions.length > 50 
+                                        ? exp.system_instructions.substring(0, 50) + '...'
+                                        : exp.system_instructions;
+                                    const tempDisplay = exp.temperature !== null && exp.temperature !== undefined 
+                                        ? exp.temperature.toFixed(2) 
+                                        : 'N/A';
+                                    const thinkingDisplay = exp.thinking ? 'Yes' : 'No';
+                                    const durationSeconds = exp.durationSeconds || 0;
+                                    const durationDisplay = durationSeconds > 0 
+                                        ? durationSeconds < 60 
+                                            ? `${durationSeconds.toFixed(1)}s`
+                                            : `${Math.floor(durationSeconds / 60)}m ${(durationSeconds % 60).toFixed(0)}s`
+                                        : 'N/A';
+                                    const tokenUsage = exp.tokenUsage || {};
+                                    const totalTokens = tokenUsage.total_tokens || 0;
+                                    const tokensDisplay = totalTokens > 0 
+                                        ? totalTokens.toLocaleString() 
+                                        : 'N/A';
+                                    return `
+                                        <tr>
+                                            <td class="rank ${getRankClass(rank)}" data-order="${rank}">${rank}</td>
+                                            <td class="accuracy-cell ${getScoreClass(exp.accuracy)}" data-order="${exp.accuracy}">${accuracyPercent}%</td>
+                                            <td class="model-cell">${exp.model_id}</td>
+                                            <td title="${exp.system_instructions}">${sysInstPreview}</td>
+                                            <td data-order="${exp.temperature !== null && exp.temperature !== undefined ? exp.temperature : -1}">${tempDisplay}</td>
+                                            <td data-order="${exp.thinking ? 1 : 0}">${thinkingDisplay}</td>
+                                            <td data-order="${exp.samples}">${exp.samples}</td>
+                                            <td data-order="${durationSeconds}">${durationDisplay}</td>
+                                            <td data-order="${totalTokens}">${tokensDisplay}</td>
+                                            <td class="experiment-id-cell">${exp.experiment_id}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 `;
             });
 
             container.innerHTML = html;
             
-            // Setup sorting for all task tables and initialize pagination
+            // Initialize DataTables for all task tables
             setTimeout(() => {
-                setupTableSorting();
-                // Initialize pagination for all task tables
                 Array.from(allTasks).sort().forEach((taskName, taskIndex) => {
                     const tableId = `table-${taskIndex}`;
-                    const table = document.getElementById(tableId);
-                    if (table) {
-                        const rows = table.querySelectorAll('tbody tr');
-                        if (rows.length > 5) {
-                            goToPage(tableId, 1);
-                        }
+                    if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
+                        $(`#${tableId}`).DataTable().destroy();
                     }
+                    $(`#${tableId}`).DataTable({
+                        pageLength: 5,
+                        order: [[1, 'desc']], // Sort by accuracy descending
+                        columnDefs: [
+                            { type: 'num', targets: [0, 1, 4, 6, 7, 8] }
+                        ]
+                    });
                 });
             }, 0);
         }
 
-        function filterTable(searchId, tableId) {
-            const searchInput = document.getElementById(searchId);
-            const filter = searchInput.value.toLowerCase();
-            const table = document.getElementById(tableId);
-            const tbody = table.querySelector('tbody');
-            if (!tbody) return;
-            
-            const rows = tbody.getElementsByTagName('tr');
-            
-            // First, show/hide rows based on filter
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const text = row.textContent || row.innerText;
-                if (text.toLowerCase().indexOf(filter) > -1) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-            
-            // Reset pagination when filtering
-            const paginationId = `pagination-${tableId}`;
-            const pagination = document.getElementById(paginationId);
-            if (pagination) {
-                goToPage(tableId, 1);
-            }
-        }
-
-        function goToPage(tableId, page) {
-            const table = document.getElementById(tableId);
-            if (!table) return;
-            
-            // Get all rows
-            const allRows = Array.from(table.querySelectorAll('tbody tr'));
-            // Filter to only rows that are not explicitly hidden by search filter
-            // Rows hidden by search have display='none', others are visible
-            const visibleRows = allRows.filter(row => row.style.display !== 'none');
-            
-            const rowsPerPage = 5;
-            const totalPages = Math.ceil(visibleRows.length / rowsPerPage);
-            
-            // Hide all visible rows
-            visibleRows.forEach(row => row.style.display = 'none');
-            
-            // Show rows for current page
-            const startIndex = (page - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            visibleRows.slice(startIndex, endIndex).forEach(row => row.style.display = '');
-            
-            // Update pagination controls
-            updatePaginationControls(tableId, page, totalPages, visibleRows.length);
-        }
-
-        function updatePaginationControls(tableId, currentPage, totalPages, totalRows) {
-            const paginationId = `pagination-${tableId}`;
-            const pagination = document.getElementById(paginationId);
-            if (!pagination) return;
-            
-            const rowsPerPage = 5;
-            const startRow = (currentPage - 1) * rowsPerPage + 1;
-            const endRow = Math.min(currentPage * rowsPerPage, totalRows);
-            
-            // Update info
-            const infoElement = pagination.querySelector('.pagination-info');
-            if (infoElement) {
-                infoElement.textContent = `Showing ${startRow}-${endRow} of ${totalRows}`;
-            }
-            
-            // Update prev/next buttons
-            const prevButton = pagination.querySelector('.pagination-prev');
-            const nextButton = pagination.querySelector('.pagination-next');
-            if (prevButton) {
-                prevButton.disabled = currentPage === 1;
-            }
-            if (nextButton) {
-                nextButton.disabled = currentPage === totalPages;
-            }
-            
-            // Update page numbers
-            const pageNumbersContainer = pagination.querySelector('.pagination-page-numbers');
-            if (pageNumbersContainer) {
-                pageNumbersContainer.innerHTML = '';
-                
-                // Show page numbers (max 5 visible at a time)
-                let startPage = Math.max(1, currentPage - 2);
-                let endPage = Math.min(totalPages, startPage + 4);
-                
-                // Adjust if we're near the end
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
-                }
-                
-                for (let i = startPage; i <= endPage; i++) {
-                    const pageButton = document.createElement('button');
-                    pageButton.className = `pagination-page-number ${i === currentPage ? 'active' : ''}`;
-                    pageButton.textContent = i;
-                    pageButton.onclick = () => goToPage(tableId, i);
-                    pageNumbersContainer.appendChild(pageButton);
-                }
-            }
-        }
-
-        function createPaginationHTML(tableId, totalRows) {
-            const rowsPerPage = 5;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-            
-            if (totalPages <= 1) {
-                return ''; // No pagination needed if 5 or fewer rows
-            }
-            
-            return `
-                <div class="pagination" id="pagination-${tableId}">
-                    <button class="pagination-button pagination-prev" onclick="goToPage('${tableId}', 1)" disabled>First</button>
-                    <button class="pagination-button pagination-prev" onclick="goToPage('${tableId}', getCurrentPage('${tableId}') - 1)">Previous</button>
-                    <div class="pagination-page-numbers"></div>
-                    <button class="pagination-button pagination-next" onclick="goToPage('${tableId}', getCurrentPage('${tableId}') + 1)">Next</button>
-                    <button class="pagination-button pagination-next" onclick="goToPage('${tableId}', ${totalPages})">Last</button>
-                    <span class="pagination-info">Showing 1-${Math.min(rowsPerPage, totalRows)} of ${totalRows}</span>
-                </div>
-            `;
-        }
-
-        function getCurrentPage(tableId) {
-            const table = document.getElementById(tableId);
-            if (!table) return 1;
-            
-            const rows = Array.from(table.querySelectorAll('tbody tr')).filter(row => row.style.display !== 'none');
-            const visibleRows = rows.filter(row => row.style.display === '');
-            if (visibleRows.length === 0) return 1;
-            
-            const firstVisibleIndex = rows.indexOf(visibleRows[0]);
-            return Math.floor(firstVisibleIndex / 5) + 1;
-        }
-
-        function sortTable(tableId, columnIndex, dataType) {
-            const table = document.getElementById(tableId);
-            if (!table) return;
-            
-            const tbody = table.querySelector('tbody');
-            if (!tbody) return;
-            
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const headerRow = table.querySelector('thead tr');
-            const headers = headerRow.querySelectorAll('th');
-            
-            // Get current sort direction BEFORE removing classes
-            const currentHeader = headers[columnIndex];
-            const isAscending = currentHeader.classList.contains('sorted-asc');
-            const isDescending = currentHeader.classList.contains('sorted-desc');
-            const newDirection = isAscending ? 'desc' : 'asc';
-            
-            // Remove sort classes from all headers
-            headers.forEach(h => {
-                h.classList.remove('sorted-asc', 'sorted-desc');
-            });
-            
-            // Add sort class to current header
-            currentHeader.classList.add(`sorted-${newDirection}`);
-            
-            // Sort rows
-            rows.sort((a, b) => {
-                const aCell = a.cells[columnIndex];
-                const bCell = b.cells[columnIndex];
-                
-                if (!aCell || !bCell) return 0;
-                
-                let aValue = aCell.textContent.trim();
-                let bValue = bCell.textContent.trim();
-                
-                // Handle different data types
-                if (dataType === 'number') {
-                    // Extract number from text (handle "N/A", percentages, formatted numbers)
-                    const extractNumber = (text) => {
-                        if (text === 'N/A' || text === '') return -Infinity;
-                        // Remove commas, %, and extract number
-                        const num = parseFloat(text.replace(/[%,]/g, ''));
-                        return isNaN(num) ? -Infinity : num;
-                    };
-                    aValue = extractNumber(aValue);
-                    bValue = extractNumber(bValue);
-                } else {
-                    // String comparison
-                    aValue = aValue.toLowerCase();
-                    bValue = bValue.toLowerCase();
-                }
-                
-                // Compare values
-                if (aValue < bValue) return newDirection === 'asc' ? -1 : 1;
-                if (aValue > bValue) return newDirection === 'asc' ? 1 : -1;
-                return 0;
-            });
-            
-            // Update rank column and re-append rows
-            rows.forEach((row, index) => {
-                const rankCell = row.querySelector('.rank');
-                if (rankCell) {
-                    const rank = index + 1;
-                    rankCell.textContent = rank;
-                    rankCell.className = 'rank ' + getRankClass(rank);
-                }
-                tbody.appendChild(row);
-            });
-            
-            // Reset pagination to page 1 after sorting
-            const paginationId = `pagination-${tableId}`;
-            const pagination = document.getElementById(paginationId);
-            if (pagination) {
-                goToPage(tableId, 1);
-            }
-        }
-
-        function setupTableSorting() {
-            // Setup sorting for all tables
-            document.querySelectorAll('.leaderboard-table').forEach(table => {
-                const allHeaders = table.querySelectorAll('thead th');
-                allHeaders.forEach((header, columnIndex) => {
-                    if (header.classList.contains('sortable')) {
-                        // Remove any existing listeners by cloning
-                        const newHeader = header.cloneNode(true);
-                        header.parentNode.replaceChild(newHeader, header);
-                        
-                        newHeader.addEventListener('click', () => {
-                            const dataType = newHeader.getAttribute('data-type') || 'string';
-                            sortTable(table.id, columnIndex, dataType);
-                        });
-                    }
-                });
-            });
-        }
 
         // Event listeners
         document.getElementById('modelFilter').addEventListener('change', filterAndDisplay);
