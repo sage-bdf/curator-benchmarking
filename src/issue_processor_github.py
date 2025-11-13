@@ -48,8 +48,15 @@ def main():
         with open(summary_path, 'w') as f:
             json.dump(summary, f, indent=2)
         
+        # Save consolidated results file for GitHub Actions workflow
+        results_dir = Path(__file__).parent.parent / 'docs' / 'results'
+        results_file = results_dir / f"{result['experiment_id']}_results.json"
+        with open(results_file, 'w') as f:
+            json.dump(result, f, indent=2)
+        
         print(f"\n✅ Experiment {result['experiment_id']} completed successfully!")
         print(f"Overall Metrics: {result['overall_metrics']}")
+        print(f"Results saved to: {results_file}")
         
     except Exception as e:
         print(f"\n❌ Experiment failed: {e}")
