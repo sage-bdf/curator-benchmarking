@@ -140,54 +140,79 @@ class BedrockClient:
                         error_message = e.response.get('Error', {}).get('Message', '')
                         raise e
                 else:
-                    # Try invoke_model first (for older models)
-                    try:
-                        response = self.bedrock_runtime.invoke_model(
-                            modelId=model_id,
-                            body=json.dumps(body)
-                        )
-                        response_body = json.loads(response['body'].read())
-                    except ClientError as e:
-                        error_code = e.response.get('Error', {}).get('Code', '')
-                        error_message = e.response.get('Error', {}).get('Message', '')
+                    # For thinking mode, use converse API directly (reasoningEffort only works with converse)
+                    # Otherwise, try invoke_model first (for older models)
+                    if thinking:
+                        # Convert to converse API format for thinking mode
+                        converse_messages = []
+                        for msg in body.get('messages', []):
+                            converse_messages.append({
+                                'role': msg.get('role', 'user'),
+                                'content': [{'text': msg.get('content', '')}]
+                            })
                         
-                        # If invoke_model fails with ValidationException about on-demand throughput,
-                        # try using converse API instead (for newer models)
-                        if error_code == 'ValidationException' and 'on-demand throughput' in error_message:
-                            # Convert to converse API format
-                            converse_messages = []
-                            for msg in body.get('messages', []):
-                                converse_messages.append({
-                                    'role': msg.get('role', 'user'),
-                                    'content': [{'text': msg.get('content', '')}]
-                                })
+                        converse_kwargs = {
+                            'modelId': model_id,
+                            'messages': converse_messages
+                        }
+                        
+                        if body.get('system'):
+                            converse_kwargs['system'] = [{'text': body['system']}]
+                        
+                        inference_config = {
+                            'maxTokens': body.get('max_tokens', max_tokens),
+                            'temperature': body.get('temperature', temperature),
+                            'reasoningEffort': "high"  # Options: "low", "medium", "high"
+                        }
+                        
+                        converse_kwargs['inferenceConfig'] = inference_config
+                        
+                        response = self.bedrock_runtime.converse(**converse_kwargs)
+                        # Converse API returns response directly, not wrapped in 'body'
+                        response_body = response
+                    else:
+                        # Try invoke_model first (for older models)
+                        try:
+                            response = self.bedrock_runtime.invoke_model(
+                                modelId=model_id,
+                                body=json.dumps(body)
+                            )
+                            response_body = json.loads(response['body'].read())
+                        except ClientError as e:
+                            error_code = e.response.get('Error', {}).get('Code', '')
+                            error_message = e.response.get('Error', {}).get('Message', '')
                             
-                            converse_kwargs = {
-                                'modelId': model_id,
-                                'messages': converse_messages
-                            }
-                            
-                            if body.get('system'):
-                                converse_kwargs['system'] = [{'text': body['system']}]
-                            
-                            inference_config = {
-                                'maxTokens': body.get('max_tokens', max_tokens),
-                                'temperature': body.get('temperature', temperature)
-                            }
-                            
-                            # Add thinking/reasoning parameters if enabled (only for converse API)
-                            if thinking:
-                                # For models that support thinking mode (e.g., Claude Sonnet 4.5)
-                                # reasoning_effort is only valid in converse API, not invoke_model
-                                inference_config['reasoningEffort'] = "high"  # Options: "low", "medium", "high"
-                            
-                            converse_kwargs['inferenceConfig'] = inference_config
-                            
-                            response = self.bedrock_runtime.converse(**converse_kwargs)
-                            # Converse API returns response directly, not wrapped in 'body'
-                            response_body = response
-                        else:
-                            raise e
+                            # If invoke_model fails with ValidationException about on-demand throughput,
+                            # try using converse API instead (for newer models)
+                            if error_code == 'ValidationException' and 'on-demand throughput' in error_message:
+                                # Convert to converse API format
+                                converse_messages = []
+                                for msg in body.get('messages', []):
+                                    converse_messages.append({
+                                        'role': msg.get('role', 'user'),
+                                        'content': [{'text': msg.get('content', '')}]
+                                    })
+                                
+                                converse_kwargs = {
+                                    'modelId': model_id,
+                                    'messages': converse_messages
+                                }
+                                
+                                if body.get('system'):
+                                    converse_kwargs['system'] = [{'text': body['system']}]
+                                
+                                inference_config = {
+                                    'maxTokens': body.get('max_tokens', max_tokens),
+                                    'temperature': body.get('temperature', temperature)
+                                }
+                                
+                                converse_kwargs['inferenceConfig'] = inference_config
+                                
+                                response = self.bedrock_runtime.converse(**converse_kwargs)
+                                # Converse API returns response directly, not wrapped in 'body'
+                                response_body = response
+                            else:
+                                raise e
                 
                 # Extract content based on model response format
                 content = ''
