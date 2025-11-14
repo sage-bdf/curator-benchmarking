@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional
 from .config import Config
 from .task import Task
 from .experiment import Experiment
+from .tool import ToolRegistry
 
 
 class IssueProcessor:
@@ -85,6 +86,15 @@ class IssueProcessor:
             elif thinking_str in ['false', 'no', '0', 'disabled', '']:
                 params['thinking'] = False
         
+        # Extract tools (checkboxes format: "- [x] tool_name" for selected, "- [ ] tool_name" for unselected)
+        tools_match = re.search(r'### Tools\s*\n\n(.*?)(?=\n###|\Z)', issue_body, re.DOTALL)
+        if tools_match:
+            tools_section = tools_match.group(1)
+            # Find all checked tools (format: "- [x] tool_name")
+            checked_tools = re.findall(r'- \[x\]\s+(\S+)', tools_section)
+            if checked_tools:
+                params['tool_names'] = checked_tools
+        
         # Prompt is always task default, so ignore any prompt field in issue
         
         # Extract description
@@ -138,6 +148,19 @@ class IssueProcessor:
         system_instructions = params.get('system_instructions')
         temperature = params.get('temperature')
         thinking = params.get('thinking')
+        tool_names = params.get('tool_names', [])
+        
+        # Load tools if specified
+        tools = None
+        tool_registry = None
+        if tool_names:
+            tool_registry = ToolRegistry()
+            tools_dir = Path(__file__).parent.parent / "tools"
+            tools = tool_registry.load_tools_by_names(tool_names, tools_dir)
+            if tools:
+                print(f"  Loaded {len(tools)} tool(s): {', '.join([t.name for t in tools])}")
+            else:
+                print(f"  Warning: No tools loaded from names: {tool_names}")
         
         print(f"Running experiment from issue #{issue_number}" if issue_number else "Running experiment")
         print(f"  Model: {model_id}")
@@ -147,6 +170,8 @@ class IssueProcessor:
             print(f"  Temperature: {temperature}")
         if thinking is not None:
             print(f"  Thinking mode: {thinking}")
+        if tools:
+            print(f"  Tools: {', '.join([t.name for t in tools])}")
         print(f"  Running all tasks...")
         
         experiment = Experiment(
@@ -155,7 +180,9 @@ class IssueProcessor:
             system_instructions=system_instructions,
             temperature=temperature,
             thinking=thinking,
-            config=self.config
+            config=self.config,
+            tools=tools,
+            tool_registry=tool_registry
         )
         
         result = experiment.run()
