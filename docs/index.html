@@ -852,7 +852,9 @@
                         console.log(`Experiment ${exp.experiment_id}, task ${taskName}: Has error`);
                         return false;
                     }
-                    const successRate = taskResult.metrics?.success_rate || 0;
+                    // Handle both minified format (no metrics wrapper) and full format
+                    const successRate = taskResult.metrics?.success_rate || 
+                                      (taskResult.average_score !== undefined && taskResult.average_score !== null ? 1.0 : 0);
                     if (successRate < 1.0) {
                         console.log(`Experiment ${exp.experiment_id}, task ${taskName}: Success rate ${successRate} < 1.0`);
                         return false;
@@ -1013,17 +1015,22 @@
                 // Get all experiments with results for this task, sorted by accuracy
                 const taskExperiments = overallPerformance
                     .filter(exp => exp.task_results[taskName] && !exp.task_results[taskName].error)
-                    .map(exp => ({
-                        experiment_id: exp.experiment_id,
-                        model_id: exp.model_id,
-                        system_instructions: exp.system_instructions,
-                        temperature: exp.temperature,
-                        thinking: exp.thinking,
-                        tools: exp.tools || [],
-                        accuracy: exp.task_results[taskName].metrics?.average_score || 0,
-                        durationSeconds: exp.task_results[taskName].duration_seconds || 0,
-                        tokenUsage: exp.task_results[taskName].token_usage || { input_tokens: 0, output_tokens: 0, total_tokens: 0 }
-                    }))
+                    .map(exp => {
+                        const taskResult = exp.task_results[taskName];
+                        // Handle both minified format (average_score at top level) and full format (metrics.average_score)
+                        const accuracy = taskResult.metrics?.average_score ?? taskResult.average_score ?? 0;
+                        return {
+                            experiment_id: exp.experiment_id,
+                            model_id: exp.model_id,
+                            system_instructions: exp.system_instructions,
+                            temperature: exp.temperature,
+                            thinking: exp.thinking,
+                            tools: exp.tools || [],
+                            accuracy: accuracy,
+                            durationSeconds: taskResult.duration_seconds || 0,
+                            tokenUsage: taskResult.token_usage || { input_tokens: 0, output_tokens: 0, total_tokens: 0 }
+                        };
+                    })
                     .sort((a, b) => b.accuracy - a.accuracy);
                 
                 if (taskExperiments.length === 0) return;
