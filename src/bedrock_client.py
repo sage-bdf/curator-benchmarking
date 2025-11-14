@@ -45,19 +45,31 @@ class BedrockClient:
         
         Args:
             tools: List of Tool objects
-            model_id: Model ID to determine format (Anthropic vs Converse API)
+            model_id: Model ID to determine format (Anthropic vs Converse API vs OpenAI)
             
         Returns:
             List of tool definitions in appropriate format
         """
-        # Determine if we should use Converse API format (for Nova, DeepSeek, Meta) or Anthropic format
+        is_openai = model_id.startswith('openai.')
         use_converse_api = (
             model_id.startswith('us.amazon.') or model_id.startswith('amazon.') or
             model_id.startswith('us.deepseek.') or model_id.startswith('deepseek.') or
             model_id.startswith('us.meta.') or model_id.startswith('meta.')
         )
         
-        if use_converse_api:
+        if is_openai:
+            # OpenAI format - uses "functions" instead of "tools"
+            result = []
+            for tool in tools:
+                schema = tool.get_schema()
+                # OpenAI function format
+                result.append({
+                    "name": tool.name,
+                    "description": tool.description,
+                    "parameters": schema  # OpenAI uses "parameters" instead of "input_schema"
+                })
+            return result
+        elif use_converse_api:
             # Converse API format
             return [tool.to_bedrock_format() for tool in tools]
         else:
@@ -72,29 +84,50 @@ class BedrockClient:
                 })
             return result
     
-    def _extract_tool_calls_from_response(self, response_body: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _extract_tool_calls_from_response(self, response_body: Dict[str, Any], model_id: str = None) -> List[Dict[str, Any]]:
         """Extract tool calls from a Bedrock response."""
         tool_calls = []
+        is_openai = model_id and model_id.startswith('openai.')
         
-        # Check Converse API format (output.message.content)
-        if 'output' in response_body:
-            output = response_body.get('output', {})
-            if 'message' in output:
-                message = output.get('message', {})
-                content = message.get('content', [])
-                for item in content:
-                    if isinstance(item, dict) and item.get('toolUse'):
-                        tool_calls.append(item['toolUse'])
-        
-        # Check Anthropic format (content array)
-        if 'content' in response_body:
-            for item in response_body.get('content', []):
-                if isinstance(item, dict) and item.get('type') == 'tool_use':
-                    tool_calls.append({
-                        'toolUseId': item.get('id'),
-                        'name': item.get('name'),
-                        'input': item.get('input', {})
-                    })
+        if is_openai:
+            # OpenAI format - check for function_call in choices
+            if 'choices' in response_body:
+                for choice in response_body.get('choices', []):
+                    message = choice.get('message', {})
+                    if 'function_call' in message:
+                        func_call = message['function_call']
+                        # Parse arguments if it's a string
+                        arguments = func_call.get('arguments', '{}')
+                        if isinstance(arguments, str):
+                            try:
+                                arguments = json.loads(arguments)
+                            except:
+                                arguments = {}
+                        tool_calls.append({
+                            'toolUseId': func_call.get('id') or f"call_{len(tool_calls)}",
+                            'name': func_call.get('name'),
+                            'input': arguments
+                        })
+        else:
+            # Check Converse API format (output.message.content)
+            if 'output' in response_body:
+                output = response_body.get('output', {})
+                if 'message' in output:
+                    message = output.get('message', {})
+                    content = message.get('content', [])
+                    for item in content:
+                        if isinstance(item, dict) and item.get('toolUse'):
+                            tool_calls.append(item['toolUse'])
+            
+            # Check Anthropic format (content array)
+            if 'content' in response_body:
+                for item in response_body.get('content', []):
+                    if isinstance(item, dict) and item.get('type') == 'tool_use':
+                        tool_calls.append({
+                            'toolUseId': item.get('id'),
+                            'name': item.get('name'),
+                            'input': item.get('input', {})
+                        })
         
         return tool_calls
     
@@ -122,14 +155,27 @@ class BedrockClient:
         # Build initial messages
         messages = []
         
-        # Determine if we should use Converse API (for Nova, DeepSeek, Meta) or invoke_model (for Anthropic)
+        # Determine model type and format
+        is_openai = model_id.startswith('openai.')
         use_converse_api = (
             model_id.startswith('us.amazon.') or model_id.startswith('amazon.') or
             model_id.startswith('us.deepseek.') or model_id.startswith('deepseek.') or
             model_id.startswith('us.meta.') or model_id.startswith('meta.')
         )
         
-        if use_converse_api:
+        if is_openai:
+            # OpenAI format - build messages with system instruction
+            messages = []
+            if system_instructions:
+                messages.append({
+                    "role": "system",
+                    "content": system_instructions
+                })
+            messages.append({
+                "role": "user",
+                "content": prompt
+            })
+        elif use_converse_api:
             # Converse API format
             messages.append({
                 "role": "user",
@@ -151,7 +197,21 @@ class BedrockClient:
             try:
                 while tool_iterations < max_tool_iterations:
                     # Build API call parameters
-                    if use_converse_api:
+                    if is_openai:
+                        # OpenAI format
+                        body = {
+                            "messages": messages,
+                            "max_tokens": max_tokens,
+                            "temperature": temperature,
+                            "functions": bedrock_tools  # OpenAI uses "functions" instead of "tools"
+                        }
+                        
+                        response = self.bedrock_runtime.invoke_model(
+                            modelId=model_id,
+                            body=json.dumps(body)
+                        )
+                        response_body = json.loads(response['body'].read())
+                    elif use_converse_api:
                         converse_kwargs = {
                             'modelId': model_id,
                             'messages': messages,
@@ -196,7 +256,7 @@ class BedrockClient:
                         response_body = json.loads(response['body'].read())
                     
                     # Check for tool calls
-                    tool_calls = self._extract_tool_calls_from_response(response_body)
+                    tool_calls = self._extract_tool_calls_from_response(response_body, model_id)
                     
                     if not tool_calls:
                         # No tool calls - we have the final response
@@ -207,7 +267,43 @@ class BedrockClient:
                     all_tool_calls.extend(tool_calls)
                     
                     # Add assistant message with tool use
-                    if use_converse_api:
+                    if is_openai:
+                        # OpenAI format - add assistant message with function_call
+                        assistant_message = {
+                            "role": "assistant",
+                            "content": None  # OpenAI may return null content when calling functions
+                        }
+                        # Add function_call if present in response
+                        if 'choices' in response_body and len(response_body['choices']) > 0:
+                            choice = response_body['choices'][0]
+                            if 'message' in choice and 'function_call' in choice['message']:
+                                assistant_message['function_call'] = choice['message']['function_call']
+                        messages.append(assistant_message)
+                        
+                        # Add tool results as function message
+                        for result in tool_results:
+                            tool_use_id = result.get('toolUseId')
+                            tool_name = None
+                            # Find the tool name from the tool call
+                            for tool_call in tool_calls:
+                                if tool_call.get('toolUseId') == tool_use_id:
+                                    tool_name = tool_call.get('name')
+                                    break
+                            
+                            # Extract result content
+                            result_content = ""
+                            for content_item in result.get('content', []):
+                                if isinstance(content_item, dict):
+                                    result_content += content_item.get('text', '')
+                                elif isinstance(content_item, str):
+                                    result_content += content_item
+                            
+                            messages.append({
+                                "role": "function",
+                                "name": tool_name,
+                                "content": result_content
+                            })
+                    elif use_converse_api:
                         assistant_content = []
                         for tool_call in tool_calls:
                             assistant_content.append({"toolUse": tool_call})
@@ -275,7 +371,18 @@ class BedrockClient:
                 
                 # Extract final content
                 content = ''
-                if use_converse_api:
+                if is_openai:
+                    # OpenAI format
+                    if 'choices' in response_body and len(response_body['choices']) > 0:
+                        choice = response_body['choices'][0]
+                        message = choice.get('message', {})
+                        # Check if there's content (not a function call)
+                        if 'content' in message and message['content']:
+                            content = message['content']
+                        elif 'function_call' not in message:
+                            # No function call and no content - might be empty
+                            content = message.get('content', '')
+                elif use_converse_api:
                     if 'output' in response_body:
                         output = response_body.get('output', {})
                         if 'message' in output:
