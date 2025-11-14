@@ -540,6 +540,7 @@
                                 exp.system_instructions = taskFile.system_instructions || exp.system_instructions;
                                 exp.temperature = taskFile.temperature !== undefined ? taskFile.temperature : exp.temperature;
                                 exp.thinking = taskFile.thinking !== undefined ? taskFile.thinking : exp.thinking;
+                                exp.tools = taskFile.tools || exp.tools || [];
                             }
                             
                             const taskResult = taskFile.task_result || {};
@@ -865,9 +866,9 @@
                     system_instructions: exp.system_instructions || 'Default',
                     temperature: exp.temperature !== undefined ? exp.temperature : null,
                     thinking: exp.thinking !== undefined ? exp.thinking : false,
+                    tools: exp.tools || [],
                     averageAccuracy: exp.overall_metrics?.average_accuracy || 0,
                     tasksCompleted: exp.overall_metrics?.tasks_completed || 0,
-                    totalSamples: exp.overall_metrics?.total_samples || 0,
                     durationSeconds: exp.overall_metrics?.duration_seconds || 0,
                     tokenUsage: exp.overall_metrics?.token_usage || { input_tokens: 0, output_tokens: 0, total_tokens: 0 },
                     task_results: taskResults
@@ -906,8 +907,8 @@
                                     <th>System Instructions</th>
                                     <th>Temperature</th>
                                     <th>Thinking</th>
+                                    <th>Tools</th>
                                     <th>Tasks Completed</th>
-                                    <th>Total Samples</th>
                                     <th>Duration</th>
                                     <th>Total Tokens</th>
                                     <th>Experiment ID</th>
@@ -924,6 +925,8 @@
                                         ? perf.temperature.toFixed(2) 
                                         : 'N/A';
                                     const thinkingDisplay = perf.thinking ? 'Yes' : 'No';
+                                    const tools = perf.tools || [];
+                                    const toolsDisplay = tools.length > 0 ? tools.join(', ') : 'None';
                                     const durationSeconds = perf.durationSeconds || 0;
                                     const durationDisplay = durationSeconds > 0 
                                         ? durationSeconds < 60 
@@ -943,8 +946,8 @@
                                             <td title="${perf.system_instructions}">${sysInstPreview}</td>
                                             <td data-order="${perf.temperature !== null && perf.temperature !== undefined ? perf.temperature : -1}">${tempDisplay}</td>
                                             <td data-order="${perf.thinking ? 1 : 0}">${thinkingDisplay}</td>
+                                            <td>${toolsDisplay}</td>
                                             <td data-order="${perf.tasksCompleted}">${perf.tasksCompleted}</td>
-                                            <td data-order="${perf.totalSamples}">${perf.totalSamples}</td>
                                             <td data-order="${durationSeconds}">${durationDisplay}</td>
                                             <td data-order="${totalTokens}">${tokensDisplay}</td>
                                             <td class="experiment-id-cell">${perf.experiment_id}</td>
@@ -969,7 +972,7 @@
                         pageLength: 5,
                         order: [[1, 'desc']], // Sort by accuracy descending
                         columnDefs: [
-                            { type: 'num', targets: [0, 1, 4, 6, 7, 8, 9] }
+                            { type: 'num', targets: [0, 1, 4, 7, 8, 9] }
                         ]
                     });
                 }, 0);
@@ -999,8 +1002,8 @@
                         system_instructions: exp.system_instructions,
                         temperature: exp.temperature,
                         thinking: exp.thinking,
+                        tools: exp.tools || [],
                         accuracy: exp.task_results[taskName].metrics?.average_score || 0,
-                        samples: exp.task_results[taskName].metrics?.total_samples || 0,
                         durationSeconds: exp.task_results[taskName].duration_seconds || 0,
                         tokenUsage: exp.task_results[taskName].token_usage || { input_tokens: 0, output_tokens: 0, total_tokens: 0 }
                     }))
@@ -1020,7 +1023,7 @@
                                     <th>System Instructions</th>
                                     <th>Temperature</th>
                                     <th>Thinking</th>
-                                    <th>Samples</th>
+                                    <th>Tools</th>
                                     <th>Duration</th>
                                     <th>Tokens</th>
                                     <th>Experiment ID</th>
@@ -1037,6 +1040,8 @@
                                         ? exp.temperature.toFixed(2) 
                                         : 'N/A';
                                     const thinkingDisplay = exp.thinking ? 'Yes' : 'No';
+                                    const tools = exp.tools || [];
+                                    const toolsDisplay = tools.length > 0 ? tools.join(', ') : 'None';
                                     const durationSeconds = exp.durationSeconds || 0;
                                     const durationDisplay = durationSeconds > 0 
                                         ? durationSeconds < 60 
@@ -1056,7 +1061,7 @@
                                             <td title="${exp.system_instructions}">${sysInstPreview}</td>
                                             <td data-order="${exp.temperature !== null && exp.temperature !== undefined ? exp.temperature : -1}">${tempDisplay}</td>
                                             <td data-order="${exp.thinking ? 1 : 0}">${thinkingDisplay}</td>
-                                            <td data-order="${exp.samples}">${exp.samples}</td>
+                                            <td>${toolsDisplay}</td>
                                             <td data-order="${durationSeconds}">${durationDisplay}</td>
                                             <td data-order="${totalTokens}">${tokensDisplay}</td>
                                             <td class="experiment-id-cell">${exp.experiment_id}</td>
@@ -1082,7 +1087,7 @@
                         pageLength: 5,
                         order: [[1, 'desc']], // Sort by accuracy descending
                         columnDefs: [
-                            { type: 'num', targets: [0, 1, 4, 6, 7, 8] }
+                            { type: 'num', targets: [0, 1, 4, 7, 8] }
                         ]
                     });
                 });
