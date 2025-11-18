@@ -41,20 +41,23 @@ class IssueProcessor:
             if model.startswith('---'):
                 model = None
             # Handle "Default" option from dropdown
-            elif model and model not in ['', '-', 'Default (global.anthropic.claude-sonnet-4-5-20250929-v1:0)', 'Default']:
+            if model and model not in ['', '-', 'Default (global.anthropic.claude-sonnet-4-5-20250929-v1:0)', 'Default']:
                 # Extract model ID if it's in the format "Default (model_id)"
                 if model.startswith('Default'):
                     # Use default from config
                     pass
                 elif model == 'Other':
-                    # Check for custom model endpoint
-                    custom_model_match = re.search(r'### Custom Model Endpoint\s*\n\n([^\n]+)', issue_body)
-                    if custom_model_match:
-                        custom_model = custom_model_match.group(1).strip()
-                        if custom_model and custom_model not in ['', '-']:
-                            params['model'] = custom_model
+                    model = None  # Will check custom_model below
                 else:
                     params['model'] = model
+        
+        # Check for custom model endpoint if model not set yet
+        if 'model' not in params:
+            custom_model_match = re.search(r'### Custom Model Endpoint\s*\n\n([^\n]+)', issue_body)
+            if custom_model_match:
+                custom_model = custom_model_match.group(1).strip()
+                if custom_model and custom_model not in ['', '-', '_No response_']:
+                    params['model'] = custom_model
         
         # Extract system instructions (may span multiple lines)
         sys_inst_match = re.search(r'### System Instructions\s*\n\n(.*?)(?=\n###|\Z)', issue_body, re.DOTALL)
