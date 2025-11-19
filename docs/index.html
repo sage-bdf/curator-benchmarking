@@ -438,15 +438,41 @@
                             .join('\n');
                         
                         // Try to find the JSON array if there's extra content
-                        const jsonStart = cleanedText.indexOf('[');
-                        const jsonEnd = cleanedText.lastIndexOf(']');
-                        
-                        let jsonText = cleanedText;
-                        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-                            jsonText = cleanedText.substring(jsonStart, jsonEnd + 1);
+                        // Use bracket counting to find the complete JSON array
+                        const firstBracket = cleanedText.indexOf('[');
+                        if (firstBracket === -1) {
+                            throw new Error('Could not find JSON array start');
                         }
                         
+                        // Find the matching closing bracket by counting brackets
+                        let bracketCount = 0;
+                        let lastBracket = firstBracket;
+                        for (let i = firstBracket; i < cleanedText.length; i++) {
+                            if (cleanedText[i] === '[') bracketCount++;
+                            if (cleanedText[i] === ']') {
+                                bracketCount--;
+                                if (bracketCount === 0) {
+                                    lastBracket = i;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        if (lastBracket <= firstBracket) {
+                            throw new Error('Could not find matching closing bracket');
+                        }
+                        
+                        // Extract just the JSON array
+                        const jsonText = cleanedText.substring(firstBracket, lastBracket + 1);
+                        
+                        // Parse and validate
                         const dashboardData = JSON.parse(jsonText);
+                        
+                        // Validate it's an array
+                        if (!Array.isArray(dashboardData)) {
+                            throw new Error('Dashboard data is not an array');
+                        }
+                        
                         console.log(`✅ Loaded ${dashboardData.length} experiments from minified dashboard data (${(text.length / 1024).toFixed(1)} KB)`);
                         
                         // Convert to expected format
