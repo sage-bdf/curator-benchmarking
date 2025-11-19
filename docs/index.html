@@ -383,7 +383,7 @@
             <div class="stats" id="stats"></div>
             
             <div class="scatterplot-container">
-                <h2>Duration vs Accuracy</h2>
+                <h2 id="scatterplotTitle">Duration vs Accuracy</h2>
                 <div class="scatterplot-wrapper">
                     <canvas id="scatterplotChart"></canvas>
                 </div>
@@ -396,8 +396,17 @@
                         <option value="">All Models</option>
                     </select>
                 </div>
+                <div class="control-group">
+                    <label>Scatter Plot X-Axis</label>
+                    <select id="xAxisSelector">
+                        <option value="duration">Duration</option>
+                        <option value="tokens">Total Tokens</option>
+                        <option value="temperature">Temperature</option>
+                    </select>
+                </div>
             </div>
 
+            <div id="modelLeaderboard"></div>
             <div id="overallPerformance"></div>
             <div id="taskTables"></div>
         </div>
@@ -406,6 +415,7 @@
     <script>
         let allExperiments = [];
         let filteredExperiments = [];
+        let scatterXAxis = 'duration';
 
         async function loadExperiments() {
             try {
@@ -670,8 +680,15 @@
                 const metrics = exp.overall_metrics;
                 if (!metrics) return false;
                 if (metrics.average_accuracy === null || metrics.average_accuracy === undefined) return false;
-                if (!metrics.duration_seconds || metrics.duration_seconds <= 0) return false;
-                if (!metrics.token_usage || !metrics.token_usage.total_tokens) return false;
+                
+                // Validate based on selected x-axis
+                if (scatterXAxis === 'duration') {
+                    if (!metrics.duration_seconds || metrics.duration_seconds <= 0) return false;
+                } else if (scatterXAxis === 'tokens') {
+                    if (!metrics.token_usage || !metrics.token_usage.total_tokens || metrics.token_usage.total_tokens <= 0) return false;
+                } else if (scatterXAxis === 'temperature') {
+                    if (exp.temperature === null || exp.temperature === undefined) return false;
+                }
                 return true;
             });
 
@@ -689,13 +706,32 @@
             }
 
             // Prepare data for scatterplot
-            const dataPoints = validExperiments.map(exp => ({
-                x: exp.overall_metrics.duration_seconds,
-                y: exp.overall_metrics.average_accuracy,
-                tokens: exp.overall_metrics.token_usage.total_tokens,
-                experiment_id: exp.experiment_id,
-                model_id: exp.model_id
-            }));
+            const dataPoints = validExperiments.map(exp => {
+                let xValue;
+                let xLabel;
+                
+                if (scatterXAxis === 'duration') {
+                    xValue = exp.overall_metrics.duration_seconds;
+                    xLabel = 'Duration (seconds)';
+                } else if (scatterXAxis === 'tokens') {
+                    xValue = exp.overall_metrics.token_usage.total_tokens;
+                    xLabel = 'Total Tokens';
+                } else if (scatterXAxis === 'temperature') {
+                    xValue = exp.temperature !== null && exp.temperature !== undefined ? exp.temperature : 0;
+                    xLabel = 'Temperature';
+                }
+                
+                return {
+                    x: xValue,
+                    y: exp.overall_metrics.average_accuracy,
+                    tokens: exp.overall_metrics.token_usage.total_tokens,
+                    duration: exp.overall_metrics.duration_seconds,
+                    temperature: exp.temperature !== null && exp.temperature !== undefined ? exp.temperature : null,
+                    experiment_id: exp.experiment_id,
+                    model_id: exp.model_id,
+                    xLabel: xLabel
+                };
+            });
 
             // Find min/max for token normalization (for color intensity)
             const tokenValues = dataPoints.map(d => d.tokens);
@@ -722,6 +758,14 @@
                 return `rgba(${r}, ${g}, ${b}, 0.7)`;
             });
 
+            // Update scatterplot title
+            const titleMap = {
+                'duration': 'Duration vs Accuracy',
+                'tokens': 'Total Tokens vs Accuracy',
+                'temperature': 'Temperature vs Accuracy'
+            };
+            document.getElementById('scatterplotTitle').textContent = titleMap[scatterXAxis] || 'Duration vs Accuracy';
+
             const ctx = document.getElementById('scatterplotChart').getContext('2d');
 
             // Destroy existing chart if it exists
@@ -739,7 +783,10 @@
                             y: d.y,
                             experiment_id: d.experiment_id,
                             model_id: d.model_id,
-                            tokens: d.tokens
+                            tokens: d.tokens,
+                            duration: d.duration,
+                            temperature: d.temperature,
+                            xLabel: d.xLabel
                         })),
                         backgroundColor: colors,
                         borderColor: colors.map(c => c.replace('0.7', '1')),
@@ -759,13 +806,16 @@
                             callbacks: {
                                 label: function(context) {
                                     const point = context.raw;
-                                    return [
+                                    const labels = [
                                         `Accuracy: ${(point.y * 100).toFixed(2)}%`,
-                                        `Duration: ${point.x.toFixed(1)}s`,
+                                        `${point.xLabel}: ${scatterXAxis === 'tokens' ? point.x.toLocaleString() : point.x.toFixed(2)}${scatterXAxis === 'duration' ? 's' : ''}`,
+                                        `Duration: ${point.duration.toFixed(1)}s`,
                                         `Tokens: ${point.tokens.toLocaleString()}`,
+                                        `Temperature: ${point.temperature !== null ? point.temperature.toFixed(2) : 'N/A'}`,
                                         `Model: ${point.model_id}`,
                                         `Experiment: ${point.experiment_id.substring(0, 8)}...`
                                     ];
+                                    return labels;
                                 }
                             }
                         }
@@ -774,7 +824,7 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Duration (seconds)',
+                                text: dataPoints.length > 0 ? dataPoints[0].xLabel : 'Duration (seconds)',
                                 font: {
                                     size: 14,
                                     weight: 'bold'
@@ -782,12 +832,24 @@
                             },
                             ticks: {
                                 callback: function(value) {
-                                    if (value >= 60) {
-                                        const mins = Math.floor(value / 60);
-                                        const secs = Math.floor(value % 60);
-                                        return `${mins}m ${secs}s`;
+                                    if (scatterXAxis === 'duration') {
+                                        if (value >= 60) {
+                                            const mins = Math.floor(value / 60);
+                                            const secs = Math.floor(value % 60);
+                                            return `${mins}m ${secs}s`;
+                                        }
+                                        return value + 's';
+                                    } else if (scatterXAxis === 'tokens') {
+                                        if (value >= 1000000) {
+                                            return (value / 1000000).toFixed(1) + 'M';
+                                        } else if (value >= 1000) {
+                                            return (value / 1000).toFixed(1) + 'K';
+                                        }
+                                        return value.toLocaleString();
+                                    } else if (scatterXAxis === 'temperature') {
+                                        return value.toFixed(2);
                                     }
-                                    return value + 's';
+                                    return value;
                                 }
                             }
                         },
@@ -905,6 +967,31 @@
             });
         }
 
+        function getBestExperimentPerModel(experiments) {
+            // Group experiments by model_id
+            const modelMap = new Map();
+            
+            experiments.forEach(exp => {
+                const modelId = exp.model_id;
+                const existing = modelMap.get(modelId);
+                
+                // If no existing experiment for this model, or this one has better accuracy
+                if (!existing || (exp.overall_metrics?.average_accuracy || 0) > (existing.overall_metrics?.average_accuracy || 0)) {
+                    modelMap.set(modelId, exp);
+                }
+            });
+            
+            // Convert to array and sort by accuracy
+            const bestExperiments = Array.from(modelMap.values());
+            bestExperiments.sort((a, b) => {
+                const aAcc = a.overall_metrics?.average_accuracy || 0;
+                const bAcc = b.overall_metrics?.average_accuracy || 0;
+                return bAcc - aAcc;
+            });
+            
+            return bestExperiments;
+        }
+
         function displayExperiments() {
             const container = document.getElementById('taskTables');
             
@@ -916,6 +1003,96 @@
                     </div>
                 `;
                 return;
+            }
+
+            // Calculate best experiment per model
+            const bestPerModel = getBestExperimentPerModel(filteredExperiments);
+            const bestPerModelPerformance = calculateOverallPerformance(bestPerModel);
+            
+            // Display model leaderboard
+            let modelLeaderboardHtml = '';
+            if (bestPerModelPerformance.length > 0) {
+                modelLeaderboardHtml = `
+                    <div class="task-section">
+                        <div class="task-header">Model Leaderboard (Best Experiment Per Model)</div>
+                        <table class="leaderboard-table" id="table-model-leaderboard">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Average Accuracy</th>
+                                    <th>Model</th>
+                                    <th>System Instructions</th>
+                                    <th>Temperature</th>
+                                    <th>Thinking</th>
+                                    <th>Tools</th>
+                                    <th>Tasks Completed</th>
+                                    <th>Duration</th>
+                                    <th>Total Tokens</th>
+                                    <th>Experiment ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${bestPerModelPerformance.map((perf, index) => {
+                                    const rank = index + 1;
+                                    const avgAccuracy = (perf.averageAccuracy * 100).toFixed(2);
+                                    const sysInstPreview = perf.system_instructions.length > 50 
+                                        ? perf.system_instructions.substring(0, 50) + '...'
+                                        : perf.system_instructions;
+                                    const tempDisplay = perf.temperature !== null && perf.temperature !== undefined 
+                                        ? perf.temperature.toFixed(2) 
+                                        : 'N/A';
+                                    const thinkingDisplay = perf.thinking ? 'Yes' : 'No';
+                                    const tools = perf.tools || [];
+                                    const toolsDisplay = tools.length > 0 ? tools.join(', ') : 'None';
+                                    const durationSeconds = perf.durationSeconds || 0;
+                                    const durationDisplay = durationSeconds > 0 
+                                        ? durationSeconds < 60 
+                                            ? `${durationSeconds.toFixed(1)}s`
+                                            : `${Math.floor(durationSeconds / 60)}m ${(durationSeconds % 60).toFixed(0)}s`
+                                        : 'N/A';
+                                    const tokenUsage = perf.tokenUsage || {};
+                                    const totalTokens = tokenUsage.total_tokens || 0;
+                                    const tokensDisplay = totalTokens > 0 
+                                        ? totalTokens.toLocaleString() 
+                                        : 'N/A';
+                                    return `
+                                        <tr>
+                                            <td class="rank ${getRankClass(rank)}" data-order="${rank}">${rank}</td>
+                                            <td class="accuracy-cell ${getScoreClass(perf.averageAccuracy)}" data-order="${perf.averageAccuracy}">${avgAccuracy}%</td>
+                                            <td class="model-cell">${perf.model_id}</td>
+                                            <td title="${perf.system_instructions}">${sysInstPreview}</td>
+                                            <td data-order="${perf.temperature !== null && perf.temperature !== undefined ? perf.temperature : -1}">${tempDisplay}</td>
+                                            <td data-order="${perf.thinking ? 1 : 0}">${thinkingDisplay}</td>
+                                            <td>${toolsDisplay}</td>
+                                            <td data-order="${perf.tasksCompleted}">${perf.tasksCompleted}</td>
+                                            <td data-order="${durationSeconds}">${durationDisplay}</td>
+                                            <td data-order="${totalTokens}">${tokensDisplay}</td>
+                                            <td class="experiment-id-cell">${perf.experiment_id}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modelLeaderboard').innerHTML = modelLeaderboardHtml;
+            
+            // Initialize DataTables for model leaderboard
+            if (bestPerModelPerformance.length > 0) {
+                setTimeout(() => {
+                    if ($.fn.DataTable.isDataTable('#table-model-leaderboard')) {
+                        $('#table-model-leaderboard').DataTable().destroy();
+                    }
+                    $('#table-model-leaderboard').DataTable({
+                        pageLength: 10,
+                        order: [[1, 'desc']], // Sort by accuracy descending
+                        columnDefs: [
+                            { type: 'num', targets: [0, 1, 4, 7, 8, 9] }
+                        ]
+                    });
+                }, 0);
             }
 
             // Calculate overall performance (experiments ranked by average accuracy)
@@ -1131,6 +1308,10 @@
 
         // Event listeners
         document.getElementById('modelFilter').addEventListener('change', filterAndDisplay);
+        document.getElementById('xAxisSelector').addEventListener('change', function() {
+            scatterXAxis = this.value;
+            updateScatterplot();
+        });
 
         // Load on page load
         loadExperiments();
