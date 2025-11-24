@@ -38,9 +38,11 @@ def run_experiment(
     temperature: Optional[float] = None,
     thinking: Optional[bool] = None,
     config: Optional[Config] = None,
-    tools_config_file: Optional[str] = None
+    tools_config_file: Optional[str] = None,
+    task_name: Optional[str] = None,
+    test_mode: bool = False
 ):
-    """Run an experiment across all tasks."""
+    """Run an experiment across all tasks or a specific task."""
     if config is None:
         config = Config()
     
@@ -75,7 +77,9 @@ def run_experiment(
         thinking=thinking,
         config=config,
         tools=tools,
-        tool_registry=tool_registry
+        tool_registry=tool_registry,
+        task_names=[task_name] if task_name else None,
+        test_mode=test_mode
     )
     
     result = experiment.run()
@@ -265,6 +269,11 @@ def main():
         help='Directory containing tasks'
     )
     run_parser.add_argument(
+        'task_name',
+        nargs='?',
+        help='Optional specific task to run'
+    )
+    run_parser.add_argument(
         '--model',
         type=str,
         help='Model endpoint ID (default: from config)'
@@ -288,6 +297,11 @@ def main():
         '--tools',
         type=str,
         help='Path to tools configuration file (JSON or YAML)'
+    )
+    run_parser.add_argument(
+        '--test',
+        action='store_true',
+        help='Run in test mode (only process the first sample of each task)'
     )
     
     # Run suite command
@@ -331,7 +345,9 @@ def main():
             system_instructions_file=args.system_instructions,
             temperature=args.temperature,
             thinking=args.thinking,
-            tools_config_file=args.tools
+            tools_config_file=args.tools,
+            task_name=args.task_name,
+            test_mode=args.test
         )
     
     elif args.command == 'suite':

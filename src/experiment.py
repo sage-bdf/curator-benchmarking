@@ -65,13 +65,17 @@ class Experiment:
         thinking: Optional[bool] = None,
         config: Optional[Config] = None,
         tools: Optional[List[Tool]] = None,
-        tool_registry: Optional[ToolRegistry] = None
+        tool_registry: Optional[ToolRegistry] = None,
+        task_names: Optional[List[str]] = None,
+        test_mode: bool = False
     ):
         """Initialize experiment with parameters."""
         self.config = config or Config()
         self.tasks_dir = Path(tasks_dir)
         self.model_id = model_id
         self.system_instructions = system_instructions or self.config.default_system_instructions
+        self.task_names = task_names
+        self.test_mode = test_mode
         
         # Get temperature from parameter or config default
         experiment_config = self.config.experiment_config
@@ -121,7 +125,12 @@ class Experiment:
         else:
             tools_str = "no_tools"
         
-        params_str = f"{self.model_id}_{self.system_instructions}_{self.temperature}_{self.thinking}_{tools_str}"
+        # Include task names in hash if specific tasks are selected
+        tasks_str = ""
+        if self.task_names:
+            tasks_str = "_" + hashlib.md5(",".join(sorted(self.task_names)).encode()).hexdigest()[:8]
+        
+        params_str = f"{self.model_id}_{self.system_instructions}_{self.temperature}_{self.thinking}_{self.test_mode}_{tools_str}{tasks_str}"
         return hashlib.md5(params_str.encode()).hexdigest()
     
     def _get_all_tasks(self) -> List[Task]:
@@ -129,6 +138,10 @@ class Experiment:
         tasks = []
         for task_dir in sorted(self.tasks_dir.iterdir()):
             if task_dir.is_dir() and task_dir.name != 'example_task':
+                # Filter by task name if specified
+                if self.task_names and task_dir.name not in self.task_names:
+                    continue
+                    
                 try:
                     task = Task(task_dir)
                     tasks.append(task)
@@ -154,6 +167,10 @@ class Experiment:
         task_start_time = time.time()
         
         input_samples = task.get_input_samples()
+        if self.test_mode:
+            print(f"    [TEST MODE] Processing only the first sample")
+            input_samples = input_samples[:1]
+            
         ground_truth_samples = task.get_ground_truth_samples()
         
         results = []
@@ -208,11 +225,14 @@ class Experiment:
                 schema_text=schema_text
             )
             
+            # Get dynamic system instructions
+            system_instructions = task.get_system_instructions() or self.system_instructions
+
             # Invoke model
             response = self.model_client.invoke_model(
                 model_id=self.model_id,
                 prompt=formatted_prompt,
-                system_instructions=self.system_instructions,
+                system_instructions=system_instructions,
                 temperature=self.temperature,
                 thinking=self.thinking,
                 max_tokens=experiment_config.get('max_tokens', 4096),
@@ -327,7 +347,7 @@ class Experiment:
                 print(f"  Warning: Could not load {task_file.name}: {e}")
         return None
     
-    def _save_experiment_task_result(self, task_name: str, task_result: Dict[str, Any], task_hash: str):
+    def _save_experiment_task_result(self, task_name: str, task_result: Dict[str, Any], task_hash: str, system_instructions: Optional[str] = None):
         """Save an experiment-task result to its own file."""
         task_file = self._get_experiment_task_file(task_name)
         
@@ -340,7 +360,7 @@ class Experiment:
             'task_name': task_name,
             'task_hash': task_hash,
             'model_id': self.model_id,
-            'system_instructions': self.system_instructions,
+            'system_instructions': system_instructions or self.system_instructions,
             'temperature': self.temperature,
             'thinking': self.thinking,
             'tools': tool_names,
@@ -477,7 +497,8 @@ class Experiment:
                 task_hash = current_task_hashes.get(task.name)
                 
                 # Save individual task result to its own file
-                self._save_experiment_task_result(task.name, task_result, task_hash)
+                # Save individual task result to its own file
+                self._save_experiment_task_result(task.name, task_result, task_hash, task.system_instructions)
                 
                 print(f"  ✓ Task {task.name} completed successfully")
                 avg_score = task_result['metrics'].get('average_score')

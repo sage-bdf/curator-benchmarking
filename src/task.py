@@ -24,11 +24,17 @@ class Task:
         # Load default prompt
         self.default_prompt = self._load_default_prompt()
         
+        # Load system instructions if they exist
+        self.system_instructions = self._load_system_instructions()
+        
         # Load schema if it exists
         self.schema = self._load_schema()
         
         # Load custom prompt formatter if it exists
         self.format_prompt_func = self._load_prompt_formatter()
+        
+        # Load custom system instructions formatter if it exists
+        self.format_system_instructions_func = self._load_system_instructions_formatter()
         
         # Load custom scorer if it exists
         self.score_func = self._load_scorer()
@@ -90,6 +96,30 @@ class Task:
         # Return a generic prompt if none exists
         return "Please process the following metadata according to the task requirements."
     
+    def _load_system_instructions(self) -> Optional[str]:
+        """Load system instructions for this task."""
+        sys_prompt_path = self.task_dir / "system_instructions.txt"
+        if sys_prompt_path.exists():
+            with open(sys_prompt_path, 'r') as f:
+                return f.read()
+        return None
+    
+    def get_system_instructions(self) -> Optional[str]:
+        """
+        Get system instructions, optionally formatted dynamically.
+        
+        If a custom format_system_instructions function exists, use it.
+        Otherwise, return the static system instructions.
+        """
+        if self.format_system_instructions_func and self.system_instructions:
+            try:
+                print(f"DEBUG: Calling format_system_instructions for {self.name}")
+                return self.format_system_instructions_func(self.system_instructions)
+            except Exception as e:
+                print(f"Warning: Error formatting system instructions for {self.name}: {e}")
+                return self.system_instructions
+        return self.system_instructions
+    
     def _load_schema(self) -> Optional[Dict[str, Any]]:
         """Load JSON schema if it exists."""
         schema_path = self.task_dir / "schema.json"
@@ -125,6 +155,27 @@ class Task:
                     return module.format_prompt
             except Exception as e:
                 print(f"Warning: Could not load format_prompt.py for {self.name}: {e}")
+        return None
+    
+    def _load_system_instructions_formatter(self) -> Optional[callable]:
+        """Load custom system instructions formatter if it exists."""
+        format_prompt_path = self.task_dir / "format_prompt.py"
+        if format_prompt_path.exists():
+            try:
+                import importlib.util
+                spec = importlib.util.spec_from_file_location(
+                    f"{self.name}_format_prompt",
+                    format_prompt_path
+                )
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                if hasattr(module, 'format_system_instructions'):
+                    print(f"DEBUG: Loaded format_system_instructions for {self.name}")
+                    return module.format_system_instructions
+            except Exception as e:
+                print(f"Warning: Could not load format_system_instructions from format_prompt.py for {self.name}: {e}")
+        else:
+            print(f"DEBUG: format_prompt.py not found at {format_prompt_path}")
         return None
     
     def format_prompt(
