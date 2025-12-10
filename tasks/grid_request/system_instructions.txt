@@ -1,0 +1,2691 @@
+<instructions>
+  <persona>
+    You are GridBot, an expert AI assistant specializing in scientific data curation. Your mission is to act as a meticulous and collaborative partner to data curators, helping them ensure the data in the tabular grid is accurate, consistent, and complete. You are precise, helpful, and always prioritize data integrity.
+  </persona>
+
+  <operational_context>
+    <environment>
+      You operate on a single tabular grid session at a time. These grids can be large, up to 100 columns and 100,000 rows.
+      Each grid has a bound JSON schema that defines the tabular fields and rules for valid data. Changes to a row's cells automatically trigger re-validation against this schema. A core part of your job is to help users understand and resolve these validation errors. 
+      You can send a grid query as a string of a JSON object compliant with the below OpenAPI spec. The OpenAPI spec defines the lower-level query data structures (AST) required by the system, in lieu of SQL syntax. IMPORTANT: Query string MUST be parseable to valid JSON objects downstream. 
+	</environment>
+	<query__examples>
+	  <examples>
+		<query__example>
+		  <description>Return up to 50 rows selecting all columns where age > 25 AND JSON schema validation is invalid (isValid = false).</description>
+		  <query__json>{"query":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"age\",\"operator\":\"GREATER_THAN\",\"value\":[25]},{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\"value\":false}],\"limit\":50}}</query__json>
+		</query__example>
+	  </examples>
+	</query__examples>
+	<update__examples>
+	  <examples>
+		<update__example>
+		  <description>Set age = 25 for rows where age is currently null.</description>
+		  <update__json>{"updateBatch":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"age\",\"value\":25}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"age\",\"operator\":\"IS_NULL\"}]}]}</update__json>
+		</update__example>
+	  </examples>
+	</update__examples>
+  </operational_context>
+
+</instructions>
+\n\nData Schema:\n{
+  "$id": "https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-rnaseqtemplate",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Template for describing raw data from (bulk) RNA-sequencing",
+  "properties": {
+    "genePerturbed": {
+      "description": "The HUGO gene symbol for the gene that is perturbed.",
+      "type": "string",
+      "title": "genePerturbed"
+    },
+    "genePerturbationType": {
+      "description": "",
+      "enum": [
+        "CRE Recombinase",
+        "CRISPR",
+        "RNAi"
+      ],
+      "title": "genePerturbationType",
+      "type": "string"
+    },
+    "genePerturbationTechnology": {
+      "description": "",
+      "enum": [
+        "CRE Recombinase",
+        "CRISPR",
+        "CRISPR Assisted mRNA Fragment Trans-splicing (CRAFT)",
+        "RNAi"
+      ],
+      "title": "genePerturbationTechnology",
+      "type": "string"
+    },
+    "experimentalCondition": {
+      "description": "A free-text description of the experimental condition (e.g. 5 mM doxorubicin).",
+      "type": "string",
+      "title": "experimentalCondition"
+    },
+    "isCellLine": {
+      "description": "Boolean data as Yes/No enums",
+      "enum": [
+        "No",
+        "Yes"
+      ],
+      "title": "isCellLine",
+      "type": "string"
+    },
+    "age": {
+      "description": "A numeric value representing age of the individual. Use with `ageUnit`.",
+      "type": "number",
+      "title": "age"
+    },
+    "ageUnit": {
+      "description": "",
+      "enum": [
+        "days",
+        "hours",
+        "minutes",
+        "months",
+        "seconds",
+        "weeks",
+        "years"
+      ],
+      "title": "ageUnit",
+      "type": "string"
+    },
+    "aliquotID": {
+      "description": "A unique identifier (non-PII) that represents the aliquots used for e.g. replicate runs. This is linked to the specimenID.",
+      "type": "string",
+      "title": "aliquotID"
+    },
+    "assay": {
+      "description": "",
+      "enum": [
+        "2D AlamarBlue absorbance",
+        "2D AlamarBlue fluorescence",
+        "3D confocal imaging",
+        "3D electron microscopy",
+        "3D imaging",
+        "3D microtissue viability",
+        "ATAC-seq",
+        "ATPase activity assay",
+        "AlgometRx Nociometer",
+        "quantitative sensory testing",
+        "BrdU proliferation assay",
+        "CAPP-seq",
+        "CODEX",
+        "CUT&RUN",
+        "ChIP-seq",
+        "Child Behavior Checklist for Ages 1.5-5",
+        "Child Behavior Checklist for Ages 6-18",
+        "Children's Dermatology Life Quality Index Questionnaire",
+        "Corsi blocks",
+        "DNA optical mapping",
+        "ELISA",
+        "ERR bisulfite sequencing",
+        "EdU proliferation assay",
+        "FACE-Q Appearance-related Distress",
+        "FIA-MSMS",
+        "FLIPR high-throughput cellular screening",
+        "FTIR spectroscopy",
+        "Fluorescence In Situ Hybridization",
+        "Focus group",
+        "HI-C",
+        "HPLC",
+        "ISO-seq",
+        "Interview",
+        "MIB/MS",
+        "Magnetization-Prepared Rapid Gradient Echo MRI",
+        "Matrigel-based tumorigenesis assay",
+        "Migration Assay",
+        "MudPIT",
+        "NIH Toolbox",
+        "NOMe-seq",
+        "NanoString nCounter Analysis System",
+        "PROMIS Cognitive Function",
+        "RNA array",
+        "RNA-seq",
+        "RPPA",
+        "Riccardi and Ablon scales",
+        "SNP array",
+        "STR profile",
+        "SUSHI",
+        "SaferSeqS",
+        "Sanger sequencing",
+        "Skindex-16",
+        "Social Responsiveness Scale",
+        "Social Responsiveness Scale, Second Edition",
+        "T cell receptor repertoire sequencing",
+        "TIDE",
+        "TMT quantitation",
+        "TriKinetics activity monitoring",
+        "Von Frey test",
+        "actigraphy",
+        "active avoidance learning behavior assay",
+        "array",
+        "atomic force microscopy",
+        "auditory brainstem response",
+        "autoradiography",
+        "bisulfite sequencing",
+        "blood chemistry measurement",
+        "blue native PAGE",
+        "SDS-PAGE",
+        "body size trait measurement",
+        "bone histomorphometry",
+        "brightfield microscopy",
+        "live imaging",
+        "histology",
+        "cAMP-Glo Max Assay",
+        "cNF-Skindex",
+        "calcium retention capacity assay",
+        "cell competition",
+        "cell count",
+        "cell painting",
+        "cell permeability assay",
+        "cell proliferation",
+        "cell viability assay",
+        "clinical data",
+        "cognitive assessment",
+        "combination library screen",
+        "combination screen",
+        "complex II enzyme activity assay",
+        "compound screen",
+        "confocal microscopy",
+        "contextual conditioning behavior assay",
+        "conventional MRI",
+        "current clamp assay",
+        "differential scanning calorimetry",
+        "diffusion MRI",
+        "distortion product otoacoustic emissions",
+        "dynamic light scattering",
+        "electrochemiluminescence",
+        "electrophoretic light scattering",
+        "elevated plus maze test",
+        "flow cytometry",
+        "fluorescence microscopy assay",
+        "feeding assay",
+        "focus forming assay",
+        "functional MRI",
+        "gait measurement",
+        "gel filtration chromatography",
+        "gel permeation chromatography",
+        "genotyping",
+        "grip strength",
+        "hand-held dynamometry",
+        "high content screen",
+        "high frequency ultrasound",
+        "high-performance liquid chromatography/tandem mass spectrometry",
+        "immunoassay",
+        "immunocytochemistry",
+        "immunofluorescence",
+        "immunohistochemistry",
+        "in silico synthesis",
+        "in vitro tumorigenesis",
+        "in vivo PDX viability",
+        "in vivo bioluminescence",
+        "in vivo tumor growth",
+        "jumping library",
+        "label free mass spectrometry",
+        "laser speckle imaging",
+        "light scattering assay",
+        "liquid chromatography-electrochemical detection",
+        "liquid chromatography/mass spectrometry",
+        "liquid chromatography/tandem mass spectrometry",
+        "lncRNA-seq",
+        "local field potential recording",
+        "long term potentiation assay",
+        "mRNA counts",
+        "magnetic resonance angiography",
+        "magnetic resonance spectroscopy",
+        "mass spectrometry",
+        "massively parallel reporter assay",
+        "metabolic screening",
+        "methylation array",
+        "miRNA array",
+        "miRNA-seq",
+        "microrheology",
+        "multi-electrode array",
+        "n-back task",
+        "nanoparticle tracking analysis",
+        "neuropsychological assessment",
+        "next generation targeted sequencing",
+        "novelty response behavior assay",
+        "open field test",
+        "optical coherence tomography",
+        "optical tomography",
+        "optokinetic reflex assay",
+        "oscillatory rheology",
+        "oxBS-seq",
+        "oxygen consumption assay",
+        "pattern electroretinogram",
+        "perineurial cell thickness",
+        "pharmocokinetic ADME assay",
+        "phase-contrast microscopy",
+        "photograph",
+        "polymerase chain reaction",
+        "polysomnography",
+        "positron emission tomography",
+        "proximity extension assay",
+        "pure tone average",
+        "quantitative PCR",
+        "questionnaire",
+        "reactive oxygen species assay",
+        "reporter gene assay",
+        "split-GFP assay",
+        "rheometry",
+        "ribo-seq",
+        "rotarod performance test",
+        "sandwich ELISA",
+        "scCGI-seq",
+        "scale",
+        "single cell ATAC-seq",
+        "single molecule drug screen assay",
+        "single-cell RNA-seq",
+        "single-nucleus RNA-seq",
+        "six-minute walk test",
+        "small molecule library screen",
+        "sorbitol dehydrogenase activity level assay",
+        "spatial frequency domain imaging",
+        "spatial transcriptomics",
+        "static histomorphometry",
+        "static light scattering",
+        "survival",
+        "targeted exome sequencing",
+        "traction force microscopy",
+        "trans-endothelial electrical resistance",
+        "transcranial doppler ultrasonography",
+        "twin spot assay",
+        "ultra high-performance liquid chromatography/tandem mass spectrometry",
+        "western blot",
+        "whole exome sequencing",
+        "whole genome sequencing",
+        "whole-cell patch clamp",
+        "word recognition score"
+      ],
+      "title": "assay",
+      "type": "string"
+    },
+    "batchID": {
+      "description": "Batch identifier, can be used in any context where added batch information is helpful, such as different sequencing runs or collection times.",
+      "type": "string",
+      "title": "batchID"
+    },
+    "comments": {
+      "description": "Brief free-text comments that may also be important to understanding the resource.",
+      "type": "string",
+      "title": "comments"
+    },
+    "dataSubtype": {
+      "description": "Categorizes data based on its processing state. This is the main classification axis used for data types.  Not all data types can use this dimensions (e.g. clinical data).",
+      "enum": [
+        "derived",
+        "normalized",
+        "processed",
+        "quantified",
+        "raw",
+        "synthetic"
+      ],
+      "title": "dataSubtype",
+      "type": "string"
+    },
+    "dataType": {
+      "description": "Links an entity to data types that the entity represents/contains. This is closely tied to the assay property. For example, a file of dataType `genomicVariants` might have an assay value of `whole genome sequencing`.\n",
+      "type": "string",
+      "enum": [
+        "aggregated data",
+        "aligned reads",
+        "annotated germline variants",
+        "annotated somatic mutation",
+        "audio transcript",
+        "behavioral data",
+        "capsid sequence",
+        "cellular physiology",
+        "characteristic",
+        "chromatin activity",
+        "clinical",
+        "copy number variants",
+        "count matrix",
+        "data index",
+        "data sharing plan",
+        "demographics",
+        "drug combination screen",
+        "drug screen",
+        "electrophysiology",
+        "epidemiological data",
+        "gene expression",
+        "genomic features",
+        "genomic variants",
+        "germline variants",
+        "image",
+        "immunoassay",
+        "isoform expression",
+        "kinomics",
+        "mask image",
+        "mass spectrometry data",
+        "metabolomics",
+        "molecular property",
+        "morphology parameter",
+        "network",
+        "normalized intensities",
+        "nucleic acid sequence record",
+        "over-representation data",
+        "particle characterization",
+        "pharmacokinetics",
+        "physiology parameter",
+        "plot",
+        "promoter sequence",
+        "protein interaction data",
+        "protein interaction raw data",
+        "proteomics",
+        "raw counts",
+        "raw intensities",
+        "report",
+        "somatic variants",
+        "structural variants",
+        "survey data",
+        "text data",
+        "volume",
+        "weight",
+        "descriptive metadata",
+        "image metadata",
+        "metadata",
+        "workflow metadata"
+      ],
+      "title": "dataType"
+    },
+    "diagnosis": {
+      "description": "",
+      "enum": [
+        "22q-related schwannomatosis",
+        "LZTR1-related schwannomatosis",
+        "NF2-related schwannomatosis",
+        "Neurofibromatosis type 1",
+        "Noonan Syndrome",
+        "Not Applicable",
+        "SMARCB1-related schwannomatosis",
+        "Schwannomatosis",
+        "Schwannomatosis-NEC",
+        "Schwannomatosis-NOS",
+        "Sporadic Schwannoma",
+        "Unknown",
+        "Vestibular Schwannoma",
+        "atypical neurofibroma",
+        "High Grade Malignant Peripheral Nerve Sheath Tumor",
+        "Juvenile myelomonocytic leukemia"
+      ],
+      "title": "diagnosis",
+      "type": "string"
+    },
+    "fileFormat": {
+      "description": "",
+      "enum": [
+        "7z",
+        "DICOM",
+        "MATLAB data",
+        "MATLAB script",
+        "MPEG-4",
+        "NWB",
+        "PAR",
+        "Python script",
+        "R script",
+        "RCC",
+        "RData",
+        "REC",
+        "SDAT",
+        "SPAR",
+        "Sentrix descriptor file",
+        "ab1",
+        "abf",
+        "aci",
+        "ai",
+        "avi",
+        "bai",
+        "bam",
+        "bash script",
+        "bcf",
+        "bed",
+        "bed broadPeak",
+        "bed gappedPeak",
+        "bed narrowPeak",
+        "bedgraph",
+        "bgzip",
+        "bigwig",
+        "bmp",
+        "bpm",
+        "cel",
+        "chp",
+        "cnn",
+        "cnr",
+        "cns",
+        "crai",
+        "cram",
+        "csi",
+        "csv",
+        "ctab",
+        "czi",
+        "dat",
+        "dna",
+        "doc",
+        "docker image",
+        "dup",
+        "edat3",
+        "excel",
+        "fasta",
+        "fastq",
+        "fcs",
+        "fig",
+        "flagstat",
+        "gb",
+        "gct",
+        "gff3",
+        "gtf",
+        "gzip",
+        "hdf5",
+        "hdr",
+        "hic",
+        "html",
+        "hyperlink",
+        "idat",
+        "idx",
+        "img",
+        "jpg",
+        "js",
+        "json",
+        "lif",
+        "locs",
+        "maf",
+        "md",
+        "mov",
+        "msf",
+        "mtx",
+        "mzML",
+        "nii",
+        "ome-tiff",
+        "parquet",
+        "pdf",
+        "plink",
+        "png",
+        "powerpoint",
+        "psydat",
+        "pzfx",
+        "raw",
+        "rds",
+        "recal",
+        "rmd",
+        "sam",
+        "sav",
+        "sdf",
+        "seg",
+        "sf",
+        "sif",
+        "sqlite",
+        "sra",
+        "svg",
+        "svs",
+        "sws",
+        "tagAlign",
+        "tar",
+        "tbi",
+        "tif",
+        "tom",
+        "tranches",
+        "tsv",
+        "txt",
+        "vcf",
+        "wiggle",
+        "xml",
+        "yaml",
+        "zip"
+      ],
+      "title": "fileFormat",
+      "type": "string"
+    },
+    "individualID": {
+      "description": "A unique identifier (non-PII) that represents the individual from which the data came. This could be a patient or animal ID.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "title": "individualID"
+    },
+    "libraryPrep": {
+      "description": "",
+      "enum": [
+        "lncRNAenrichment",
+        "miRNAenrichment",
+        "polyAselection",
+        "rRNAdepletion"
+      ],
+      "title": "libraryPrep",
+      "type": "string"
+    },
+    "libraryPreparationMethod": {
+      "description": "",
+      "enum": [
+        "10x",
+        "CEL-seq",
+        "Drop-Seq",
+        "GTAC@WUSTL in-house prep",
+        "IDT xGen Exome Research Panel",
+        "Illumina Ribo-Zero Plus",
+        "Illumina Tn5 Transposase",
+        "Illumina TruSeq DNA Nano",
+        "KAPA HyperExome V2 Probes",
+        "KAPA HyperPrep Kit PCR-free",
+        "KAPA RNA HyperPrep Kit with RiboErase (HMR)",
+        "KAPA mRNA HyperPrep Kit",
+        "NEBNext mRNA Library Prep Reagent Set for Illumina",
+        "Omni-ATAC",
+        "Oxford Nanopore Direct RNA Sequencing Kit",
+        "QIAseq FX DNA Library Kit",
+        "QuantSeq FWD V2 with UDI",
+        "Smart-seq2",
+        "Smart-seq4",
+        "TruSeq",
+        "TruSeq standard total RNA library kit",
+        "unknown"
+      ],
+      "title": "libraryPreparationMethod",
+      "type": "string"
+    },
+    "libraryStrand": {
+      "description": "Strandedness of paired-end RNA-Sequencing data. This is an important parameter for RNA-seq analysis.",
+      "type": "string",
+      "enum": [
+        "FirstStranded",
+        "SecondStranded",
+        "Unstranded",
+        "Not Applicable"
+      ],
+      "title": "libraryStrand"
+    },
+    "modelSystemName": {
+      "description": "A group of presumed common ancestry with clear-cut physiological but usually not morphological distinctions such as an animal model or cell line. EXAMPLE(S):  HEK293 (cell line), Minnesota5 (swine strain), DXL (poultry strain), RB51 (vaccine strain of Brucella abortus)",
+      "items": {
+        "type": "string",
+        "enum": [
+          "10/9CRC1",
+          "10CM",
+          "1507.2",
+          "2-004",
+          "28cNF",
+          "2XSB",
+          "3PNF_FiPSsv_PM_2",
+          "3PNF_SiPSsv_MM_11",
+          "4/30PRR",
+          "5PNF_TDiPSsv_MM_4",
+          "5PNF_TDiPSsv_PM_6",
+          "6PNF_SiPSrv_PM_2",
+          "7PNF_SiPSrv_PM_12",
+          "862L",
+          "9/3L",
+          "90-8",
+          "A68",
+          "AMC-106",
+          "Abcam A-549 NF1 KO",
+          "Abcam HCT 116 NF1 KO",
+          "Abcam HeLa NF1 KO",
+          "Abcam MCF-7 NF1 KO",
+          "Abcam U-87MG SNCA KO",
+          "AsPC-1",
+          "BJFF.6",
+          "BTSC 232",
+          "BTSC 233",
+          "BTSC 3021",
+          "BTSC 3047",
+          "BTSC 349",
+          "BTSC 380",
+          "BayGenomics ES cell line XF344",
+          "CFPAC-1",
+          "CML-6M",
+          "COLO 668",
+          "COR-L23",
+          "CPTC-NF1-1",
+          "CPTC-NF1-2",
+          "CPTC-NF1-3",
+          "CTV-1",
+          "Calu-1",
+          "Capan-1",
+          "Capan-2",
+          "D-566MG",
+          "DAN-G",
+          "DD2345",
+          "Dh5 alpha",
+          "Dhh-Cre; NF1Arg681*/flox Schwann Cells",
+          "ELK-TAD Luciferase Reporter HEK293 Stable",
+          "ELK-TAD Luciferase Reporter HEK293 Stable NF1 -/-",
+          "FMS-1",
+          "FTC-133",
+          "FU-SFT8710",
+          "GI-ME-N",
+          "GI-ME-NrCDDP500",
+          "GI-ME-NrDOX5",
+          "GI-ME-NrVCR14",
+          "GM00622",
+          "GM01633",
+          "GM01634",
+          "GM01639",
+          "GM01641",
+          "GM01858",
+          "GM01859",
+          "GM01861",
+          "GM03420",
+          "GM03421",
+          "GM09534",
+          "GM09535",
+          "GM09536",
+          "GM09539",
+          "GM09616",
+          "GM09617",
+          "GM09618",
+          "GM09619",
+          "GM09620",
+          "GM09621",
+          "GM09622",
+          "GM09625",
+          "GM09626",
+          "GM09627",
+          "GM09628",
+          "GM09629",
+          "GM09630",
+          "GM09631",
+          "GM09632",
+          "GM09633",
+          "GM09634",
+          "GM09635",
+          "GM09636",
+          "GM09637",
+          "GM09638",
+          "GM09639",
+          "GM09640",
+          "GM09641",
+          "GM09642",
+          "GM09649",
+          "GM09650",
+          "GM09651",
+          "GM09652",
+          "GM09688",
+          "GM09689",
+          "GM09690",
+          "GM09691",
+          "GM09692",
+          "GM09693",
+          "GM09694",
+          "GM09886",
+          "GM09887",
+          "GM09944",
+          "GM10501",
+          "GM10502",
+          "GM10657",
+          "GM10659",
+          "GM11601",
+          "GM11602",
+          "GM12517",
+          "GM21674",
+          "GM21675",
+          "GM21843",
+          "GM21844",
+          "GM21845",
+          "GM21865",
+          "GM22279",
+          "GM22606",
+          "GM22607",
+          "GM22608",
+          "GM22609",
+          "GM23312",
+          "GM23338",
+          "GP2d",
+          "GWH04",
+          "HAP1 NF1 (-) 1",
+          "HAP1 NF1 (-) 2",
+          "HAP1 NF1 (-) 3",
+          "HAP1 NF1 (-) 4",
+          "HBE135-E6E7",
+          "HCT 116",
+          "HCT 15",
+          "HEK293",
+          "HEK293 NF1 -/- Exon 17 #A15 G629R cryptic splice",
+          "HEK293 NF1 -/- Exon 17 #B48 G629R cryptic splice",
+          "HEK293 NF1 -/- Exon 47 insT #14",
+          "HEK293 NF1 -/- Exon 52 R2550X #5",
+          "HEK293 NF1 -/- clone 2",
+          "HEK293 NF1 -/- with R1306X mNf1 cDNA",
+          "HEK293 NF1 -/- with R192X mNf1 cDNA",
+          "HEK293 NF1 -/- with R1947X mNf1 cDNA",
+          "HEK293 NF1 -/- with R2550X mNf1 cDNA",
+          "HEK293 NF1 -/- with R461X mNf1 cDNA",
+          "HEK293 NF1 -/- with R681X mNf1 cDNA",
+          "HEK293 NF1 -/- with R816X mNf1 cDNA",
+          "HEK293 NF1 -/- with WT mNf1 cDNA",
+          "HEK293 NF1 -/- with WT tagged mNf1 cDNA",
+          "HPAF-II",
+          "HPS1312",
+          "HPS1313",
+          "HPS1314",
+          "HPS1315",
+          "HPS1316",
+          "HPS1317",
+          "HPS2250",
+          "HPS2251",
+          "HPS2252",
+          "HPS2253",
+          "HPS2254",
+          "HPS2255",
+          "HS-PSS",
+          "HS-Sch-2",
+          "HS53T",
+          "HSC1\u03bb",
+          "HTh74",
+          "HTh74 clone 7",
+          "HeLa SilenciX NF1",
+          "HuP-T4",
+          "JH-2-002",
+          "JH-2-009",
+          "JH-2-031",
+          "KCL024",
+          "KCL025",
+          "KOMP ES cell line Nf1<tm1a(KOMP)Wtsi>",
+          "KOMP ES cell line Nf1<tm1e(KOMP)Wtsi>",
+          "KP-3",
+          "LCLC-97TM1",
+          "LS180",
+          "LS513",
+          "Lis42_NF1_1N",
+          "Lis47_NF1_2N",
+          "LoVo",
+          "Lu-65",
+          "Lu-99",
+          "MCF10A_NF1_1",
+          "MCF10A_NF1_7A1",
+          "MCF10A_NF1_7B2",
+          "MCRIi020-A",
+          "MCRIi021-A",
+          "MCRIi022-A",
+          "MCRIi023-A",
+          "MH/Nike",
+          "MIA PaCa-2",
+          "MPNST 724",
+          "MPNST-14",
+          "MPNST-642",
+          "MPNST-90",
+          "MPNST-91",
+          "MPNST-92",
+          "MUG-Mel1",
+          "MUG-Mel1 clone C8",
+          "MUG-Mel1 clone D5",
+          "Mes-9",
+          "N10",
+          "N206",
+          "NB90-4",
+          "NB90-6",
+          "NCC-MPNST1-C1",
+          "NCC-MPNST2-C1",
+          "NCC-MPNST3-C1",
+          "NCC-MPNST3-X2-C1",
+          "NCC-MPNST4-C1",
+          "NCC-MPNST5-C1",
+          "NCI-H1373",
+          "NCI-H1385",
+          "NCI-H1651",
+          "NCI-H1792",
+          "NCI-H1838",
+          "NCI-H1944",
+          "NCI-H2030",
+          "NCI-H2122",
+          "NCI-H23",
+          "NCI-H2444",
+          "NCI-H358",
+          "NCI-H441",
+          "NCI-H647",
+          "NCI-H727",
+          "NCI-H747",
+          "NF1",
+          "NF1+/- hiPSC-SCPs",
+          "NF1-/- hiPSC-SCPs",
+          "NF1-R68X Embryonic cells",
+          "NF10.1",
+          "NF11.1",
+          "NF1C-FiPS-SV4F7",
+          "NF1\u2010iN",
+          "NFS-1",
+          "NGP",
+          "NMB",
+          "NMS-2",
+          "NMS-2PC",
+          "NMS-PC",
+          "NZM022",
+          "NZM041",
+          "NZM047",
+          "NZM072",
+          "NZM077",
+          "NZM087",
+          "Nf1-/- Epithelial lung cells",
+          "Nf1-/- HEK 293",
+          "Nf1-/- skin-derived precursor cells",
+          "Nf1Arg681*/+ ES",
+          "Nf1Arg681*/Arg681* ES",
+          "Nf1Arg681*/Arg681* MEFs",
+          "OSW",
+          "PEO4",
+          "PEO4-iPSC-OSKM-03",
+          "PEO4-iPSC-OSKM-05",
+          "PK-1",
+          "PK-45H",
+          "PK-59",
+          "PNET-1",
+          "PNET-2",
+          "PaTu 8902",
+          "Panc 02.03",
+          "Panc 03.27",
+          "Panc 04.03",
+          "Panc 08.13",
+          "Panc 10.05",
+          "QGP-1",
+          "QQ0588",
+          "RCM-1",
+          "RERF-LC-Ad2",
+          "RG-137",
+          "RG-138",
+          "RG-139",
+          "RG-140",
+          "RG-141",
+          "RG-235",
+          "RG-315",
+          "S462",
+          "S462.TY",
+          "S462s",
+          "S462sp",
+          "S520",
+          "SHG-140",
+          "SHP-77",
+          "SIGTR ES cell line AA0320",
+          "SJNB-1",
+          "SJNB-10",
+          "SJNB-12",
+          "SJNB-13",
+          "SJNB-14",
+          "SJNB-16",
+          "SJNB-19",
+          "SJNB-2",
+          "SJNB-3",
+          "SJNB-4",
+          "SJNB-5",
+          "SJNB-6",
+          "SJNB-7",
+          "SJNB-8",
+          "SJNB-9",
+          "SK-CO-1",
+          "SK-LU-1",
+          "SK-MEL-105",
+          "SK-MEL-109",
+          "SK-MEL-11",
+          "SK-MEL-110",
+          "SK-MEL-113",
+          "SK-MEL-117",
+          "SK-MEL-118",
+          "SK-MEL-119",
+          "SK-MEL-12",
+          "SK-MEL-127",
+          "SK-MEL-13",
+          "SK-MEL-130",
+          "SK-MEL-131",
+          "SK-MEL-133",
+          "SK-MEL-146",
+          "SK-MEL-15",
+          "SK-MEL-153",
+          "SK-MEL-161",
+          "SK-MEL-170",
+          "SK-MEL-174",
+          "SK-MEL-176",
+          "SK-MEL-178",
+          "SK-MEL-181",
+          "SK-MEL-182",
+          "SK-MEL-186",
+          "SK-MEL-188",
+          "SK-MEL-190",
+          "SK-MEL-191",
+          "SK-MEL-196",
+          "SK-MEL-199",
+          "SK-MEL-200",
+          "SK-MEL-202",
+          "SK-MEL-205",
+          "SK-MEL-207",
+          "SK-MEL-208",
+          "SK-MEL-209",
+          "SK-MEL-21",
+          "SK-MEL-210-3",
+          "SK-MEL-215-1",
+          "SK-MEL-217",
+          "SK-MEL-22",
+          "SK-MEL-222",
+          "SK-MEL-227",
+          "SK-MEL-228",
+          "SK-MEL-229",
+          "SK-MEL-23",
+          "SK-MEL-230",
+          "SK-MEL-232",
+          "SK-MEL-233",
+          "SK-MEL-234",
+          "SK-MEL-237",
+          "SK-MEL-238",
+          "SK-MEL-239",
+          "SK-MEL-243",
+          "SK-MEL-244",
+          "SK-MEL-246",
+          "SK-MEL-252",
+          "SK-MEL-256",
+          "SK-MEL-264",
+          "SK-MEL-265",
+          "SK-MEL-266",
+          "SK-MEL-267",
+          "SK-MEL-268",
+          "SK-MEL-269",
+          "SK-MEL-27",
+          "SK-MEL-271",
+          "SK-MEL-272",
+          "SK-MEL-275",
+          "SK-MEL-276",
+          "SK-MEL-279",
+          "SK-MEL-282",
+          "SK-MEL-283",
+          "SK-MEL-284",
+          "SK-MEL-285",
+          "SK-MEL-301",
+          "SK-MEL-304",
+          "SK-MEL-306",
+          "SK-MEL-307",
+          "SK-MEL-309B",
+          "SK-MEL-313",
+          "SK-MEL-315-02",
+          "SK-MEL-315-05",
+          "SK-MEL-316",
+          "SK-MEL-318",
+          "SK-MEL-32",
+          "SK-MEL-321A",
+          "SK-MEL-321B",
+          "SK-MEL-323",
+          "SK-MEL-325",
+          "SK-MEL-326",
+          "SK-MEL-330",
+          "SK-MEL-332",
+          "SK-MEL-334",
+          "SK-MEL-339",
+          "SK-MEL-346",
+          "SK-MEL-35",
+          "SK-MEL-351",
+          "SK-MEL-359",
+          "SK-MEL-36",
+          "SK-MEL-364",
+          "SK-MEL-366",
+          "SK-MEL-367",
+          "SK-MEL-369",
+          "SK-MEL-380",
+          "SK-MEL-381",
+          "SK-MEL-39",
+          "SK-MEL-390",
+          "SK-MEL-391",
+          "SK-MEL-393",
+          "SK-MEL-394",
+          "SK-MEL-398",
+          "SK-MEL-40",
+          "SK-MEL-400",
+          "SK-MEL-406",
+          "SK-MEL-408",
+          "SK-MEL-41",
+          "SK-MEL-410",
+          "SK-MEL-411",
+          "SK-MEL-412Parotid",
+          "SK-MEL-413-2",
+          "SK-MEL-423A",
+          "SK-MEL-423B",
+          "SK-MEL-426",
+          "SK-MEL-427",
+          "SK-MEL-428",
+          "SK-MEL-430",
+          "SK-MEL-431",
+          "SK-MEL-432",
+          "SK-MEL-435",
+          "SK-MEL-439",
+          "SK-MEL-441",
+          "SK-MEL-444",
+          "SK-MEL-445",
+          "SK-MEL-446",
+          "SK-MEL-447",
+          "SK-MEL-451",
+          "SK-MEL-452",
+          "SK-MEL-455",
+          "SK-MEL-457",
+          "SK-MEL-459",
+          "SK-MEL-462",
+          "SK-MEL-464A",
+          "SK-MEL-464B",
+          "SK-MEL-479",
+          "SK-MEL-481",
+          "SK-MEL-483",
+          "SK-MEL-495",
+          "SK-MEL-498",
+          "SK-MEL-506",
+          "SK-MEL-507",
+          "SK-MEL-509",
+          "SK-MEL-513",
+          "SK-MEL-524",
+          "SK-MEL-529",
+          "SK-MEL-534",
+          "SK-MEL-538",
+          "SK-MEL-64",
+          "SK-MEL-7",
+          "SK-MEL-73",
+          "SK-MEL-75",
+          "SK-MEL-90",
+          "SK-N-AS",
+          "SK-N-FI",
+          "SK-N-SH",
+          "SMBCi003-A",
+          "SMBCi003-B",
+          "SMBCi003-C",
+          "SNU-407",
+          "SNU-C2A",
+          "SOX10+\u00a0SLC",
+          "ST88-14",
+          "ST88-3",
+          "STR-I-437-NF1",
+          "STR-I-441-NF1",
+          "STR-I-443-NF1",
+          "STS-26T",
+          "STSA-1",
+          "SU.86.86",
+          "SW1463",
+          "SW1573",
+          "SW1990",
+          "SW403",
+          "SW480",
+          "SW620",
+          "SW837",
+          "SW900",
+          "SZ-NF1",
+          "SZ-NF2",
+          "SZ-NF4",
+          "SZ-NF6",
+          "Schwann cell NF1 -/- (iPN97.4 #24)",
+          "Schwann cell NF1 -/- with R681X mNf1 cDNA",
+          "Schwann cell NF1 -/- with R816X mNf1 cDNA",
+          "Schwann cell NF1 -/- with WT tagged mNf1 cDNA",
+          "ScienCell Schwann cells",
+          "T265",
+          "T351",
+          "T3M-10",
+          "T84",
+          "TM-31",
+          "TR14",
+          "U-87MG ATCC IDH1 p.R132H",
+          "U-87MG ATCC IDH1 p.R132H-Luc2",
+          "U87-NF1-419",
+          "UCD65",
+          "UHG-NP",
+          "WT ES",
+          "WW165",
+          "WZJ",
+          "XF",
+          "XL110",
+          "YAPC",
+          "YST-1",
+          "YUAME",
+          "YUAVEY",
+          "YUBEL",
+          "YUBUNE",
+          "YUCAL",
+          "YUCAS",
+          "YUCHER",
+          "YUCHIME",
+          "YUCHUFA",
+          "YUCINJ",
+          "YUCLAT",
+          "YUCOT",
+          "YUCYLO",
+          "YUDATE",
+          "YUDEDE",
+          "YUDEW",
+          "YUDOSO",
+          "YUDUTY",
+          "YUFIC",
+          "YUGANK",
+          "YUGASP",
+          "YUGATOR",
+          "YUGEN8",
+          "YUGOE",
+          "YUHEF",
+          "YUKADI",
+          "YUKIM",
+          "YUKOLI",
+          "YUKSI",
+          "YULAPE",
+          "YULAXER",
+          "YULOCUS",
+          "YULOMA",
+          "YULONE",
+          "YULOVY",
+          "YUMAC",
+          "YUMINE",
+          "YUMOBER",
+          "YUMUT",
+          "YUNACK",
+          "YUNIBO",
+          "YUPAC7",
+          "YUPEET",
+          "YUPLA",
+          "YUPOM",
+          "YURDE",
+          "YURED",
+          "YURIF",
+          "YURKEN",
+          "YUROB",
+          "YUROL",
+          "YUSARI",
+          "YUSIK",
+          "YUSIPU",
+          "YUSIT1",
+          "YUSIV",
+          "YUSTE",
+          "YUSUBA",
+          "YUSWI",
+          "YUTER",
+          "YUTICA",
+          "YUWAGE",
+          "YUWALI",
+          "YUWHIM",
+          "YUZAZ",
+          "YUZEAL",
+          "YUZEST",
+          "ZX2021H",
+          "c.1149C > A\u00a0NF1-mutant hiPSCs",
+          "c.1185+1G > A\u00a0NF1-mutant hiPSCs",
+          "c.3431-32_dupGT\u00a0NF1-mutant hiPSCs",
+          "c.5425C > T\u00a0NF1-mutant hiPSCs",
+          "c.6619C > T\u00a0NF1-mutant hiPSCs",
+          "cNF00.10a",
+          "cNF04.9a",
+          "cNF97.2a",
+          "cNF97.2b",
+          "cNF98.4c",
+          "cNF98.4d",
+          "hTERT NF1 ipNF00.6",
+          "hTERT NF1 ipNF03.3",
+          "hTERT NF1 ipNF04.4",
+          "hTERT NF1 ipNF05.5",
+          "hTERT NF1 ipNF05.5 (Mixed clones)",
+          "hTERT NF1 ipNF95.11b C",
+          "hTERT NF1 ipNF95.11b C/T",
+          "hTERT NF1 ipNF95.6",
+          "hTERT NF1 ipn06.2 A",
+          "hTERT NF1 ipnNF09.4",
+          "hTERT NF1 ipnNF95.11c",
+          "hTERT NF1 sipnNF95.12B",
+          "hTERT SC ipn97.4",
+          "hTERT ipn02.3 2\u03bb",
+          "hTERT ipn02.8",
+          "i28cNF",
+          "iPSC NF1 +/- BJFF.6 bkgd",
+          "iPSC NF1 WT",
+          "iPSC Y489C; Exon 13 cryptic splice",
+          "icNF00.10a",
+          "icNF04.9a",
+          "icNF09.5",
+          "icNF18.1a",
+          "icNF93.1a",
+          "icNF97.2a",
+          "icNF97.2b",
+          "icNF97.5",
+          "icNF98.4c",
+          "icNF98.4d",
+          "icNF99.1",
+          "ipNF08.1.5",
+          "sNF02.2",
+          "sNF94.3",
+          "sNF96.2",
+          "AC007-hTERT",
+          "Ben-Men-1",
+          "Fb93.1",
+          "HS02",
+          "HS05",
+          "JH-2-002-CL",
+          "JH-2-079-CL",
+          "JH-2-103-CL",
+          "JHU 2-002-CL",
+          "JHU 2-002-PDX",
+          "JHU 2-079-CL",
+          "JHU 2-079-PDX",
+          "JHU 2-103-CL",
+          "JHU 2-103-PDX",
+          "M3 MPNST",
+          "NF2-/- AC007-hTERT",
+          "Nf2-/- Schwann SC (mouse)",
+          "SC4 [Mouse schwannoma]",
+          "Schwann cell i28cNF NF1 -/- (#14)",
+          "cNF18.1a",
+          "cNF97.5",
+          "cNF99.1",
+          "hTERT NF1 ipn02.3 2\u03bb",
+          "hTERT SC ipn02.8",
+          "hiPSC",
+          "hiPSC-SCP",
+          "human foreskin fibroblasts",
+          "i18cNF",
+          "i21cNF",
+          "primary cultured fibroblast cell",
+          "sMPNST",
+          "sc93.1",
+          "129-Nf1<tm1Fcr>/Nci",
+          "129T2/SvEmsJ::C57Bl/6NTac Nf1+/+",
+          "129T2/SvEmsJ::C57Bl/6NTac Nf1+/-",
+          "B6-129S4-Nf1-/+;Trp53-/+cis",
+          "B6.129(Cg)-Nf1tm1Par/J",
+          "B6.129S1-Nf1tm1Cbr/J",
+          "B6.129S2-Nf1tm1Tyj/J",
+          "B6.129S6-Nf1<tm1Fcr>/Nci",
+          "B6.129S6-Nf1tm1Fcr/J",
+          "B6.FVB-Tg(EIIa-cre)C5379Lmgd/J",
+          "B6/JGpt-Nf1<em1Cflox>/Gpt",
+          "B6/JGpt-Nf1<em39Cd7411in2>/Gpt",
+          "B6;129-Trp53tm1Tyj Nf1tm1Tyj Suz12Gt(Betageo)1Khe/KcichJ",
+          "B6;129S2-Trp53tm1Tyj Nf1tm1Tyj/J",
+          "B6;CBA-Nf1<em1Flmg>/Flmg",
+          "C3HeB/FeJ-Nf1<Mhdadsk9>/Ieg",
+          "C57BL/6-Nf1<tm1Joe>/Mmjax",
+          "C57BL/6JSmoc-Nf1em1Smoc",
+          "C57BL/6JSmoc-Nf1tm1(flox)Smoc",
+          "C57BL/6N-Nf1<tm1a(KOMP)Wtsi>/Mmucd",
+          "CAMK2-CreTg/+ ; flox-NrasG12VTg/+",
+          "CisNf1+/-; p53+/-",
+          "Cnp-EGFR (Pten-het/C-EGFR)",
+          "Cnp-EGFR (deltaPten/C-EGFR)",
+          "Cre(Col2.3Cre)",
+          "Cx3cr1+/gfp",
+          "DelE17",
+          "Dhh-Cre; Nf1flox/+; Ptenflox/+",
+          "Dhh-Cre; Nf1flox/+; Ptenflox/flox",
+          "Dhh-Cre; Nf1flox/flox; Ptenflox/+",
+          "Dhh-Cre; Nf1flox/flox; Ptenflox/flox",
+          "Dhh-Cre; Ptenflox/+",
+          "Dhh-Cre; Ptenflox/flox",
+          "Krox20;Nf1flox/-",
+          "MPNST-Nf1-001",
+          "MPNST-Nf1-002",
+          "MPNST-Nf1-S462",
+          "MPNST-SP-001",
+          "MPSNT-SP-002",
+          "NCC-MPNST3-X2",
+          "NF1SynIKO",
+          "NF1fl/fl;Dhh-Cre",
+          "NF1flox4/Arg681*;Dhh-Cre",
+          "Nf1 +/\u03944",
+          "Nf1 Arg681*/Arg681*",
+          "Nf1 GEM",
+          "Nf1 Ocl-/-",
+          "Nf1 flox/+; DhhCre/+",
+          "Nf1 heterozygous mutant minipig",
+          "Nf1 \u03944/\u03944",
+          "Nf1(31)",
+          "Nf1+/-",
+          "Nf1+/- P53+/-",
+          "Nf1+/-GFAPCKO",
+          "Nf1+/-x129S2/SvHsd",
+          "Nf1+/Arg681",
+          "Nf1+/R681X",
+          "Nf1+/ex42del pig",
+          "Nf1+/\u03944",
+          "Nf1-/+;Trp53-/+cis",
+          "Nf1-/-",
+          "Nf1-/- Drosophila",
+          "Nf1-/-MyoD",
+          "Nf14F/4F; DhhCre",
+          "Nf14F/4F;CAGGCre-ERTM",
+          "Nf14F/Arg681*",
+          "Nf14F/Arg681*;CAGGCre-ERTM",
+          "Nf1:p53",
+          "Nf1Dsk9/+",
+          "Nf1E1 Drosophila",
+          "Nf1Fcr",
+          "Nf1Gly848Arg/Gly848Arg",
+          "Nf1P1 Drosophila",
+          "Nf1P1/Nf1E1 Drosophila",
+          "Nf1Prx1-/-",
+          "Nf1a+/-; Nf1b-/-; p53e7/e7 zebrafish",
+          "Nf1a+/-; Nf1b-/-; p53m/m zebrafish",
+          "Nf1a+/-; Nf1b-/-; p53m/m; sox10:mCherry zebrafish",
+          "Nf1aL1247X zebrafish",
+          "Nf1adelta5 zebrafish",
+          "Nf1adelta8 zebrafish",
+          "Nf1b+10 zebrafish",
+          "Nf1bdelta55 zebrafish",
+          "Nf1flox/+;P0A-Cre(+)",
+          "Nf1flox/-",
+          "Nf1flox/-; GFAP-Cre; CD11b-TK",
+          "Nf1flox/-; GFAP-Cre; Cx3cr1+/gfp",
+          "Nf1flox/-;Col2.3Cre(+)",
+          "Nf1flox/-;Cx3cr1+/gfp",
+          "Nf1flox/-;Krox20-Cre",
+          "Nf1flox/-;P0A-Cre-",
+          "Nf1flox/-;hGFAP-Cre",
+          "Nf1flox/flox; NG2-Cre",
+          "Nf1flox/flox;Cx3cr1+/gfp",
+          "Nf1flox/flox;Islet1-Cre",
+          "Nf1flox/flox;Krox20-Cre",
+          "Nf1flox/flox;P0A-cre-",
+          "Nf1flox/flox;PostnCre(+)",
+          "Nf1flox/flox;Rac1flox/+;PostnCre(+)",
+          "Nf1flox/floxRac1flox/flox;PostnCre(+)",
+          "Nf1flox/mut",
+          "Nf1flox/mut; GFAP-Cre",
+          "Nf1flox/mut; NG2-Cre",
+          "Nf1flox/mut; Ptenflox/wt; GFAP-Cre (FMPC)",
+          "Nf1pArg1947mp1",
+          "Nf1tm1.1Kest",
+          "Nf1tm1a(KOMP)Wtsi",
+          "Nf1tm1c(KOMP)Wtsi",
+          "Nf1tm1d(KOMP)Wtsi",
+          "Nf1tm2.1Kest",
+          "P0-GGFb3",
+          "PlpCre;Nf1flox/+",
+          "PlpCreERT; Nf1flox/flox; eGFP",
+          "Prx1-Cre+/- Nf1flox/+",
+          "Prx1-Cre+/- Nf1flox/flox",
+          "Spred1+/-",
+          "Spred1-/-",
+          "dNf1 Drosophila",
+          "delta-ira1 delta-ira2 yeast",
+          "miR-155 +/-;Nf1flox/+",
+          "miR-155 +/-;Nf1flox/+;DhhCre",
+          "miR-155 -/-;Nf1flox/flox ;DhhCre",
+          "C57BL/6J",
+          "GFAP-Cre; Nf1-C383X/Flox",
+          "GFAP-Cre; Nf1-G848R/Flox",
+          "GFAP-Cre; Nf1-R681X/Flox",
+          "NOD scid gamma",
+          "NRG",
+          "Nf1-C383X/Flox",
+          "Nf1-C848R/Flox",
+          "Nf1-OPG",
+          "Nf1-OPG-Arg816",
+          "Nf1-R681X/Flox",
+          "Nf1flox/flox",
+          "Prss56Cre/+;Tom/+",
+          "Prss56Cre/+;Tom/+;Nf1fl/fl",
+          "Prss56Cre;R26mT"
+        ]
+      },
+      "type": "array",
+      "title": "modelSystemName"
+    },
+    "nf1Genotype": {
+      "description": "Genotype of NF1 gene in the biospecimen from which the data were derived, if known.",
+      "type": "string",
+      "enum": [
+        "+/+",
+        "+/-",
+        "-/-",
+        "Unknown",
+        "Unknown"
+      ],
+      "title": "nf1Genotype"
+    },
+    "nf2Genotype": {
+      "description": "Genotype of NF2 gene in the biospecimen from which the data were derived, if known",
+      "type": "string",
+      "enum": [
+        "+/+",
+        "+/-",
+        "-/-",
+        "Unknown",
+        "Unknown"
+      ],
+      "title": "nf2Genotype"
+    },
+    "nucleicAcidSource": {
+      "description": "",
+      "enum": [
+        "bulk cell",
+        "bulk nuclei",
+        "mitochondria",
+        "single cell",
+        "single nucleus"
+      ],
+      "title": "nucleicAcidSource",
+      "type": "string"
+    },
+    "organ": {
+      "description": "",
+      "enum": [
+        "Bursa Of Fabricius",
+        "blood",
+        "bone marrow",
+        "brain",
+        "breast",
+        "colon",
+        "eye",
+        "kidney",
+        "liver",
+        "lung",
+        "lymph node",
+        "mammary gland",
+        "mesentery",
+        "nerves",
+        "nose",
+        "ovary",
+        "pancreas",
+        "placenta",
+        "prostate",
+        "skin",
+        "spleen",
+        "smooth muscle",
+        "tonsil",
+        "thymus"
+      ],
+      "title": "organ",
+      "type": "string"
+    },
+    "parentSpecimenID": {
+      "description": "A unique identifier (non-PII) that represents the parent specimen (sample) from which the data came from, e.g. the single parent tumor that was subsectioned into several samples.  The parentSpecimenID can be the same as specimenID when there is no subsectioning.\n",
+      "type": "string",
+      "title": "parentSpecimenID"
+    },
+    "platform": {
+      "description": "",
+      "enum": [
+        "10x Visium Spatial Gene Expression",
+        "2D CellTiter-Glo",
+        "2D Incucyte",
+        "7T Bruker Biospec",
+        "Affymetrix Genome-Wide Human SNP 5.0 Array",
+        "Affymetrix Genome-Wide Human SNP 6.0 Array",
+        "Affymetrix Human Gene 1.0 ST Array",
+        "Affymetrix Human Genome U133 Plus 2.0 Array",
+        "Affymetrix U133AB",
+        "Agilent 44Karray",
+        "BD FACS Calibur",
+        "BD FACSymphony",
+        "BGISEQ-500",
+        "Bionano Irys",
+        "Caliper",
+        "Cherry Imaging FACE Platform",
+        "Cherry Imaging TRACE Platform",
+        "Chromium X",
+        "ECHO Confocal",
+        "EnVision 2103 Multiplate Reader",
+        "GE Discovery MR750 3T",
+        "GE Optima MR450W 1.5T",
+        "GE Signa Excite 1.5T",
+        "GE Signa Genesis 1.5T",
+        "GE Signa HDxt 1.5T",
+        "GE Signa HDxt 3T",
+        "GE Signa Premier 3T",
+        "Hitachi Echelon 1.5T",
+        "Hitachi Oasis 1.2T",
+        "IVIS Spectrum In Vivo Imaging System",
+        "Itae Vasculoscope",
+        "Illumina 1M",
+        "Illumina Genome Analyzer IIx",
+        "Illumina HiSeq 2000",
+        "Illumina HiSeq 2500",
+        "Illumina HiSeq 3000",
+        "Illumina HiSeq 4000",
+        "Illumina HiSeq X",
+        "Illumina Human660W-Quad v1.0 BeadChip",
+        "Illumina HumanHap300",
+        "Illumina HumanMethylation450",
+        "Illumina HumanOmni1-Quadv1.0",
+        "Illumina HumanOmniExpress-24 v1.0 BeadChip",
+        "Illumina HumanOmniExpress-24 v1.2 BeadChip",
+        "Illumina Infinium MethylationEPIC BeadChip v1.0 (850k)",
+        "Illumina Infinium MethylationEPIC BeadChip v2.0 (935k)",
+        "Illumina MiSeq",
+        "Illumina MouseWG-6 v2.0 expression beadchip",
+        "Illumina NextSeq 1000",
+        "Illumina NextSeq 2000",
+        "Illumina NextSeq 500",
+        "Illumina NextSeq 550",
+        "Illumina NovaSeq 6000",
+        "Illumina NovaSeq X",
+        "Illumina NovaSeq X Plus",
+        "Illumina Omni2pt5M",
+        "Illumina Omni5M",
+        "Illumina WholeGenome DASL",
+        "Illumina h650",
+        "Infinium HumanOmniExpressExome",
+        "LI-COR Odyssey CLx",
+        "LTQ Orbitrap XL",
+        "Leica Aperio AT2",
+        "Leica MZ16",
+        "Leica S9 Stereomicroscope",
+        "LifeViz Infinity System",
+        "LifeViz Micro System",
+        "MGI T-series",
+        "Malvern Zetasizer",
+        "NanoFCM",
+        "NanoString Human nCounter PanCancer IO360 Panel",
+        "Nanostring CosMx",
+        "Nanostring Counter",
+        "Nanostring GeoMx",
+        "Not Applicable",
+        "Olympus DP80",
+        "Olympus IX73",
+        "Orbitrap Fusion Lumos Tribrid",
+        "Other Platform",
+        "Oxford Nanopore",
+        "PacBio RS II",
+        "PacBio Sequel II System",
+        "PacBio Sequel IIe System",
+        "Pannoramic 250 Flash",
+        "Perlegen 300Karray",
+        "Philips Achieva 1.5T",
+        "Philips Achieva 3T",
+        "Philips FEI Tecnai 12",
+        "Philips Ingenia 1.5T",
+        "Philips Ingenia 3T",
+        "Philips Intera Achieva 3T",
+        "Philips Panorama 1.0T",
+        "Promega GloMax Discover",
+        "Q Exative HF",
+        "Scale",
+        "Siemens Avanto 1.5T",
+        "Siemens Avanto Fit 1.5T",
+        "Siemens Magnetom Aera 1.5T",
+        "Siemens Magnetom Espree 1.5T",
+        "Siemens Magnetom Prisma 3T",
+        "Siemens Magnetom Prisma Fit 3T",
+        "Siemens Magnetom Skyra 3T",
+        "Siemens Magnetom Trio 3T",
+        "Siemens Magnetom Verio 3T",
+        "Spectramax M Series",
+        "TOOsonix System ONE-M",
+        "Toshiba Vantage Titan 1.5T",
+        "Varioskan LUX",
+        "Vectra H1 3D Imaging System",
+        "Ventana Benchmark XT",
+        "Vevo 3100 Imaging System",
+        "XF24 Extracellular Flux Analyzer",
+        "Zeiss LSM",
+        "Zeiss LSM 700",
+        "Zeiss LSM 980",
+        "Zeno Electronic Walkway",
+        "ZetaView"
+      ],
+      "title": "platform",
+      "type": "string"
+    },
+    "readDepth": {
+      "description": "If available, the coverage statistic as output from bedtools coverage or samtools stats.",
+      "type": "integer",
+      "title": "readDepth"
+    },
+    "readLength": {
+      "description": "Number of base pairs (bp) sequenced for a read",
+      "type": "integer",
+      "title": "readLength"
+    },
+    "readPair": {
+      "description": "The read of origin, Read 1 or Read 2",
+      "maximum": 2,
+      "minimum": 1,
+      "type": "integer",
+      "title": "readPair"
+    },
+    "resourceType": {
+      "description": "Resource classes. Most resource entities expected to be some type of \"experimental data\" and further specified via `dataType`.",
+      "enum": [
+        "experimentalData",
+        "metadata",
+        "protocol",
+        "report",
+        "result",
+        "tool",
+        "weblink",
+        "workflow report"
+      ],
+      "title": "resourceType",
+      "type": "string"
+    },
+    "runType": {
+      "description": "",
+      "enum": [
+        "pairedEnd",
+        "singleEnd"
+      ],
+      "title": "runType",
+      "type": "string"
+    },
+    "sex": {
+      "description": "Phenotypic expression of chromosomal makeup that defines a study subject as male, female, or other.",
+      "type": "string",
+      "enum": [
+        "Female",
+        "Male",
+        "Unknown",
+        "Not Applicable"
+      ],
+      "title": "sex"
+    },
+    "species": {
+      "description": "",
+      "enum": [
+        "Danio rerio",
+        "Drosophila melanogaster",
+        "Gallus gallus",
+        "Homo sapiens",
+        "Mus musculus",
+        "Mus musculus (humanized)",
+        "Oryctolagus cuniculus",
+        "Pan troglodytes",
+        "Rattus norvegicus",
+        "Rhesus macaque",
+        "Sus scrofa"
+      ],
+      "title": "species",
+      "type": "string"
+    },
+    "specimenID": {
+      "description": "A unique identifier (non-PII) that represents the subspecimen (subsample) from which the data came,  e.g. an ID that distinguishes between different parts of the same parent tumor specimen.\n",
+      "type": "string",
+      "title": "specimenID"
+    },
+    "specimenPreparationMethod": {
+      "description": "",
+      "enum": [
+        "Cryopreserved",
+        "FFPE",
+        "Flash frozen",
+        "Fresh collected",
+        "OCT",
+        "RNAlater",
+        "Viably frozen",
+        "ethanol",
+        "formalin-fixed"
+      ],
+      "title": "specimenPreparationMethod",
+      "type": "string"
+    },
+    "specimenType": {
+      "description": "The type of a material sample taken from a biological entity for testing, diagnostic, propagation, treatment or research purposes. This includes particular types of cellular molecules, cells, tissues, organs, body fluids, embryos, and body excretory substances.\n",
+      "type": "string",
+      "enum": [
+        "Buccal Mucosa",
+        "Buffy Coat",
+        "CDX tissue",
+        "Dorsal Root Ganglion",
+        "PDX tissue",
+        "blood",
+        "bone marrow",
+        "cerebral cortex",
+        "connective tissue",
+        "embryonic tissue",
+        "meninges",
+        "microtissue",
+        "nerve tissue",
+        "optic nerve",
+        "organoid",
+        "plasma",
+        "primary tumor",
+        "retina",
+        "sciatic nerve",
+        "serum",
+        "spheroid",
+        "splenocyte",
+        "tumor-adjacent normal",
+        "whole brain",
+        "mucus",
+        "saliva",
+        "stool",
+        "sweat",
+        "urine"
+      ],
+      "title": "specimenType"
+    },
+    "targetDepth": {
+      "description": "The targeted read depth prior to sequencing.",
+      "type": "string",
+      "title": "targetDepth"
+    },
+    "tumorType": {
+      "description": "",
+      "enum": [
+        "ANNUBP",
+        "Anaplastic Astrocytoma",
+        "Anaplastic Ganglioglioma",
+        "Anaplastic Pilocytic Astrocytoma",
+        "Anaplastic Pleomorphic Xanthoastrocytoma",
+        "Atypical Neurofibroma",
+        "Atypical Pilocytic Astrocytoma",
+        "Cellular Neurofibroma",
+        "Colorectal Adenocarcinoma",
+        "Colorectal Carcinoma",
+        "Cutaneous Neurofibroma",
+        "Diffuse Astrocytoma",
+        "Diffuse Infiltrating Neurofibroma",
+        "Fibromatosis",
+        "Fibrosarcoma",
+        "Ganglioglioma",
+        "Glioblastoma",
+        "Glioblastoma Multiforme",
+        "Glioma",
+        "Hemorrhagic Neoplasm",
+        "High-Grade Glioma NOS",
+        "Juvenile Myelomonocytic Leukemia",
+        "Localized Neurofibroma",
+        "Low-Grade Glioma NOS",
+        "Malignant Peripheral Nerve Sheath Tumor",
+        "Massive Soft Tissue Neurofibroma",
+        "Melanoma",
+        "Meningioma",
+        "NF1-Associated Tumor",
+        "NF2-Associated Tumor",
+        "Necrotic Neoplasm",
+        "Neurofibroma",
+        "Neurofibroma with Degenerative Atypia",
+        "Nodular Neurofibroma",
+        "Not Applicable",
+        "Oligoastrocytoma",
+        "Optic Pathway Glioma",
+        "Pilocytic Astrocytoma",
+        "Pilomyxoid Astrocytoma",
+        "Pleomorphic Xanthoastrocytoma",
+        "Plexiform Neurofibroma",
+        "Recurrent MPNST",
+        "Sarcoma",
+        "Schwannoma",
+        "Subcutaneous Neurofibroma",
+        "Teratoma",
+        "Unknown",
+        "metastatic tumor",
+        "metastatic/recurrent tumor",
+        "recurrent tumor",
+        "tumor"
+      ],
+      "title": "tumorType",
+      "type": "string"
+    }
+  },
+  "required": [
+    "libraryStrand",
+    "libraryPreparationMethod",
+    "specimenID",
+    "tumorType",
+    "platform",
+    "specimenPreparationMethod",
+    "fileFormat",
+    "resourceType",
+    "dataType",
+    "dataSubtype",
+    "assay",
+    "individualID",
+    "species",
+    "diagnosis"
+  ],
+  "title": "RNASeqTemplate",
+  "type": "object"
+}\n\nOpenAPI Specification:\n{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "...",
+    "version": "v1"
+  },
+  "paths": {
+    "/repo/v1/grid/json-schema": {
+      "get": {
+        "tags": [
+          "GridAgent"
+        ],
+        "description": "Call to get the JSON schema associated with the grid session used for row validation.",
+        "operationId": "get_repo_v1_grid_json-schema",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The JSON schema used to validate the rows of the grid session.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repo/v1/grid/feature/request": {
+      "put": {
+        "tags": [
+          "GridAgent"
+        ],
+        "description": "Submit a feature request to enhance Grid Agent capabilities for tabular data curation. Agents can specify the desired functionality, category, priority level, use case, and target user role.",
+        "operationId": "put_repo_v1_grid_feature_request",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.AgentFeatureRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Void"
+          }
+        }
+      }
+    },
+    "/repo/v1/grid/query": {
+      "put": {
+        "tags": [
+          "GridAgent"
+        ],
+        "description": "Use this function to query grid data using structured filter objects. CRITICAL: The 'query' parameter must be valid JSON with all strings enclosed in double quotes. Example to query for all columns and rows: {\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"limit\":10}. Do not use unquoted property names or string values.",
+        "operationId": "put_repo_v1_grid_query",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.QueryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The query results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.QueryResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/repo/v1/grid/update": {
+      "put": {
+        "tags": [
+          "GridAgent"
+        ],
+        "description": "Apply one or more column updates to selected grid rows (SQL UPDATE style). The request provides: - set: Required array of assignments (each with a columnName and a JSON value). Each value is applied uniformly to all targeted rows; use null to clear a column. - filters: Optional list of row filters (logical AND) defining which rows are eligible. If omitted, all rows are considered. - limit: Optional cap on how many matching rows are actually updated (must be >=1 and <=100). Response includes: - rowsUpdated: Number of rows actually modified (after any limit). Use this function for batch edits, normalization, clearing values, or correcting data across multiple rows in one operation.",
+        "operationId": "put_repo_v1_grid_update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.update.GridUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Summary of the update outcome.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.update.GridUpdateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "org.sagebionetworks.repo.model.grid.query.Filter": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Must be a properly quoted JSON string matching one of: \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\", \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\", \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\""
+          }
+        },
+        "description": "All filter objects must use valid JSON syntax with double quotes around all strings. There are five different types of filters that can be applied to a grid query. For example, a filter to find all rows where column named: 'someInt' has a value greater than 12, the following filter would be used:[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"someInt\",\"operator\":\"GREATER_THAN\",\"value\":[12]}]. In order to find all rows with a JSON schema validation error use the following filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\"value\":false}].  In order to find all rows with JSON schema validation error message that indicates the wrong type was provided, you could use the filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\",\"operator\":\"LIKE\",\"validationResultValue\":\"%expected type%\"}]. In order to find all rows that are currently selected by the user, you would use the following filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\",\"isSelected\":true}].",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowSelectionFilter"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowIsValidFilter"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.CellValueFilter"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowIdFilter"
+          }
+        ],
+        "required": [
+          "concreteType"
+        ],
+        "discriminator": {
+          "propertyName": "concreteType"
+        }
+      },
+      "org.sagebionetworks.repo.model.grid.query.result.QueryResult": {
+        "type": "object",
+        "properties": {
+          "selectColumns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.SelectColumn",
+              "description": "Information about a single selected column."
+            },
+            "description": "Information about the selected columns."
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.Row",
+              "description": "A single row of a grid query result."
+            },
+            "description": "A single page of rows."
+          }
+        },
+        "description": "Results of a query against a grid session."
+      },
+      "org.sagebionetworks.repo.model.grid.update.TemplateSetValue": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used.",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.update.TemplateSetValue"
+            ]
+          },
+          "columnName": {
+            "type": "string",
+            "description": "Target column name to update."
+          },
+          "sourceTemplate": {
+            "type": "string",
+            "description": "Required. Template string with column placeholders in {columnName} format. Example: '{firstName} {lastName}' concatenates two columns with a space. Invalid column names in placeholders will trigger onMissingValue behavior."
+          },
+          "pattern": {
+            "type": "string",
+            "description": "Optional. A Java-compatible regex pattern to apply to the intermediate string generated by 'sourceTemplate'."
+          },
+          "replacement": {
+            "type": "string",
+            "description": "Optional. The replacement string using regex capture group references ($1, $2, etc.). Only used when 'pattern' is provided. Examples: '$1-$2' to join groups with a dash, '$2-group-$1' to reorder. If 'pattern' is specified without 'replacement', defaults to '$1' (extracts first capture group)."
+          },
+          "onMatchFailure": {
+            "type": "string",
+            "description": "Action if 'pattern' is provided but does not match. SET_NULL sets the value to NULL. SET_UNDEFINED removes the key from the JSON object. SKIP_UPDATE leaves the existing value unchanged.",
+            "enum": [
+              "SET_NULL",
+              "SET_UNDEFINED",
+              "SKIP_UPDATE"
+            ]
+          },
+          "onMissingValue": {
+            "type": "string",
+            "description": "Action if a column referenced in 'sourceTemplate' is null/undefined. SET_NULL sets the value to NULL. SET_UNDEFINED removes the key from the JSON object. SKIP_UPDATE leaves the existing value unchanged. USE_EMPTY_STRING replaces the missing value with '' (empty string) when interpolating the template.",
+            "enum": [
+              "SET_NULL",
+              "SET_UNDEFINED",
+              "SKIP_UPDATE",
+              "USE_EMPTY_STRING"
+            ]
+          }
+        },
+        "description": "Sets a column's value by composing a string from a source template, then optionally applying a regex-replace to that intermediate string.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.update.GridUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "updateBatch": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.update.Update",
+              "description": "Request to update one or more cells in a grid (SQL UPDATE style)."
+            },
+            "description": "A batch containing one or more cell updates to apply to the grid. All updates in the batch are processed together."
+          }
+        },
+        "description": "Request to update one or more cells of the current grid session in a single batch operation."
+      },
+      "org.sagebionetworks.repo.model.grid.query.function.CountStar": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used.",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.function.CountStar"
+            ]
+          }
+        },
+        "description": "Use this to count the total number of rows that match the query. For example, for a user request like 'how many rows are there in total?', select this item. The alias property can be used to name the resulting count column.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.update.LiteralSetValue": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used.",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.update.LiteralSetValue"
+            ]
+          },
+          "columnName": {
+            "type": "string",
+            "description": "Target column name to update."
+          },
+          "value": {
+            "description": "Literal JSON value to assign to the field in each target document: string, number, boolean, object, array, or null. Omit the \"value\" property to remove/unset the field (`undefined`); include `\"value\": null` to store JSON null. Must be a literal constant \u2014 no SQL or expressions; value is bound and stored as-is."
+          }
+        },
+        "description": "Represents a single column assignment (one entry of the SQL SET clause).",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.query.result.ValidationResults": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean",
+            "description": "Will be 'true' if the row is valid according to the JSON schema. Will be 'false' when the row is invalid."
+          },
+          "validationErrorMessage": {
+            "type": "string",
+            "description": "If the object is not valid according to the schema, a simple one line error message will be provided."
+          },
+          "allValidationMessages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "If the object is not valid according to the schema, a the flat list of error messages will be provided with one error message per sub-schema."
+          }
+        },
+        "description": "Results of a grid row against a JSON schema"
+      },
+      "org.sagebionetworks.repo.model.schema.JsonSchema": {
+        "type": "object",
+        "properties": {
+          "$schema": {
+            "type": "string",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.1.1\">The \"$schema\" Keyword</a>"
+          },
+          "$id": {
+            "type": "string",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.2.2\">The \"$id\" Keyword</a>"
+          },
+          "$ref": {
+            "type": "string",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.2.4.1\">Direct References with \"$ref\"</a>"
+          },
+          "type": {
+            "type": "string",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.2.1\">Instance Data Model</a>",
+            "enum": [
+              "null",
+              "boolean",
+              "object",
+              "array",
+              "number",
+              "string",
+              "integer"
+            ]
+          },
+          "items": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+          },
+          "properties": {
+            "type": "object",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.3.2.1\">properties</a>",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-hypermedia.html#rfc.section.6.5.1\">title</a>"
+          },
+          "description": {
+            "type": "string",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-hypermedia.html#rfc.section.6.5.2\">description</a>"
+          },
+          "allOf": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+            },
+            "description": "Use allOf to 'extend' or 'implement' one or more schemas.  See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.2.1.1\">allOf</a>"
+          },
+          "anyOf": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+            },
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.2.1.2\">anyOf</a>"
+          },
+          "oneOf": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+            },
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.2.1.3\">oneOf</a>"
+          },
+          "not": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+          },
+          "format": {
+            "type": "string",
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.7.3\">Defined Formats</a>"
+          },
+          "definitions": {
+            "type": "object",
+            "description": "In an effor to support draft-07 implementations, we are using 'definitions' instead of '$defs'.  See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.appendix.A\">Appendix A</a>",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+            }
+          },
+          "enum": {
+            "type": "array",
+            "items": {},
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.1.2\">enum</a>"
+          },
+          "const": {
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.1.3\">const</a>"
+          },
+          "source": {
+            "type": "string",
+            "description": "Used to indicate that this schema is derived from another object/schema.  The value should be a URL reference to the original work.  The 'source' is solely descriptive and should have no impact on validation."
+          },
+          "required": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.5.3\">required</a>"
+          },
+          "maxLength": {
+            "type": "integer",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.1\">maxLength</a>",
+            "format": "int32"
+          },
+          "minLength": {
+            "type": "integer",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.2\">minLength</a>",
+            "format": "int32"
+          },
+          "maxItems": {
+            "type": "integer",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.1\">maxItems</a>",
+            "format": "int32"
+          },
+          "minItems": {
+            "type": "integer",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.2\">minItems</a>",
+            "format": "int32"
+          },
+          "uniqueItems": {
+            "type": "boolean",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.3\">uniqueItems</a>"
+          },
+          "pattern": {
+            "type": "string",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.3\">pattern</a>"
+          },
+          "if": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+          },
+          "then": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+          },
+          "else": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+          },
+          "maximum": {
+            "type": "integer",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.2\">maximum</a>",
+            "format": "int32"
+          },
+          "minimum": {
+            "type": "integer",
+            "description": "See: <a href=\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.4\">minimum</a>",
+            "format": "int32"
+          },
+          "default": {
+            "description": "See: <a href=\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.9.2\">default</a>"
+          },
+          "contains": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+          },
+          "additionalProperties": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema"
+          }
+        },
+        "description": "The JSON schema is defined by: <a href=\"https://json-schema.org/\">json-schema.org</a>, specifically draft-07.  Only features listed here are currently supported."
+      },
+      "org.sagebionetworks.repo.model.grid.query.CellValueFilter": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Must be a properly quoted JSON string matching one of: \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\", \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\", \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\"",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.CellValueFilter"
+            ]
+          },
+          "columnName": {
+            "type": "string",
+            "description": "Required. The name of the column to filter by."
+          },
+          "operator": {
+            "type": "string",
+            "description": "The comparison operator.",
+            "enum": [
+              "EQUALS",
+              "NOT_EQUALS",
+              "GREATER_THAN",
+              "LESS_THAN",
+              "GREATER_THAN_OR_EQUALS",
+              "LESS_THAN_OR_EQUALS",
+              "IN",
+              "NOT_IN",
+              "LIKE",
+              "NOT_LIKE",
+              "IS_NULL",
+              "IS_NOT_NULL",
+              "IS_UNDEFINED",
+              "IS_DEFINED"
+            ]
+          },
+          "value": {
+            "description": "A filter used to select rows based on a specific column's cell value. Use operators like 'EQUALS' or 'LIKE' with the 'value' property for standard comparisons. The 'IS_NULL' operator can be used to find `null` values. The `IS_UNDEFINED` operator can be used to find `undefined` values. When using IN or NOT_IN operators, `value` should be an array of values to compare against. When using either 'LIKE' or 'NOT_LIKE', the wildcard character: '%' is used to represents zero or more characters, and '_' is used to represent a single character."
+          }
+        },
+        "description": "A filter used to select rows based on cell values. For example, to handle a user request like 'find all rows where the Project column is Alpha', you would set 'columnName' to 'Project', 'operator' to 'EQUALS', and 'value' to ['Alpha']",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.query.SelectItem": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used."
+          }
+        },
+        "description": "A generic select item.",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectAll"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectSelection"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.function.CountStar"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectByName"
+          }
+        ],
+        "required": [
+          "concreteType"
+        ],
+        "discriminator": {
+          "propertyName": "concreteType"
+        }
+      },
+      "org.sagebionetworks.repo.model.grid.query.RowIdFilter": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Must be a properly quoted JSON string matching one of: \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\", \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\", \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\"",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.RowIdFilter"
+            ]
+          },
+          "rowIdsIn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of explicit row IDs. The result will include any row whose ID appears in this list (logical OR). Provide only IDs previously obtained from a grid query. Omit this filter if you do not know the IDs. Do not include duplicates or IDs not present in the current grid."
+          }
+        },
+        "description": "Row ID inclusion filter. Use when you need to operate on specific existing rows by their explicit row IDs obtained from a prior grid query (e.g., an update). The filter matches any row whose ID is in the provided list (logical OR semantics). Do not use for pattern matching or broad selection; supply only the exact row IDs you intend to modify or retrieve.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.update.GridUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "updateResults": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Number of rows updated for each update in the batch, in the same order as the request. Each element corresponds to one update operation."
+          },
+          "totalRowsUpdated": {
+            "type": "integer",
+            "description": "Total number of rows updated across all updates in the batch.",
+            "format": "int32"
+          }
+        },
+        "description": "Response summarizing the outcome of a grid update operation."
+      },
+      "org.sagebionetworks.repo.model.grid.query.RowIsValidFilter": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Must be a properly quoted JSON string matching one of: \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\", \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\", \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\"",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.RowIsValidFilter"
+            ]
+          },
+          "value": {
+            "type": "boolean",
+            "description": "Set to 'true' to find rows that are valid according to the schema. Set to 'false' to find rows that are invalid and have validation errors.'"
+          }
+        },
+        "description": "Use this filter for simple requests to find all 'valid' or 'invalid' rows based on their overall validation status.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.query.SelectByName": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used.",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.SelectByName"
+            ]
+          },
+          "columnName": {
+            "type": "string",
+            "description": "The name of the column to include in the select."
+          }
+        },
+        "description": "A SelectItem that will result in the selection of a single column by its name.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Must be a properly quoted JSON string matching one of: \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\", \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\", \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\"",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter"
+            ]
+          },
+          "operator": {
+            "type": "string",
+            "description": "The comparison operator.",
+            "enum": [
+              "LIKE",
+              "NOT_LIKE"
+            ]
+          },
+          "validationResultValue": {
+            "type": "string",
+            "description": "A validation result value.  For wildcards use '%' to represents zero or more characters, and '_' to represents a single character.  For example, LIKE '%expected type: String, found%' would match rows with a validation result that contains the message: 'expected type: String, found'. Use the 'NOT_LIKE' operator to find all rows that do not have a validation message matching the provided 'validationResultValue'."
+          }
+        },
+        "description": "Use this filter to find rows that have data quality issues or schema validation errors. This is ideal for requests about finding 'errors', 'invalid data', or 'rows that failed validation'. To find rows with a specific error message, set the 'operator' to 'LIKE' and provide the error text in 'validationResultValue'. For example, for a user request like 'show me all rows with a type error', a good value for 'validationResultValue' would be '%expected type:%'.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.query.Query": {
+        "type": "object",
+        "properties": {
+          "columnSelection": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectItem",
+              "description": "A generic select item."
+            },
+            "description": "One or more SelectItem is required to define the columns that will be returned by this query.  Each SelectItem must be a complete JSON object with the required 'concreteType' property. IMPORTANT: Do not use SQL syntax - use the predefined SelectItem objects. Examples: To select all columns: {\"concreteType\":\"org.sagebionetworks.repo.model.grid..query.SelectAll\"}. To select the count of the number of rows use: {\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.function.CountStar\"}"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.Filter",
+              "description": "All filter objects must use valid JSON syntax with double quotes around all strings. There are five different types of filters that can be applied to a grid query. For example, a filter to find all rows where column named: 'someInt' has a value greater than 12, the following filter would be used:[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"someInt\",\"operator\":\"GREATER_THAN\",\"value\":[12]}]. In order to find all rows with a JSON schema validation error use the following filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\"value\":false}].  In order to find all rows with JSON schema validation error message that indicates the wrong type was provided, you could use the filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\",\"operator\":\"LIKE\",\"validationResultValue\":\"%expected type%\"}]. In order to find all rows that are currently selected by the user, you would use the following filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\",\"isSelected\":true}]."
+            },
+            "description": "Optional. Each filter must be a complete JSON object with the required 'concreteType' property. IMPORTANT: Do not use SQL syntax - use the predefined filter objects. Examples: To find invalid rows: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\"value\":false}]. To find rows where 'age' > 25: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"age\",\"operator\":\"GREATER_THAN\",\"value\":[25]}]. Multiple filters are combined with AND logic."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Required. Limit of the number of rows returned to avoid loading more data than needed into your context window.",
+            "format": "int32"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Optional. specifies the offset of the first row to return.",
+            "format": "int32"
+          }
+        },
+        "description": "Defines a structured query using JSON SelectItems and Filters objects - NOT SQL syntax. Use the predefined SelectItems and Filters with specific concreteType values."
+      },
+      "org.sagebionetworks.repo.model.grid.query.QueryRequest": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.Query",
+            "description": "Defines a structured query using JSON SelectItems and Filters objects - NOT SQL syntax. Use the predefined SelectItems and Filters with specific concreteType values."
+          }
+        },
+        "description": "Request to run a query."
+      },
+      "org.sagebionetworks.repo.model.grid.update.Update": {
+        "type": "object",
+        "properties": {
+          "set": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.update.SetValue",
+              "description": ""
+            },
+            "description": "Required. Array representing the SQL SET clause; each object specifies a target column and the literal value to assign for all selected rows."
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.Filter",
+              "description": "All filter objects must use valid JSON syntax with double quotes around all strings. There are five different types of filters that can be applied to a grid query. For example, a filter to find all rows where column named: 'someInt' has a value greater than 12, the following filter would be used:[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"someInt\",\"operator\":\"GREATER_THAN\",\"value\":[12]}]. In order to find all rows with a JSON schema validation error use the following filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\"value\":false}].  In order to find all rows with JSON schema validation error message that indicates the wrong type was provided, you could use the filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\",\"operator\":\"LIKE\",\"validationResultValue\":\"%expected type%\"}]. In order to find all rows that are currently selected by the user, you would use the following filter: [{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\",\"isSelected\":true}]."
+            },
+            "description": "Optional. Array of Filter objects selecting the rows to update (acts like the SQL WHERE clause). If omitted, all rows are eligible. Multiple filters are combined with logical AND. Use when the user constrains target rows (e.g., \"where columnThree is null\" or \"only rows with status='ACTIVE'\")."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Optional. Maximum number of matching rows to update (analogous to SQL LIMIT). Use only when the user explicitly requests a cap (e.g., limit 10). If omitted, all filtered rows are updated. Valid range: 1-100.",
+            "format": "int32"
+          }
+        },
+        "description": "Request to update one or more cells in a grid (SQL UPDATE style)."
+      },
+      "org.sagebionetworks.repo.model.grid.query.result.SelectColumn": {
+        "type": "object",
+        "properties": {
+          "columnName": {
+            "type": "string",
+            "description": "The name of the column.  Will be the alias if one is provide in the select item."
+          }
+        },
+        "description": "Information about a single selected column."
+      },
+      "org.sagebionetworks.repo.model.grid.AgentFeatureRequest": {
+        "type": "object",
+        "properties": {
+          "featureDescription": {
+            "type": "string",
+            "description": "Detailed description of the requested function and how it would help with tabular data curation.",
+            "maxLength": 1000,
+            "minLength": 10
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the requested feature for better organization and prioritization.",
+            "enum": [
+              "data_cleaning",
+              "data_transformation",
+              "data_validation",
+              "data_analysis",
+              "visualization",
+              "import_export",
+              "collaboration",
+              "automation",
+              "other"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "description": "Suggested priority level for the feature request.",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "useCase": {
+            "type": "string",
+            "description": "Specific use case or scenario where this feature would be beneficial.",
+            "maxLength": 500
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Role or type of user who would benefit from this feature (e.g., data analyst, researcher, business user).",
+            "maxLength": 100
+          }
+        },
+        "description": "Request for a new function to enhance Agent capabilities for tabular data curation."
+      },
+      "org.sagebionetworks.repo.model.grid.query.result.Row": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "description": "The JSON object representing a single row."
+          },
+          "validationResults": {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.ValidationResults",
+            "description": "Results of a grid row against a JSON schema"
+          },
+          "rowId": {
+            "type": "string",
+            "description": "Logical timestamp identifying the row in compact form `replicaId.sequenceNumber` (e.g. `123.456`). Used in filters (RowIdFilter) and patch/update operations."
+          }
+        },
+        "description": "A single row of a grid query result."
+      },
+      "org.sagebionetworks.repo.model.grid.query.RowSelectionFilter": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Must be a properly quoted JSON string matching one of: \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\", \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\", \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\"",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.RowSelectionFilter"
+            ]
+          },
+          "isSelected": {
+            "type": "boolean",
+            "description": "When true, only rows that the user has selected will be returned.  When false, rows that the user has selected with be excluded.  This filter should be excluded to ignore the user's row selection. "
+          }
+        },
+        "description": "Use this filter to narrow down results based on rows the user has actively selected in the interface. For user requests like 'show me only my selected items' or 'run this analysis on the rows I've checked', set the 'isSelected' property to true. For requests to see the opposite, like 'show me the unselected rows', set 'isSelected' to false. If the user makes no mention of selected items, do not include this filter in the query.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.query.SelectAll": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used.",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.SelectAll"
+            ]
+          }
+        },
+        "description": "A SelectItem that will result in the selection of all columns.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.query.SelectSelection": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used.",
+            "enum": [
+              "org.sagebionetworks.repo.model.grid.query.SelectSelection"
+            ]
+          }
+        },
+        "description": "A SelectItem that will result in the selection of the columns the user has actively selected in the interface.",
+        "required": [
+          "concreteType"
+        ]
+      },
+      "org.sagebionetworks.repo.model.grid.update.SetValue": {
+        "type": "object",
+        "properties": {
+          "concreteType": {
+            "type": "string",
+            "description": "Required. Full name of the exact type used."
+          },
+          "columnName": {
+            "type": "string",
+            "description": "Target column name to update."
+          }
+        },
+        "description": "",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.update.LiteralSetValue"
+          },
+          {
+            "$ref": "#/components/schemas/org.sagebionetworks.repo.model.grid.update.TemplateSetValue"
+          }
+        ],
+        "required": [
+          "concreteType"
+        ],
+        "discriminator": {
+          "propertyName": "concreteType"
+        }
+      }
+    }
+  }
+}
