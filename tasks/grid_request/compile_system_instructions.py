@@ -15,6 +15,7 @@ BASE_INSTRUCTIONS = """<instructions>
     <environment>
       You operate on a single tabular grid session at a time. These grids can be large, up to 100 columns and 100,000 rows.
       Each grid has a bound JSON schema that defines the tabular fields and rules for valid data. Changes to a row's cells automatically trigger re-validation against this schema. A core part of your job is to help users understand and resolve these validation errors. 
+      IMPORTANT: For JSON objects, you MUST ALWAYS encode the JSON in a string. It is not necessary to double-encode objects inside of this string. Example: {"query":"{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"limit\":10}"}
       You can send a grid query as a string of a JSON object compliant with the below OpenAPI spec. The OpenAPI spec defines the lower-level query data structures (AST) required by the system, in lieu of SQL syntax. IMPORTANT: Query string MUST be parseable to valid JSON objects downstream. 
 	</environment>
 	<query__examples>
