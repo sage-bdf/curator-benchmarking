@@ -1,8 +1,11 @@
 """Custom scorer for search_query_generation task."""
 import json
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Set, Tuple
 from urllib.parse import unquote, urlparse, parse_qs
+import urllib.request
+import urllib.error
+import time
 
 
 def _extract_json(text: str) -> Optional[str]:
@@ -20,13 +23,142 @@ def _extract_json(text: str) -> Optional[str]:
     return text
 
 
+def _fetch_query_results(query_wrapper_url: str, timeout: int = 10) -> Optional[Set[str]]:
+    """
+    Fetch results from a query wrapper URL by executing the query via Synapse REST API.
+
+    Args:
+        query_wrapper_url: The full query wrapper URL
+        timeout: Request timeout in seconds
+
+    Returns:
+        Set of row IDs from the query results, or None if fetch failed
+    """
+    try:
+        # Parse the QueryWrapper0 parameter
+        parsed_url = urlparse(query_wrapper_url)
+        query_params = parse_qs(parsed_url.query)
+
+        if 'QueryWrapper0' not in query_params:
+            return None
+
+        query_wrapper_json = query_params['QueryWrapper0'][0]
+        query_wrapper = json.loads(query_wrapper_json)
+
+        # Extract SQL query
+        sql_query = query_wrapper.get('sql', '')
+        if not sql_query:
+            return None
+
+        # Build Synapse REST API request
+        # POST to /repo/v1/table/query/async/start
+        api_url = "https://repo-prod.prod.sagebase.org/repo/v1/table/query/async/start"
+
+        # Prepare request body
+        request_body = {
+            "query": sql_query,
+            "includeEntityEtag": False,
+            "isConsistent": False
+        }
+
+        # Add selected facets if present
+        if 'selectedFacets' in query_wrapper:
+            request_body['selectedFacets'] = query_wrapper['selectedFacets']
+
+        # Add additional filters if present
+        if 'additionalFilters' in query_wrapper:
+            request_body['additionalFilters'] = query_wrapper['additionalFilters']
+
+        # Make the request
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        req = urllib.request.Request(
+            api_url,
+            data=json.dumps(request_body).encode('utf-8'),
+            headers=headers,
+            method='POST'
+        )
+
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            result = json.loads(response.read().decode('utf-8'))
+
+            # Get the async job token
+            token = result.get('token')
+            if not token:
+                return None
+
+            # Poll for results
+            result_url = f"https://repo-prod.prod.sagebase.org/repo/v1/table/query/async/get/{token}"
+
+            max_attempts = 10
+            for attempt in range(max_attempts):
+                time.sleep(0.5)  # Wait before polling
+
+                result_req = urllib.request.Request(result_url, headers={'Accept': 'application/json'})
+                try:
+                    with urllib.request.urlopen(result_req, timeout=timeout) as result_response:
+                        query_result = json.loads(result_response.read().decode('utf-8'))
+
+                        # Extract row IDs from results
+                        row_ids = set()
+                        if 'queryResult' in query_result:
+                            rows = query_result['queryResult'].get('queryResults', {}).get('rows', [])
+                            for row in rows:
+                                row_id = row.get('rowId')
+                                if row_id:
+                                    row_ids.add(str(row_id))
+
+                        return row_ids
+                except urllib.error.HTTPError as e:
+                    if e.code == 202:  # Still processing
+                        continue
+                    else:
+                        return None
+
+            return None
+
+    except Exception as e:
+        print(f"    Error fetching query results: {e}")
+        return None
+
+
+def _calculate_metrics(pred_results: Set[str], gt_results: Set[str]) -> Tuple[int, int, int, int]:
+    """
+    Calculate TP, FP, FN, TN from predicted and ground truth result sets.
+
+    Args:
+        pred_results: Set of row IDs from predicted query
+        gt_results: Set of row IDs from ground truth query
+
+    Returns:
+        Tuple of (true_positive, false_positive, false_negative, true_negative)
+    """
+    # True Positive: In both predicted and ground truth
+    tp = len(pred_results & gt_results)
+
+    # False Positive: In predicted but not in ground truth
+    fp = len(pred_results - gt_results)
+
+    # False Negative: In ground truth but not in predicted
+    fn = len(gt_results - pred_results)
+
+    # True Negative: Not in either set (hard to define for information retrieval)
+    # For IR tasks, TN is typically not used as we don't have a closed universe
+    tn = 0
+
+    return tp, fp, fn, tn
+
+
 def score(
     prediction: str,
     ground_truth: Dict[str, Any],
     input_data: Optional[Dict[str, Any]] = None
 ) -> Optional[float]:
     """
-    Score search_query_generation task by validating the generated query wrapper URL.
+    Score search_query_generation task by comparing actual query results only.
 
     Args:
         prediction: The model's prediction containing platform and queryWrapper
@@ -34,7 +166,7 @@ def score(
         input_data: Dictionary with "queryPhrase" and "platform" fields
 
     Returns:
-        Score between 0.0 and 1.0, or None on error
+        F1 score based on result overlap (0.0 to 1.0), or None on error
     """
     try:
         # Extract JSON from prediction
@@ -51,70 +183,52 @@ def score(
         if not pred_query_wrapper:
             return 0.0
 
-        # Get input platform
-        platform = input_data.get('platform', '') if input_data else ''
-
         # Get expected query wrapper from ground truth
         expected_query_wrapper = ground_truth.get('queryWrapper', '')
         if not expected_query_wrapper:
             return 0.0
 
-        score_value = 0.0
+        # Fetch results from both queries
+        pred_results = _fetch_query_results(pred_query_wrapper)
+        gt_results = _fetch_query_results(expected_query_wrapper)
 
-        # Component 1: Check correct base URL (40%)
-        if platform == 'Bridge2AI':
-            if pred_query_wrapper.startswith('https://b2ai.standards.synapse.org/Explore/?QueryWrapper0='):
-                score_value += 0.4
-        elif platform == 'NF Tools':
-            if pred_query_wrapper.startswith('https://nf.synapse.org/Explore/Tools?QueryWrapper0='):
-                score_value += 0.4
+        if pred_results is None or gt_results is None:
+            print(f"    Could not fetch query results for comparison")
+            return None
 
-        # Component 2: Check if QueryWrapper0 parameter has valid JSON structure (40%)
-        try:
-            parsed_url = urlparse(pred_query_wrapper)
-            query_params = parse_qs(parsed_url.query)
+        # Calculate metrics
+        tp, fp, fn, tn = _calculate_metrics(pred_results, gt_results)
 
-            if 'QueryWrapper0' in query_params:
-                query_wrapper_json = query_params['QueryWrapper0'][0]
-                # Try to parse the JSON
-                wrapper_dict = json.loads(query_wrapper_json)
+        print(f"    Query Results Comparison:")
+        print(f"      Predicted results: {len(pred_results)} rows")
+        print(f"      Ground truth results: {len(gt_results)} rows")
+        print(f"      True Positives (TP): {tp} (fetched and expected)")
+        print(f"      False Positives (FP): {fp} (fetched but not expected)")
+        print(f"      False Negatives (FN): {fn} (not fetched but expected)")
+        print(f"      True Negatives (TN): {tn} (not fetched and not expected)")
 
-                # Check if it has a 'query' field
-                if 'query' in wrapper_dict and wrapper_dict['query']:
-                    score_value += 0.4
-        except (json.JSONDecodeError, ValueError, KeyError, IndexError):
-            # Invalid JSON structure, no points for this component
-            pass
+        # Calculate F1 score as the final score
+        # F1 = 2 * (precision * recall) / (precision + recall)
+        # Where precision = TP / (TP + FP) and recall = TP / (TP + FN)
 
-        # Component 3: Check query similarity with ground truth (20%)
-        try:
-            # Extract queries from both URLs
-            pred_parsed = urlparse(pred_query_wrapper)
-            pred_params = parse_qs(pred_parsed.query)
-            pred_wrapper_json = pred_params.get('QueryWrapper0', [''])[0]
-            pred_wrapper_dict = json.loads(pred_wrapper_json)
-            pred_query = pred_wrapper_dict.get('query', '').lower().strip()
+        if tp + fp + fn > 0:
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+            recall = tp / (tp + fn) if (tp + fn) > 0 else 0
 
-            gt_parsed = urlparse(expected_query_wrapper)
-            gt_params = parse_qs(gt_parsed.query)
-            gt_wrapper_json = gt_params.get('QueryWrapper0', [''])[0]
-            gt_wrapper_dict = json.loads(gt_wrapper_json)
-            gt_query = gt_wrapper_dict.get('query', '').lower().strip()
-
-            # Simple word overlap similarity
-            if pred_query and gt_query:
-                pred_words = set(pred_query.split())
-                gt_words = set(gt_query.split())
-                if pred_words and gt_words:
-                    overlap = len(pred_words & gt_words)
-                    union = len(pred_words | gt_words)
-                    similarity = overlap / union if union > 0 else 0
-                    score_value += 0.2 * similarity
-        except (json.JSONDecodeError, ValueError, KeyError, IndexError):
-            # Can't compare queries, no points for this component
-            pass
-
-        return score_value
+            if precision + recall > 0:
+                f1_score = 2 * (precision * recall) / (precision + recall)
+                print(f"      Precision: {precision:.3f}, Recall: {recall:.3f}, F1 Score: {f1_score:.3f}")
+                return f1_score
+            else:
+                # No overlap at all
+                print(f"      No overlap between results")
+                return 0.0
+        elif len(pred_results) == 0 and len(gt_results) == 0:
+            # Both queries returned no results - perfect match
+            print(f"      Both queries returned 0 results (perfect match)")
+            return 1.0
+        else:
+            return 0.0
 
     except Exception as e:
         print(f"Error scoring search query generation: {e}")
