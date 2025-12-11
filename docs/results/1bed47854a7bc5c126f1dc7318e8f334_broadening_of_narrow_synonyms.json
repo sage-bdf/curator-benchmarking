@@ -1,0 +1,683 @@
+{
+  "experiment_id": "1bed47854a7bc5c126f1dc7318e8f334",
+  "task_name": "broadening_of_narrow_synonyms",
+  "task_hash": "a2c885aa2a82bb5b150f213062bbeb89",
+  "model_id": "us.amazon.nova-premier-v1:0",
+  "system_instructions": "_No response_",
+  "temperature": 0.0,
+  "thinking": false,
+  "tools": [],
+  "timestamp": "2025-12-11T04:42:26.189400",
+  "task_result": {
+    "task_name": "broadening_of_narrow_synonyms",
+    "num_samples": 10,
+    "results": [
+      {
+        "sample_index": 0,
+        "input": {
+          "diagnosis": "Neurofibromatosis type 1 microdeletion syndrome",
+          "assay": "clinical whole-exome sequencing",
+          "tumorType": "Plexiform neurofibroma (morphologic abnormality)"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - Original: \"Neurofibromatosis type 1 microdeletion syndrome\"\n   - Corrected: \"Neurofibromatosis type 1\"\n   - The controlled terminology only includes \"Neurofibromatosis type 1\" as a valid value, so the more specific term was broadened to match the schema.\n\n2. **Assay**:\n   - Original: \"clinical whole-exome sequencing\"\n   - Corrected: \"whole exome sequencing\"\n   - The schema lists \"whole exome sequencing\" as the exact term, so \"clinical\" was removed to match the controlled vocabulary.\n\n3. **Tumor Type**:\n   - Original: \"Plexiform neurofibroma (morphologic abnormality)\"\n   - Corrected: \"Plexiform Neurofibroma\"\n   - The schema specifies \"Plexiform Neurofibroma\" as the valid term, so the parenthetical note and lowercase letters were adjusted to match the exact terminology.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2647,
+            "outputTokens": 276,
+            "totalTokens": 2923
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "cf4c7e26-1b57-4c49-8efd-79af7821a29a",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:41:55 GMT",
+                "content-type": "application/json",
+                "content-length": "1219",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "cf4c7e26-1b57-4c49-8efd-79af7821a29a"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Plexiform Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - Original: \"Neurofibromatosis type 1 microdeletion syndrome\"\n   - Corrected: \"Neurofibromatosis type 1\"\n   - The controlled terminology only includes \"Neurofibromatosis type 1\" as a valid value, so the more specific term was broadened to match the schema.\n\n2. **Assay**:\n   - Original: \"clinical whole-exome sequencing\"\n   - Corrected: \"whole exome sequencing\"\n   - The schema lists \"whole exome sequencing\" as the exact term, so \"clinical\" was removed to match the controlled vocabulary.\n\n3. **Tumor Type**:\n   - Original: \"Plexiform neurofibroma (morphologic abnormality)\"\n   - Corrected: \"Plexiform Neurofibroma\"\n   - The schema specifies \"Plexiform Neurofibroma\" as the valid term, so the parenthetical note and lowercase letters were adjusted to match the exact terminology."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2647,
+              "outputTokens": 276,
+              "totalTokens": 2923
+            },
+            "metrics": {
+              "latencyMs": 3408
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "whole exome sequencing",
+          "tumorType": "Plexiform Neurofibroma"
+        },
+        "token_usage": {
+          "input_tokens": 2647,
+          "output_tokens": 276,
+          "total_tokens": 2923
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 1,
+        "input": {
+          "diagnosis": "Neurofibromatosis type 1 with optic pathway glioma",
+          "assay": "Illumina whole exome sequencing ",
+          "tumorType": "malignant triton tumor"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - Original: \"Neurofibromatosis type 1 with optic pathway glioma\"\n   - Corrected: \"Neurofibromatosis type 1\"\n   - Reasoning: The schema lists \"Neurofibromatosis type 1\" as a valid enum value. The additional detail about \"optic pathway glioma\" is not part of the controlled vocabulary and should be omitted.\n\n2. **Assay**:\n   - Original: \"Illumina whole exome sequencing \"\n   - Corrected: \"whole exome sequencing\"\n   - Reasoning: The schema specifies \"whole exome sequencing\" as the exact term. Vendor-specific details (\"Illumina\") and trailing spaces are removed.\n\n3. **Tumor Type**:\n   - Original: \"malignant triton tumor\"\n   - Corrected: \"Malignant Peripheral Nerve Sheath Tumor\"\n   - Reasoning: The schema doesn't list \"malignant triton tumor\" but includes \"Malignant Peripheral Nerve Sheath Tumor\" as the closest equivalent. \"Triton tumor\" is a subtype of MPNST, so the broader category is used.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2642,
+            "outputTokens": 301,
+            "totalTokens": 2943
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "43c099b3-80f4-4ab3-a7e6-4faf1e3dfb5c",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:41:58 GMT",
+                "content-type": "application/json",
+                "content-length": "1360",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "43c099b3-80f4-4ab3-a7e6-4faf1e3dfb5c"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"whole exome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - Original: \"Neurofibromatosis type 1 with optic pathway glioma\"\n   - Corrected: \"Neurofibromatosis type 1\"\n   - Reasoning: The schema lists \"Neurofibromatosis type 1\" as a valid enum value. The additional detail about \"optic pathway glioma\" is not part of the controlled vocabulary and should be omitted.\n\n2. **Assay**:\n   - Original: \"Illumina whole exome sequencing \"\n   - Corrected: \"whole exome sequencing\"\n   - Reasoning: The schema specifies \"whole exome sequencing\" as the exact term. Vendor-specific details (\"Illumina\") and trailing spaces are removed.\n\n3. **Tumor Type**:\n   - Original: \"malignant triton tumor\"\n   - Corrected: \"Malignant Peripheral Nerve Sheath Tumor\"\n   - Reasoning: The schema doesn't list \"malignant triton tumor\" but includes \"Malignant Peripheral Nerve Sheath Tumor\" as the closest equivalent. \"Triton tumor\" is a subtype of MPNST, so the broader category is used."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2642,
+              "outputTokens": 301,
+              "totalTokens": 2943
+            },
+            "metrics": {
+              "latencyMs": 3526
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "whole exome sequencing",
+          "tumorType": "Malignant Peripheral Nerve Sheath Tumor"
+        },
+        "token_usage": {
+          "input_tokens": 2642,
+          "output_tokens": 301,
+          "total_tokens": 2943
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 2,
+        "input": {
+          "diagnosis": "Watson Syndrome",
+          "assay": "MGI whole genome sequencing",
+          "tumorType": "Malignant Peripheral Nerve Sheath Tumor with Mesenchymal Differentiation"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Unknown\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - The input value \"Watson Syndrome\" is not listed in the Target Schema's `diagnosis` enum.\n   - The closest match in the schema is \"Unknown\" since it's the standard fallback for unspecified conditions.\n\n2. **Assay**:\n   - \"MGI whole genome sequencing\" contains a vendor-specific prefix (\"MGI\") not present in the schema.\n   - The standardized term \"whole genome sequencing\" exactly matches an entry in the schema's `assay` enum.\n\n3. **Tumor Type**:\n   - \"Malignant Peripheral Nerve Sheath Tumor with Mesenchymal Differentiation\" includes additional specificity (\"with Mesenchymal Differentiation\") not found in the schema.\n   - The base term \"Malignant Peripheral Nerve Sheath Tumor\" exists in the schema's `tumorType` enum and is the appropriate generalization.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2639,
+            "outputTokens": 248,
+            "totalTokens": 2887
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "412aed69-d766-4aa8-9263-a0698e1eb390",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:02 GMT",
+                "content-type": "application/json",
+                "content-length": "1195",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "412aed69-d766-4aa8-9263-a0698e1eb390"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Unknown\",\n  \"assay\": \"whole genome sequencing\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - The input value \"Watson Syndrome\" is not listed in the Target Schema's `diagnosis` enum.\n   - The closest match in the schema is \"Unknown\" since it's the standard fallback for unspecified conditions.\n\n2. **Assay**:\n   - \"MGI whole genome sequencing\" contains a vendor-specific prefix (\"MGI\") not present in the schema.\n   - The standardized term \"whole genome sequencing\" exactly matches an entry in the schema's `assay` enum.\n\n3. **Tumor Type**:\n   - \"Malignant Peripheral Nerve Sheath Tumor with Mesenchymal Differentiation\" includes additional specificity (\"with Mesenchymal Differentiation\") not found in the schema.\n   - The base term \"Malignant Peripheral Nerve Sheath Tumor\" exists in the schema's `tumorType` enum and is the appropriate generalization."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2639,
+              "outputTokens": 248,
+              "totalTokens": 2887
+            },
+            "metrics": {
+              "latencyMs": 3420
+            }
+          }
+        },
+        "score": 0.6666666666666666,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "whole genome sequencing",
+          "tumorType": "Malignant Peripheral Nerve Sheath Tumor"
+        },
+        "token_usage": {
+          "input_tokens": 2639,
+          "output_tokens": 248,
+          "total_tokens": 2887
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 3,
+        "input": {
+          "diagnosis": "neurofibromatosis, familial spinal",
+          "assay": "open MRI",
+          "tumorType": "unknown - no information available"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - The input term \"neurofibromatosis, familial spinal\" is too narrow and not in the controlled vocabulary. The closest match in the schema is \"Neurofibromatosis type 1,\" which is a standard term for familial neurofibromatosis.\n\n2. **Assay**:\n   - \"open MRI\" is not listed in the controlled vocabulary. The closest equivalent term is \"conventional MRI,\" which is a standard term for MRI techniques.\n\n3. **Tumor Type**:\n   - \"unknown - no information available\" is not a valid term. The schema provides \"Unknown\" as the appropriate term for cases with no available information.\n\nThe corrected metadata uses exact terms from the provided schema to ensure standardization and compliance.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2633,
+            "outputTokens": 214,
+            "totalTokens": 2847
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "cfe30d35-2d8e-43ec-8ec2-4454b0d04baf",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:05 GMT",
+                "content-type": "application/json",
+                "content-length": "1088",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "cfe30d35-2d8e-43ec-8ec2-4454b0d04baf"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - The input term \"neurofibromatosis, familial spinal\" is too narrow and not in the controlled vocabulary. The closest match in the schema is \"Neurofibromatosis type 1,\" which is a standard term for familial neurofibromatosis.\n\n2. **Assay**:\n   - \"open MRI\" is not listed in the controlled vocabulary. The closest equivalent term is \"conventional MRI,\" which is a standard term for MRI techniques.\n\n3. **Tumor Type**:\n   - \"unknown - no information available\" is not a valid term. The schema provides \"Unknown\" as the appropriate term for cases with no available information.\n\nThe corrected metadata uses exact terms from the provided schema to ensure standardization and compliance."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2633,
+              "outputTokens": 214,
+              "totalTokens": 2847
+            },
+            "metrics": {
+              "latencyMs": 2922
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "conventional MRI",
+          "tumorType": "Unknown"
+        },
+        "token_usage": {
+          "input_tokens": 2633,
+          "output_tokens": 214,
+          "total_tokens": 2847
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 4,
+        "input": {
+          "diagnosis": "Not Applicable",
+          "assay": "immunohistochemistry of skin",
+          "tumorType": "Cutaneous storiform neurofibroma"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunohistochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**: The input value \"Not Applicable\" matches the controlled terminology exactly, so no changes are needed.\n\n2. **Assay**: The input \"immunohistochemistry of skin\" is narrowed by specifying \"of skin\". The broader term in the schema is simply \"immunohistochemistry\", so we use that.\n\n3. **Tumor Type**: The input \"Cutaneous storiform neurofibroma\" uses \"storiform\", which is a specific pattern not listed in the schema. The closest match in the schema is \"Cutaneous Neurofibroma\", which is the standardized term for neurofibromas in the skin.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2637,
+            "outputTokens": 193,
+            "totalTokens": 2830
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "6af4bc6d-8bab-4ad1-b5ef-e259127adea6",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:08 GMT",
+                "content-type": "application/json",
+                "content-length": "945",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "6af4bc6d-8bab-4ad1-b5ef-e259127adea6"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Not Applicable\",\n  \"assay\": \"immunohistochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**: The input value \"Not Applicable\" matches the controlled terminology exactly, so no changes are needed.\n\n2. **Assay**: The input \"immunohistochemistry of skin\" is narrowed by specifying \"of skin\". The broader term in the schema is simply \"immunohistochemistry\", so we use that.\n\n3. **Tumor Type**: The input \"Cutaneous storiform neurofibroma\" uses \"storiform\", which is a specific pattern not listed in the schema. The closest match in the schema is \"Cutaneous Neurofibroma\", which is the standardized term for neurofibromas in the skin."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2637,
+              "outputTokens": 193,
+              "totalTokens": 2830
+            },
+            "metrics": {
+              "latencyMs": 3315
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "diagnosis": "Not Applicable",
+          "assay": "immunohistochemistry",
+          "tumorType": "Cutaneous Neurofibroma"
+        },
+        "token_usage": {
+          "input_tokens": 2637,
+          "output_tokens": 193,
+          "total_tokens": 2830
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 5,
+        "input": {
+          "diagnosis": "chromosome 17q11.2 deletion syndrome, 1.4Mb",
+          "assay": "cell viability assay using Annexin V staining",
+          "tumorType": "Pedunculated Cutaneous Neurofibroma"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - The input \"chromosome 17q11.2 deletion syndrome, 1.4Mb\" is a specific genetic description that corresponds to Neurofibromatosis type 1 (NF1). The controlled terminology in the schema includes \"Neurofibromatosis type 1\" as the standardized term.\n\n2. **Assay**:\n   - The input \"cell viability assay using Annexin V staining\" is a specific method for measuring cell viability. The schema lists \"cell viability assay\" as the broader, standardized term.\n\n3. **Tumor Type**:\n   - The input \"Pedunculated Cutaneous Neurofibroma\" is a specific subtype of neurofibroma. The schema includes \"Cutaneous Neurofibroma\" as the standardized term for this broader category.\n\nThe corrected metadata uses the exact terms from the provided schema to ensure consistency and standardization.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2656,
+            "outputTokens": 253,
+            "totalTokens": 2909
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "215608ac-128c-406c-a158-f5b6f166383f",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:12 GMT",
+                "content-type": "application/json",
+                "content-length": "1197",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "215608ac-128c-406c-a158-f5b6f166383f"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - The input \"chromosome 17q11.2 deletion syndrome, 1.4Mb\" is a specific genetic description that corresponds to Neurofibromatosis type 1 (NF1). The controlled terminology in the schema includes \"Neurofibromatosis type 1\" as the standardized term.\n\n2. **Assay**:\n   - The input \"cell viability assay using Annexin V staining\" is a specific method for measuring cell viability. The schema lists \"cell viability assay\" as the broader, standardized term.\n\n3. **Tumor Type**:\n   - The input \"Pedunculated Cutaneous Neurofibroma\" is a specific subtype of neurofibroma. The schema includes \"Cutaneous Neurofibroma\" as the standardized term for this broader category.\n\nThe corrected metadata uses the exact terms from the provided schema to ensure consistency and standardization."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2656,
+              "outputTokens": 253,
+              "totalTokens": 2909
+            },
+            "metrics": {
+              "latencyMs": 3580
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "cell viability assay",
+          "tumorType": "Cutaneous Neurofibroma"
+        },
+        "token_usage": {
+          "input_tokens": 2656,
+          "output_tokens": 253,
+          "total_tokens": 2909
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 6,
+        "input": {
+          "diagnosis": "Neurofibromatosis type 1 with scoliosis",
+          "assay": "anti-tag immunocytochemistry",
+          "tumorType": "sessile cutaneous neurofibroma"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - Original: \"Neurofibromatosis type 1 with scoliosis\"\n   - Corrected: \"Neurofibromatosis type 1\"\n   - Reasoning: The schema lists \"Neurofibromatosis type 1\" as the exact term, and additional details like \"with scoliosis\" are extraneous for this field.\n\n2. **Assay**:\n   - Original: \"anti-tag immunocytochemistry\"\n   - Corrected: \"immunocytochemistry\"\n   - Reasoning: The schema specifies \"immunocytochemistry\" as the standardized term, and \"anti-tag\" is a method detail not required here.\n\n3. **Tumor Type**:\n   - Original: \"sessile cutaneous neurofibroma\"\n   - Corrected: \"Cutaneous Neurofibroma\"\n   - Reasoning: The schema uses \"Cutaneous Neurofibroma\" as the standardized term, and \"sessile\" is a descriptive modifier not needed for this classification.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2643,
+            "outputTokens": 275,
+            "totalTokens": 2918
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "d0d275e3-cd85-4cf2-837c-ee0957eec264",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:15 GMT",
+                "content-type": "application/json",
+                "content-length": "1196",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d0d275e3-cd85-4cf2-837c-ee0957eec264"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"immunocytochemistry\",\n  \"tumorType\": \"Cutaneous Neurofibroma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**:\n   - Original: \"Neurofibromatosis type 1 with scoliosis\"\n   - Corrected: \"Neurofibromatosis type 1\"\n   - Reasoning: The schema lists \"Neurofibromatosis type 1\" as the exact term, and additional details like \"with scoliosis\" are extraneous for this field.\n\n2. **Assay**:\n   - Original: \"anti-tag immunocytochemistry\"\n   - Corrected: \"immunocytochemistry\"\n   - Reasoning: The schema specifies \"immunocytochemistry\" as the standardized term, and \"anti-tag\" is a method detail not required here.\n\n3. **Tumor Type**:\n   - Original: \"sessile cutaneous neurofibroma\"\n   - Corrected: \"Cutaneous Neurofibroma\"\n   - Reasoning: The schema uses \"Cutaneous Neurofibroma\" as the standardized term, and \"sessile\" is a descriptive modifier not needed for this classification."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2643,
+              "outputTokens": 275,
+              "totalTokens": 2918
+            },
+            "metrics": {
+              "latencyMs": 3170
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "immunocytochemistry",
+          "tumorType": "Cutaneous Neurofibroma"
+        },
+        "token_usage": {
+          "input_tokens": 2643,
+          "output_tokens": 275,
+          "total_tokens": 2918
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 7,
+        "input": {
+          "diagnosis": "neurofibromatosis, peripheral type",
+          "assay": "wide bore MRI",
+          "tumorType": "no clear diagnosis"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**: The input \"neurofibromatosis, peripheral type\" was mapped to \"Neurofibromatosis type 1\" from the controlled terminology, as it is the closest match for peripheral neurofibromatosis.\n\n2. **Assay**: \"wide bore MRI\" was replaced with \"conventional MRI\" because it is the standardized term in the schema that best represents the input.\n\n3. **Tumor Type**: \"no clear diagnosis\" was replaced with \"Unknown\" to match the controlled vocabulary for cases where the diagnosis is not available.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2632,
+            "outputTokens": 170,
+            "totalTokens": 2802
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "013bcdc6-695b-4abe-a9b4-ac283a5a605e",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:18 GMT",
+                "content-type": "application/json",
+                "content-length": "881",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "013bcdc6-695b-4abe-a9b4-ac283a5a605e"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"conventional MRI\",\n  \"tumorType\": \"Unknown\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis**: The input \"neurofibromatosis, peripheral type\" was mapped to \"Neurofibromatosis type 1\" from the controlled terminology, as it is the closest match for peripheral neurofibromatosis.\n\n2. **Assay**: \"wide bore MRI\" was replaced with \"conventional MRI\" because it is the standardized term in the schema that best represents the input.\n\n3. **Tumor Type**: \"no clear diagnosis\" was replaced with \"Unknown\" to match the controlled vocabulary for cases where the diagnosis is not available."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2632,
+              "outputTokens": 170,
+              "totalTokens": 2802
+            },
+            "metrics": {
+              "latencyMs": 2746
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "conventional MRI",
+          "tumorType": "Unknown"
+        },
+        "token_usage": {
+          "input_tokens": 2632,
+          "output_tokens": 170,
+          "total_tokens": 2802
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 8,
+        "input": {
+          "diagnosis": "acoustic neurofibromatosis",
+          "assay": "RNA-seq with ribosomal RNA depletion",
+          "tumorType": "Acoustic neuroma of left vestibular nerve"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Vestibular Schwannoma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis:**\n   - Original: \"acoustic neurofibromatosis\"\n   - Corrected: \"NF2-related schwannomatosis\"\n   - Reasoning: \"Acoustic neurofibromatosis\" is an older term for Neurofibromatosis Type 2 (NF2), which is associated with schwannomatosis. The closest match in the schema is \"NF2-related schwannomatosis\".\n\n2. **Assay:**\n   - Original: \"RNA-seq with ribosomal RNA depletion\"\n   - Corrected: \"RNA-seq\"\n   - Reasoning: The core method is RNA sequencing. The additional detail about ribosomal depletion isn't specified in the schema, so we use the broader term \"RNA-seq\".\n\n3. **Tumor Type:**\n   - Original: \"Acoustic neuroma of left vestibular nerve\"\n   - Corrected: \"Vestibular Schwannoma\"\n   - Reasoning: \"Acoustic neuroma\" is synonymous with vestibular schwannoma, which matches the schema term \"Vestibular Schwannoma\". The anatomical location (left vestibular nerve) isn't required for the schema.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2640,
+            "outputTokens": 311,
+            "totalTokens": 2951
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "abbefe98-f1b0-40ef-bc93-01f2b24c5608",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:22 GMT",
+                "content-type": "application/json",
+                "content-length": "1313",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "abbefe98-f1b0-40ef-bc93-01f2b24c5608"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"NF2-related schwannomatosis\",\n  \"assay\": \"RNA-seq\",\n  \"tumorType\": \"Vestibular Schwannoma\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis:**\n   - Original: \"acoustic neurofibromatosis\"\n   - Corrected: \"NF2-related schwannomatosis\"\n   - Reasoning: \"Acoustic neurofibromatosis\" is an older term for Neurofibromatosis Type 2 (NF2), which is associated with schwannomatosis. The closest match in the schema is \"NF2-related schwannomatosis\".\n\n2. **Assay:**\n   - Original: \"RNA-seq with ribosomal RNA depletion\"\n   - Corrected: \"RNA-seq\"\n   - Reasoning: The core method is RNA sequencing. The additional detail about ribosomal depletion isn't specified in the schema, so we use the broader term \"RNA-seq\".\n\n3. **Tumor Type:**\n   - Original: \"Acoustic neuroma of left vestibular nerve\"\n   - Corrected: \"Vestibular Schwannoma\"\n   - Reasoning: \"Acoustic neuroma\" is synonymous with vestibular schwannoma, which matches the schema term \"Vestibular Schwannoma\". The anatomical location (left vestibular nerve) isn't required for the schema."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2640,
+              "outputTokens": 311,
+              "totalTokens": 2951
+            },
+            "metrics": {
+              "latencyMs": 4221
+            }
+          }
+        },
+        "score": 0.6666666666666666,
+        "ground_truth": {
+          "diagnosis": "NF2-related schwannomatosis",
+          "assay": "RNA-seq",
+          "tumorType": "schwannoma"
+        },
+        "token_usage": {
+          "input_tokens": 2640,
+          "output_tokens": 311,
+          "total_tokens": 2951
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 9,
+        "input": {
+          "diagnosis": "neurofibromatosis type 1 due to NF1 mutation or intragenic deletion",
+          "assay": "CellTiter-Glo\u00ae 3D Cell Viability Assay",
+          "tumorType": "Epithelioid Malignant Peripheral Nerve Sheath Tumor"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis:**\n   - Original: `\"neurofibromatosis type 1 due to NF1 mutation or intragenic deletion\"`\n   - Corrected: `\"Neurofibromatosis type 1\"`\n   - The controlled terminology requires the exact value `\"Neurofibromatosis type 1\"`, so the additional details about the mutation were removed.\n\n2. **Assay:**\n   - Original: `\"CellTiter-Glo\u00ae 3D Cell Viability Assay\"`\n   - Corrected: `\"cell viability assay\"`\n   - The closest match in the controlled terminology is `\"cell viability assay\"`, as the original term specifies a particular brand and type of assay that isn't listed.\n\n3. **Tumor Type:**\n   - Original: `\"Epithelioid Malignant Peripheral Nerve Sheath Tumor\"`\n   - Corrected: `\"Malignant Peripheral Nerve Sheath Tumor\"`\n   - The controlled terminology includes `\"Malignant Peripheral Nerve Sheath Tumor\"`, which is the broader category for the specified tumor type. The subtype \"Epithelioid\" is not listed, so it's omitted.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 2664,
+            "outputTokens": 304,
+            "totalTokens": 2968
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "21c45421-a146-483d-921d-641fb77493b7",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:42:26 GMT",
+                "content-type": "application/json",
+                "content-length": "1367",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "21c45421-a146-483d-921d-641fb77493b7"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "```json\n{\n  \"diagnosis\": \"Neurofibromatosis type 1\",\n  \"assay\": \"cell viability assay\",\n  \"tumorType\": \"Malignant Peripheral Nerve Sheath Tumor\"\n}\n```\n\n**Explanation:**\n\n1. **Diagnosis:**\n   - Original: `\"neurofibromatosis type 1 due to NF1 mutation or intragenic deletion\"`\n   - Corrected: `\"Neurofibromatosis type 1\"`\n   - The controlled terminology requires the exact value `\"Neurofibromatosis type 1\"`, so the additional details about the mutation were removed.\n\n2. **Assay:**\n   - Original: `\"CellTiter-Glo\u00ae 3D Cell Viability Assay\"`\n   - Corrected: `\"cell viability assay\"`\n   - The closest match in the controlled terminology is `\"cell viability assay\"`, as the original term specifies a particular brand and type of assay that isn't listed.\n\n3. **Tumor Type:**\n   - Original: `\"Epithelioid Malignant Peripheral Nerve Sheath Tumor\"`\n   - Corrected: `\"Malignant Peripheral Nerve Sheath Tumor\"`\n   - The controlled terminology includes `\"Malignant Peripheral Nerve Sheath Tumor\"`, which is the broader category for the specified tumor type. The subtype \"Epithelioid\" is not listed, so it's omitted."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 2664,
+              "outputTokens": 304,
+              "totalTokens": 2968
+            },
+            "metrics": {
+              "latencyMs": 3778
+            }
+          }
+        },
+        "score": 0.6666666666666666,
+        "ground_truth": {
+          "diagnosis": "Neurofibromatosis type 1",
+          "assay": "3D microtissue viability",
+          "tumorType": "Malignant Peripheral Nerve Sheath Tumor"
+        },
+        "token_usage": {
+          "input_tokens": 2664,
+          "output_tokens": 304,
+          "total_tokens": 2968
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      }
+    ],
+    "metrics": {
+      "total_samples": 10,
+      "successful_runs": 10,
+      "failed_runs": 0,
+      "success_rate": 1.0,
+      "average_score": 0.8999999999999998,
+      "min_score": 0.6666666666666666,
+      "max_score": 1.0,
+      "num_scored": 10
+    },
+    "duration_seconds": 34.289697885513306,
+    "token_usage": {
+      "input_tokens": 26433,
+      "output_tokens": 2545,
+      "total_tokens": 28978
+    }
+  }
+}

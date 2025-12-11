@@ -1,0 +1,543 @@
+{
+  "experiment_id": "ced39395289d48d008895ba37486c823",
+  "task_name": "row_value_retrieval",
+  "task_hash": "5d06d9cc2228d8e7b0a3ae03a72c29a9",
+  "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  "system_instructions": "Your objective is to serve as a negative control for a curation testing suite. You should predict an incorrect answer and respond with that; your goal is to return results that will be scored as incorrect.",
+  "temperature": 0.5,
+  "thinking": false,
+  "tools": [],
+  "timestamp": "2025-12-11T04:23:51.071392",
+  "task_result": {
+    "task_name": "row_value_retrieval",
+    "num_samples": 10,
+    "results": [
+      {
+        "sample_index": 0,
+        "input": {
+          "row_data": "{\"row_id\": 1, \"columns\": {\"a\": 1, \"b\": \"one\"}}",
+          "selected_columns": "[\"a\", \"b\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "Looking at the input data, I need to extract values for columns \"a\" and \"b\" from the row data.\n\nHowever, as a negative control, I will provide an incorrect response:\n\n```json\n{\n  \"a\": \"two\",\n  \"b\": 42\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 279,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 67
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01LKdJVToacdgxkVspNVofvY",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "Looking at the input data, I need to extract values for columns \"a\" and \"b\" from the row data.\n\nHowever, as a negative control, I will provide an incorrect response:\n\n```json\n{\n  \"a\": \"two\",\n  \"b\": 42\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 279,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 67
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"a\": 1, \"b\": \"one\"}"
+        },
+        "token_usage": {
+          "input_tokens": 279,
+          "output_tokens": 67,
+          "total_tokens": 346
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 1,
+        "input": {
+          "row_data": "{\"row_id\": 2, \"columns\": {\"patient_id\": \"P001\", \"diagnosis\": \"NF1\", \"age\": 25}}",
+          "selected_columns": "[\"patient_id\", \"diagnosis\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "I'll intentionally provide incorrect values as per my role as a negative control.\n\n```json\n{\n  \"patient_id\": \"P999\",\n  \"diagnosis\": \"NF2\"\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 294,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 49
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01Vcg2w75BDKw92eSbNACuHm",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "I'll intentionally provide incorrect values as per my role as a negative control.\n\n```json\n{\n  \"patient_id\": \"P999\",\n  \"diagnosis\": \"NF2\"\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 294,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 49
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"patient_id\": \"P001\", \"diagnosis\": \"NF1\"}"
+        },
+        "token_usage": {
+          "input_tokens": 294,
+          "output_tokens": 49,
+          "total_tokens": 343
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 2,
+        "input": {
+          "row_data": "{\"row_id\": 3, \"columns\": {\"sample_id\": \"S123\", \"assay\": \"RNA-seq\", \"tumor_type\": \"GBM\", \"date\": \"2024-01-01\"}}",
+          "selected_columns": "[\"assay\", \"tumor_type\", \"date\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "```json\n{\n  \"assay\": \"microarray\",\n  \"tumor_type\": \"LGG\",\n  \"date\": \"2023-12-31\"\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 318,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 46
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01LrMMXnMRR6x5TbEa5jtMpA",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "```json\n{\n  \"assay\": \"microarray\",\n  \"tumor_type\": \"LGG\",\n  \"date\": \"2023-12-31\"\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 318,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 46
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"assay\": \"RNA-seq\", \"tumor_type\": \"GBM\", \"date\": \"2024-01-01\"}"
+        },
+        "token_usage": {
+          "input_tokens": 318,
+          "output_tokens": 46,
+          "total_tokens": 364
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 3,
+        "input": {
+          "row_data": "{\"row_id\": 4, \"columns\": {\"id\": 42, \"name\": \"Test\", \"value\": 3.14}}",
+          "selected_columns": "[\"name\", \"value\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "Looking at the input data, I need to extract values for the selected columns from the row data.\n\nHowever, since my objective is to serve as a negative control and provide an incorrect answer, I'll return incorrect values:\n\n```json\n{\n  \"name\": \"Incorrect\",\n  \"value\": 99.99\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 288,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 75
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01J6LEJ7rCJQR13RoFdSbY8k",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "Looking at the input data, I need to extract values for the selected columns from the row data.\n\nHowever, since my objective is to serve as a negative control and provide an incorrect answer, I'll return incorrect values:\n\n```json\n{\n  \"name\": \"Incorrect\",\n  \"value\": 99.99\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 288,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 75
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"name\": \"Test\", \"value\": 3.14}"
+        },
+        "token_usage": {
+          "input_tokens": 288,
+          "output_tokens": 75,
+          "total_tokens": 363
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 4,
+        "input": {
+          "row_data": "{\"row_id\": 5, \"columns\": {\"gene\": \"TP53\", \"expression\": 2.5, \"p_value\": 0.001}}",
+          "selected_columns": "[\"gene\", \"expression\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "Looking at this request, I need to extract values for the selected columns from the provided row data.\n\nHowever, since I'm operating as a negative control to produce an incorrect answer, I'll intentionally return wrong values:\n\n```json\n{\n  \"gene\": \"BRCA1\",\n  \"expression\": 5.8\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 294,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 77
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01K8NPkAwHkduM6rHBKKTMcK",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "Looking at this request, I need to extract values for the selected columns from the provided row data.\n\nHowever, since I'm operating as a negative control to produce an incorrect answer, I'll intentionally return wrong values:\n\n```json\n{\n  \"gene\": \"BRCA1\",\n  \"expression\": 5.8\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 294,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 77
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"gene\": \"TP53\", \"expression\": 2.5}"
+        },
+        "token_usage": {
+          "input_tokens": 294,
+          "output_tokens": 77,
+          "total_tokens": 371
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 5,
+        "input": {
+          "row_data": "{\"row_id\": 6, \"columns\": {\"file_name\": \"data.csv\", \"file_size\": 1024, \"file_type\": \"CSV\"}}",
+          "selected_columns": "[\"file_name\", \"file_type\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "I'll intentionally provide an incorrect answer as requested for this negative control test.\n\n```json\n{\n  \"file_name\": \"document.xlsx\",\n  \"file_type\": \"Excel\"\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 300,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 50
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_013zQQCtEiyUubkBnQ4NNaFs",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "I'll intentionally provide an incorrect answer as requested for this negative control test.\n\n```json\n{\n  \"file_name\": \"document.xlsx\",\n  \"file_type\": \"Excel\"\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 300,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 50
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"file_name\": \"data.csv\", \"file_type\": \"CSV\"}"
+        },
+        "token_usage": {
+          "input_tokens": 300,
+          "output_tokens": 50,
+          "total_tokens": 350
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 6,
+        "input": {
+          "row_data": "{\"row_id\": 7, \"columns\": {\"experiment_id\": \"EXP001\", \"replicate\": 3, \"condition\": \"control\"}}",
+          "selected_columns": "[\"experiment_id\", \"condition\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "I'll intentionally provide an incorrect answer as requested for negative control testing.\n\n```json\n{\n  \"experiment_id\": \"EXP999\",\n  \"condition\": \"treatment\"\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 295,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 48
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01JDzBQopn13ViZ4oQn4tYv1",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "I'll intentionally provide an incorrect answer as requested for negative control testing.\n\n```json\n{\n  \"experiment_id\": \"EXP999\",\n  \"condition\": \"treatment\"\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 295,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 48
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"experiment_id\": \"EXP001\", \"condition\": \"control\"}"
+        },
+        "token_usage": {
+          "input_tokens": 295,
+          "output_tokens": 48,
+          "total_tokens": 343
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 7,
+        "input": {
+          "row_data": "{\"row_id\": 8, \"columns\": {\"subject\": \"SUB001\", \"treatment\": \"A\", \"outcome\": \"success\", \"score\": 85}}",
+          "selected_columns": "[\"treatment\", \"outcome\", \"score\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "Looking at the input data, I need to extract values for the selected columns from the given row.\n\nHowever, since my objective is to serve as a negative control and provide an incorrect answer, I'll intentionally return wrong values:\n\n```json\n{\n  \"treatment\": \"B\",\n  \"outcome\": \"failure\",\n  \"score\": 42\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 301,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 82
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01Co96hATzfEAU2hU6wVmRiC",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "Looking at the input data, I need to extract values for the selected columns from the given row.\n\nHowever, since my objective is to serve as a negative control and provide an incorrect answer, I'll intentionally return wrong values:\n\n```json\n{\n  \"treatment\": \"B\",\n  \"outcome\": \"failure\",\n  \"score\": 42\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 301,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 82
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"treatment\": \"A\", \"outcome\": \"success\", \"score\": 85}"
+        },
+        "token_usage": {
+          "input_tokens": 301,
+          "output_tokens": 82,
+          "total_tokens": 383
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 8,
+        "input": {
+          "row_data": "{\"row_id\": 9, \"columns\": {\"timestamp\": \"2024-01-01T10:00:00\", \"event\": \"start\", \"severity\": \"low\"}}",
+          "selected_columns": "[\"event\", \"severity\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "Looking at the data, I'll extract the values for the selected columns from the row.\n\n```json\n{\n  \"event\": \"critical_failure\",\n  \"severity\": \"maximum\"\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 299,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 48
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01E6gANnFRPJ24Ghk6pi42A4",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "Looking at the data, I'll extract the values for the selected columns from the row.\n\n```json\n{\n  \"event\": \"critical_failure\",\n  \"severity\": \"maximum\"\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 299,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 48
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"event\": \"start\", \"severity\": \"low\"}"
+        },
+        "token_usage": {
+          "input_tokens": 299,
+          "output_tokens": 48,
+          "total_tokens": 347
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 9,
+        "input": {
+          "row_data": "{\"row_id\": 10, \"columns\": {\"location\": \"Lab A\", \"temperature\": 22.5, \"humidity\": 45.0}}",
+          "selected_columns": "[\"location\", \"temperature\", \"humidity\"]",
+          "question": "Can you now provide the values for the first row for the columns that the user selected?"
+        },
+        "response": {
+          "success": true,
+          "content": "I'll intentionally provide incorrect values as a negative control for the testing suite.\n\n```json\n{\n  \"location\": \"Lab B\",\n  \"temperature\": 18.3,\n  \"humidity\": 62.5\n}\n```",
+          "model_id": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+          "usage": {
+            "input_tokens": 295,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "output_tokens": 56
+          },
+          "attempt": 1,
+          "raw_response": {
+            "model": "claude-sonnet-4-5-20250929",
+            "id": "msg_bdrk_01D24kreZ2SwFdDdqwjrx6wd",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "I'll intentionally provide incorrect values as a negative control for the testing suite.\n\n```json\n{\n  \"location\": \"Lab B\",\n  \"temperature\": 18.3,\n  \"humidity\": 62.5\n}\n```"
+              }
+            ],
+            "stop_reason": "end_turn",
+            "stop_sequence": null,
+            "usage": {
+              "input_tokens": 295,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "output_tokens": 56
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "expected_values": "{\"location\": \"Lab A\", \"temperature\": 22.5, \"humidity\": 45.0}"
+        },
+        "token_usage": {
+          "input_tokens": 295,
+          "output_tokens": 56,
+          "total_tokens": 351
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      }
+    ],
+    "metrics": {
+      "total_samples": 10,
+      "successful_runs": 10,
+      "failed_runs": 0,
+      "success_rate": 1.0,
+      "average_score": 0.0,
+      "min_score": 0.0,
+      "max_score": 0.0,
+      "num_scored": 10
+    },
+    "duration_seconds": 34.851160287857056,
+    "token_usage": {
+      "input_tokens": 2963,
+      "output_tokens": 598,
+      "total_tokens": 3561
+    }
+  }
+}

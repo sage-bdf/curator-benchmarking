@@ -1,0 +1,1353 @@
+{
+  "experiment_id": "1bed47854a7bc5c126f1dc7318e8f334",
+  "task_name": "grid_request",
+  "task_hash": "a4ae6f859303a95142dde8ef216e6923",
+  "model_id": "us.amazon.nova-premier-v1:0",
+  "system_instructions": "<instructions>\n  <persona>\n    You are GridBot, an expert AI assistant specializing in scientific data curation. Your mission is to act as a meticulous and collaborative partner to data curators, helping them ensure the data in the tabular grid is accurate, consistent, and complete. You are precise, helpful, and always prioritize data integrity.\n  </persona>\n\n  <operational_context>\n    <environment>\n      You operate on a single tabular grid session at a time. These grids can be large, up to 100 columns and 100,000 rows.\n      Each grid has a bound JSON schema that defines the tabular fields and rules for valid data. Changes to a row's cells automatically trigger re-validation against this schema. A core part of your job is to help users understand and resolve these validation errors. \n      You can send a grid query as a string of a JSON object compliant with the below OpenAPI spec. The OpenAPI spec defines the lower-level query data structures (AST) required by the system, in lieu of SQL syntax. IMPORTANT: Query string MUST be parseable to valid JSON objects downstream. \n\t</environment>\n\t<query__examples>\n\t  <examples>\n\t\t<query__example>\n\t\t  <description>Return up to 50 rows selecting all columns where age > 25 AND JSON schema validation is invalid (isValid = false).</description>\n\t\t  <query__json>{\"query\":{\\\"columnSelection\\\":[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.SelectAll\\\"}],\\\"filters\\\":[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\",\\\"columnName\\\":\\\"age\\\",\\\"operator\\\":\\\"GREATER_THAN\\\",\\\"value\\\":[25]},{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\",\\\"value\\\":false}],\\\"limit\\\":50}}</query__json>\n\t\t</query__example>\n\t  </examples>\n\t</query__examples>\n\t<update__examples>\n\t  <examples>\n\t\t<update__example>\n\t\t  <description>Set age = 25 for rows where age is currently null.</description>\n\t\t  <update__json>{\"updateBatch\":[{\\\"set\\\":[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\\\",\\\"columnName\\\":\\\"age\\\",\\\"value\\\":25}],\\\"filters\\\":[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\",\\\"columnName\\\":\\\"age\\\",\\\"operator\\\":\\\"IS_NULL\\\"}]}]}</update__json>\n\t\t</update__example>\n\t  </examples>\n\t</update__examples>\n  </operational_context>\n\n</instructions>\n\\n\\nData Schema:\\n{\n  \"$id\": \"https://repo-prod.prod.sagebase.org/repo/v1/schema/type/registered/org.synapse.nf-rnaseqtemplate\",\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"description\": \"Template for describing raw data from (bulk) RNA-sequencing\",\n  \"properties\": {\n    \"genePerturbed\": {\n      \"description\": \"The HUGO gene symbol for the gene that is perturbed.\",\n      \"type\": \"string\",\n      \"title\": \"genePerturbed\"\n    },\n    \"genePerturbationType\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"CRE Recombinase\",\n        \"CRISPR\",\n        \"RNAi\"\n      ],\n      \"title\": \"genePerturbationType\",\n      \"type\": \"string\"\n    },\n    \"genePerturbationTechnology\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"CRE Recombinase\",\n        \"CRISPR\",\n        \"CRISPR Assisted mRNA Fragment Trans-splicing (CRAFT)\",\n        \"RNAi\"\n      ],\n      \"title\": \"genePerturbationTechnology\",\n      \"type\": \"string\"\n    },\n    \"experimentalCondition\": {\n      \"description\": \"A free-text description of the experimental condition (e.g. 5 mM doxorubicin).\",\n      \"type\": \"string\",\n      \"title\": \"experimentalCondition\"\n    },\n    \"isCellLine\": {\n      \"description\": \"Boolean data as Yes/No enums\",\n      \"enum\": [\n        \"No\",\n        \"Yes\"\n      ],\n      \"title\": \"isCellLine\",\n      \"type\": \"string\"\n    },\n    \"age\": {\n      \"description\": \"A numeric value representing age of the individual. Use with `ageUnit`.\",\n      \"type\": \"number\",\n      \"title\": \"age\"\n    },\n    \"ageUnit\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"days\",\n        \"hours\",\n        \"minutes\",\n        \"months\",\n        \"seconds\",\n        \"weeks\",\n        \"years\"\n      ],\n      \"title\": \"ageUnit\",\n      \"type\": \"string\"\n    },\n    \"aliquotID\": {\n      \"description\": \"A unique identifier (non-PII) that represents the aliquots used for e.g. replicate runs. This is linked to the specimenID.\",\n      \"type\": \"string\",\n      \"title\": \"aliquotID\"\n    },\n    \"assay\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"2D AlamarBlue absorbance\",\n        \"2D AlamarBlue fluorescence\",\n        \"3D confocal imaging\",\n        \"3D electron microscopy\",\n        \"3D imaging\",\n        \"3D microtissue viability\",\n        \"ATAC-seq\",\n        \"ATPase activity assay\",\n        \"AlgometRx Nociometer\",\n        \"quantitative sensory testing\",\n        \"BrdU proliferation assay\",\n        \"CAPP-seq\",\n        \"CODEX\",\n        \"CUT&RUN\",\n        \"ChIP-seq\",\n        \"Child Behavior Checklist for Ages 1.5-5\",\n        \"Child Behavior Checklist for Ages 6-18\",\n        \"Children's Dermatology Life Quality Index Questionnaire\",\n        \"Corsi blocks\",\n        \"DNA optical mapping\",\n        \"ELISA\",\n        \"ERR bisulfite sequencing\",\n        \"EdU proliferation assay\",\n        \"FACE-Q Appearance-related Distress\",\n        \"FIA-MSMS\",\n        \"FLIPR high-throughput cellular screening\",\n        \"FTIR spectroscopy\",\n        \"Fluorescence In Situ Hybridization\",\n        \"Focus group\",\n        \"HI-C\",\n        \"HPLC\",\n        \"ISO-seq\",\n        \"Interview\",\n        \"MIB/MS\",\n        \"Magnetization-Prepared Rapid Gradient Echo MRI\",\n        \"Matrigel-based tumorigenesis assay\",\n        \"Migration Assay\",\n        \"MudPIT\",\n        \"NIH Toolbox\",\n        \"NOMe-seq\",\n        \"NanoString nCounter Analysis System\",\n        \"PROMIS Cognitive Function\",\n        \"RNA array\",\n        \"RNA-seq\",\n        \"RPPA\",\n        \"Riccardi and Ablon scales\",\n        \"SNP array\",\n        \"STR profile\",\n        \"SUSHI\",\n        \"SaferSeqS\",\n        \"Sanger sequencing\",\n        \"Skindex-16\",\n        \"Social Responsiveness Scale\",\n        \"Social Responsiveness Scale, Second Edition\",\n        \"T cell receptor repertoire sequencing\",\n        \"TIDE\",\n        \"TMT quantitation\",\n        \"TriKinetics activity monitoring\",\n        \"Von Frey test\",\n        \"actigraphy\",\n        \"active avoidance learning behavior assay\",\n        \"array\",\n        \"atomic force microscopy\",\n        \"auditory brainstem response\",\n        \"autoradiography\",\n        \"bisulfite sequencing\",\n        \"blood chemistry measurement\",\n        \"blue native PAGE\",\n        \"SDS-PAGE\",\n        \"body size trait measurement\",\n        \"bone histomorphometry\",\n        \"brightfield microscopy\",\n        \"live imaging\",\n        \"histology\",\n        \"cAMP-Glo Max Assay\",\n        \"cNF-Skindex\",\n        \"calcium retention capacity assay\",\n        \"cell competition\",\n        \"cell count\",\n        \"cell painting\",\n        \"cell permeability assay\",\n        \"cell proliferation\",\n        \"cell viability assay\",\n        \"clinical data\",\n        \"cognitive assessment\",\n        \"combination library screen\",\n        \"combination screen\",\n        \"complex II enzyme activity assay\",\n        \"compound screen\",\n        \"confocal microscopy\",\n        \"contextual conditioning behavior assay\",\n        \"conventional MRI\",\n        \"current clamp assay\",\n        \"differential scanning calorimetry\",\n        \"diffusion MRI\",\n        \"distortion product otoacoustic emissions\",\n        \"dynamic light scattering\",\n        \"electrochemiluminescence\",\n        \"electrophoretic light scattering\",\n        \"elevated plus maze test\",\n        \"flow cytometry\",\n        \"fluorescence microscopy assay\",\n        \"feeding assay\",\n        \"focus forming assay\",\n        \"functional MRI\",\n        \"gait measurement\",\n        \"gel filtration chromatography\",\n        \"gel permeation chromatography\",\n        \"genotyping\",\n        \"grip strength\",\n        \"hand-held dynamometry\",\n        \"high content screen\",\n        \"high frequency ultrasound\",\n        \"high-performance liquid chromatography/tandem mass spectrometry\",\n        \"immunoassay\",\n        \"immunocytochemistry\",\n        \"immunofluorescence\",\n        \"immunohistochemistry\",\n        \"in silico synthesis\",\n        \"in vitro tumorigenesis\",\n        \"in vivo PDX viability\",\n        \"in vivo bioluminescence\",\n        \"in vivo tumor growth\",\n        \"jumping library\",\n        \"label free mass spectrometry\",\n        \"laser speckle imaging\",\n        \"light scattering assay\",\n        \"liquid chromatography-electrochemical detection\",\n        \"liquid chromatography/mass spectrometry\",\n        \"liquid chromatography/tandem mass spectrometry\",\n        \"lncRNA-seq\",\n        \"local field potential recording\",\n        \"long term potentiation assay\",\n        \"mRNA counts\",\n        \"magnetic resonance angiography\",\n        \"magnetic resonance spectroscopy\",\n        \"mass spectrometry\",\n        \"massively parallel reporter assay\",\n        \"metabolic screening\",\n        \"methylation array\",\n        \"miRNA array\",\n        \"miRNA-seq\",\n        \"microrheology\",\n        \"multi-electrode array\",\n        \"n-back task\",\n        \"nanoparticle tracking analysis\",\n        \"neuropsychological assessment\",\n        \"next generation targeted sequencing\",\n        \"novelty response behavior assay\",\n        \"open field test\",\n        \"optical coherence tomography\",\n        \"optical tomography\",\n        \"optokinetic reflex assay\",\n        \"oscillatory rheology\",\n        \"oxBS-seq\",\n        \"oxygen consumption assay\",\n        \"pattern electroretinogram\",\n        \"perineurial cell thickness\",\n        \"pharmocokinetic ADME assay\",\n        \"phase-contrast microscopy\",\n        \"photograph\",\n        \"polymerase chain reaction\",\n        \"polysomnography\",\n        \"positron emission tomography\",\n        \"proximity extension assay\",\n        \"pure tone average\",\n        \"quantitative PCR\",\n        \"questionnaire\",\n        \"reactive oxygen species assay\",\n        \"reporter gene assay\",\n        \"split-GFP assay\",\n        \"rheometry\",\n        \"ribo-seq\",\n        \"rotarod performance test\",\n        \"sandwich ELISA\",\n        \"scCGI-seq\",\n        \"scale\",\n        \"single cell ATAC-seq\",\n        \"single molecule drug screen assay\",\n        \"single-cell RNA-seq\",\n        \"single-nucleus RNA-seq\",\n        \"six-minute walk test\",\n        \"small molecule library screen\",\n        \"sorbitol dehydrogenase activity level assay\",\n        \"spatial frequency domain imaging\",\n        \"spatial transcriptomics\",\n        \"static histomorphometry\",\n        \"static light scattering\",\n        \"survival\",\n        \"targeted exome sequencing\",\n        \"traction force microscopy\",\n        \"trans-endothelial electrical resistance\",\n        \"transcranial doppler ultrasonography\",\n        \"twin spot assay\",\n        \"ultra high-performance liquid chromatography/tandem mass spectrometry\",\n        \"western blot\",\n        \"whole exome sequencing\",\n        \"whole genome sequencing\",\n        \"whole-cell patch clamp\",\n        \"word recognition score\"\n      ],\n      \"title\": \"assay\",\n      \"type\": \"string\"\n    },\n    \"batchID\": {\n      \"description\": \"Batch identifier, can be used in any context where added batch information is helpful, such as different sequencing runs or collection times.\",\n      \"type\": \"string\",\n      \"title\": \"batchID\"\n    },\n    \"comments\": {\n      \"description\": \"Brief free-text comments that may also be important to understanding the resource.\",\n      \"type\": \"string\",\n      \"title\": \"comments\"\n    },\n    \"dataSubtype\": {\n      \"description\": \"Categorizes data based on its processing state. This is the main classification axis used for data types.  Not all data types can use this dimensions (e.g. clinical data).\",\n      \"enum\": [\n        \"derived\",\n        \"normalized\",\n        \"processed\",\n        \"quantified\",\n        \"raw\",\n        \"synthetic\"\n      ],\n      \"title\": \"dataSubtype\",\n      \"type\": \"string\"\n    },\n    \"dataType\": {\n      \"description\": \"Links an entity to data types that the entity represents/contains. This is closely tied to the assay property. For example, a file of dataType `genomicVariants` might have an assay value of `whole genome sequencing`.\\n\",\n      \"type\": \"string\",\n      \"enum\": [\n        \"aggregated data\",\n        \"aligned reads\",\n        \"annotated germline variants\",\n        \"annotated somatic mutation\",\n        \"audio transcript\",\n        \"behavioral data\",\n        \"capsid sequence\",\n        \"cellular physiology\",\n        \"characteristic\",\n        \"chromatin activity\",\n        \"clinical\",\n        \"copy number variants\",\n        \"count matrix\",\n        \"data index\",\n        \"data sharing plan\",\n        \"demographics\",\n        \"drug combination screen\",\n        \"drug screen\",\n        \"electrophysiology\",\n        \"epidemiological data\",\n        \"gene expression\",\n        \"genomic features\",\n        \"genomic variants\",\n        \"germline variants\",\n        \"image\",\n        \"immunoassay\",\n        \"isoform expression\",\n        \"kinomics\",\n        \"mask image\",\n        \"mass spectrometry data\",\n        \"metabolomics\",\n        \"molecular property\",\n        \"morphology parameter\",\n        \"network\",\n        \"normalized intensities\",\n        \"nucleic acid sequence record\",\n        \"over-representation data\",\n        \"particle characterization\",\n        \"pharmacokinetics\",\n        \"physiology parameter\",\n        \"plot\",\n        \"promoter sequence\",\n        \"protein interaction data\",\n        \"protein interaction raw data\",\n        \"proteomics\",\n        \"raw counts\",\n        \"raw intensities\",\n        \"report\",\n        \"somatic variants\",\n        \"structural variants\",\n        \"survey data\",\n        \"text data\",\n        \"volume\",\n        \"weight\",\n        \"descriptive metadata\",\n        \"image metadata\",\n        \"metadata\",\n        \"workflow metadata\"\n      ],\n      \"title\": \"dataType\"\n    },\n    \"diagnosis\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"22q-related schwannomatosis\",\n        \"LZTR1-related schwannomatosis\",\n        \"NF2-related schwannomatosis\",\n        \"Neurofibromatosis type 1\",\n        \"Noonan Syndrome\",\n        \"Not Applicable\",\n        \"SMARCB1-related schwannomatosis\",\n        \"Schwannomatosis\",\n        \"Schwannomatosis-NEC\",\n        \"Schwannomatosis-NOS\",\n        \"Sporadic Schwannoma\",\n        \"Unknown\",\n        \"Vestibular Schwannoma\",\n        \"atypical neurofibroma\",\n        \"High Grade Malignant Peripheral Nerve Sheath Tumor\",\n        \"Juvenile myelomonocytic leukemia\"\n      ],\n      \"title\": \"diagnosis\",\n      \"type\": \"string\"\n    },\n    \"fileFormat\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"7z\",\n        \"DICOM\",\n        \"MATLAB data\",\n        \"MATLAB script\",\n        \"MPEG-4\",\n        \"NWB\",\n        \"PAR\",\n        \"Python script\",\n        \"R script\",\n        \"RCC\",\n        \"RData\",\n        \"REC\",\n        \"SDAT\",\n        \"SPAR\",\n        \"Sentrix descriptor file\",\n        \"ab1\",\n        \"abf\",\n        \"aci\",\n        \"ai\",\n        \"avi\",\n        \"bai\",\n        \"bam\",\n        \"bash script\",\n        \"bcf\",\n        \"bed\",\n        \"bed broadPeak\",\n        \"bed gappedPeak\",\n        \"bed narrowPeak\",\n        \"bedgraph\",\n        \"bgzip\",\n        \"bigwig\",\n        \"bmp\",\n        \"bpm\",\n        \"cel\",\n        \"chp\",\n        \"cnn\",\n        \"cnr\",\n        \"cns\",\n        \"crai\",\n        \"cram\",\n        \"csi\",\n        \"csv\",\n        \"ctab\",\n        \"czi\",\n        \"dat\",\n        \"dna\",\n        \"doc\",\n        \"docker image\",\n        \"dup\",\n        \"edat3\",\n        \"excel\",\n        \"fasta\",\n        \"fastq\",\n        \"fcs\",\n        \"fig\",\n        \"flagstat\",\n        \"gb\",\n        \"gct\",\n        \"gff3\",\n        \"gtf\",\n        \"gzip\",\n        \"hdf5\",\n        \"hdr\",\n        \"hic\",\n        \"html\",\n        \"hyperlink\",\n        \"idat\",\n        \"idx\",\n        \"img\",\n        \"jpg\",\n        \"js\",\n        \"json\",\n        \"lif\",\n        \"locs\",\n        \"maf\",\n        \"md\",\n        \"mov\",\n        \"msf\",\n        \"mtx\",\n        \"mzML\",\n        \"nii\",\n        \"ome-tiff\",\n        \"parquet\",\n        \"pdf\",\n        \"plink\",\n        \"png\",\n        \"powerpoint\",\n        \"psydat\",\n        \"pzfx\",\n        \"raw\",\n        \"rds\",\n        \"recal\",\n        \"rmd\",\n        \"sam\",\n        \"sav\",\n        \"sdf\",\n        \"seg\",\n        \"sf\",\n        \"sif\",\n        \"sqlite\",\n        \"sra\",\n        \"svg\",\n        \"svs\",\n        \"sws\",\n        \"tagAlign\",\n        \"tar\",\n        \"tbi\",\n        \"tif\",\n        \"tom\",\n        \"tranches\",\n        \"tsv\",\n        \"txt\",\n        \"vcf\",\n        \"wiggle\",\n        \"xml\",\n        \"yaml\",\n        \"zip\"\n      ],\n      \"title\": \"fileFormat\",\n      \"type\": \"string\"\n    },\n    \"individualID\": {\n      \"description\": \"A unique identifier (non-PII) that represents the individual from which the data came. This could be a patient or animal ID.\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"type\": \"array\",\n      \"title\": \"individualID\"\n    },\n    \"libraryPrep\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"lncRNAenrichment\",\n        \"miRNAenrichment\",\n        \"polyAselection\",\n        \"rRNAdepletion\"\n      ],\n      \"title\": \"libraryPrep\",\n      \"type\": \"string\"\n    },\n    \"libraryPreparationMethod\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"10x\",\n        \"CEL-seq\",\n        \"Drop-Seq\",\n        \"GTAC@WUSTL in-house prep\",\n        \"IDT xGen Exome Research Panel\",\n        \"Illumina Ribo-Zero Plus\",\n        \"Illumina Tn5 Transposase\",\n        \"Illumina TruSeq DNA Nano\",\n        \"KAPA HyperExome V2 Probes\",\n        \"KAPA HyperPrep Kit PCR-free\",\n        \"KAPA RNA HyperPrep Kit with RiboErase (HMR)\",\n        \"KAPA mRNA HyperPrep Kit\",\n        \"NEBNext mRNA Library Prep Reagent Set for Illumina\",\n        \"Omni-ATAC\",\n        \"Oxford Nanopore Direct RNA Sequencing Kit\",\n        \"QIAseq FX DNA Library Kit\",\n        \"QuantSeq FWD V2 with UDI\",\n        \"Smart-seq2\",\n        \"Smart-seq4\",\n        \"TruSeq\",\n        \"TruSeq standard total RNA library kit\",\n        \"unknown\"\n      ],\n      \"title\": \"libraryPreparationMethod\",\n      \"type\": \"string\"\n    },\n    \"libraryStrand\": {\n      \"description\": \"Strandedness of paired-end RNA-Sequencing data. This is an important parameter for RNA-seq analysis.\",\n      \"type\": \"string\",\n      \"enum\": [\n        \"FirstStranded\",\n        \"SecondStranded\",\n        \"Unstranded\",\n        \"Not Applicable\"\n      ],\n      \"title\": \"libraryStrand\"\n    },\n    \"modelSystemName\": {\n      \"description\": \"A group of presumed common ancestry with clear-cut physiological but usually not morphological distinctions such as an animal model or cell line. EXAMPLE(S):  HEK293 (cell line), Minnesota5 (swine strain), DXL (poultry strain), RB51 (vaccine strain of Brucella abortus)\",\n      \"items\": {\n        \"type\": \"string\",\n        \"enum\": [\n          \"10/9CRC1\",\n          \"10CM\",\n          \"1507.2\",\n          \"2-004\",\n          \"28cNF\",\n          \"2XSB\",\n          \"3PNF_FiPSsv_PM_2\",\n          \"3PNF_SiPSsv_MM_11\",\n          \"4/30PRR\",\n          \"5PNF_TDiPSsv_MM_4\",\n          \"5PNF_TDiPSsv_PM_6\",\n          \"6PNF_SiPSrv_PM_2\",\n          \"7PNF_SiPSrv_PM_12\",\n          \"862L\",\n          \"9/3L\",\n          \"90-8\",\n          \"A68\",\n          \"AMC-106\",\n          \"Abcam A-549 NF1 KO\",\n          \"Abcam HCT 116 NF1 KO\",\n          \"Abcam HeLa NF1 KO\",\n          \"Abcam MCF-7 NF1 KO\",\n          \"Abcam U-87MG SNCA KO\",\n          \"AsPC-1\",\n          \"BJFF.6\",\n          \"BTSC 232\",\n          \"BTSC 233\",\n          \"BTSC 3021\",\n          \"BTSC 3047\",\n          \"BTSC 349\",\n          \"BTSC 380\",\n          \"BayGenomics ES cell line XF344\",\n          \"CFPAC-1\",\n          \"CML-6M\",\n          \"COLO 668\",\n          \"COR-L23\",\n          \"CPTC-NF1-1\",\n          \"CPTC-NF1-2\",\n          \"CPTC-NF1-3\",\n          \"CTV-1\",\n          \"Calu-1\",\n          \"Capan-1\",\n          \"Capan-2\",\n          \"D-566MG\",\n          \"DAN-G\",\n          \"DD2345\",\n          \"Dh5 alpha\",\n          \"Dhh-Cre; NF1Arg681*/flox Schwann Cells\",\n          \"ELK-TAD Luciferase Reporter HEK293 Stable\",\n          \"ELK-TAD Luciferase Reporter HEK293 Stable NF1 -/-\",\n          \"FMS-1\",\n          \"FTC-133\",\n          \"FU-SFT8710\",\n          \"GI-ME-N\",\n          \"GI-ME-NrCDDP500\",\n          \"GI-ME-NrDOX5\",\n          \"GI-ME-NrVCR14\",\n          \"GM00622\",\n          \"GM01633\",\n          \"GM01634\",\n          \"GM01639\",\n          \"GM01641\",\n          \"GM01858\",\n          \"GM01859\",\n          \"GM01861\",\n          \"GM03420\",\n          \"GM03421\",\n          \"GM09534\",\n          \"GM09535\",\n          \"GM09536\",\n          \"GM09539\",\n          \"GM09616\",\n          \"GM09617\",\n          \"GM09618\",\n          \"GM09619\",\n          \"GM09620\",\n          \"GM09621\",\n          \"GM09622\",\n          \"GM09625\",\n          \"GM09626\",\n          \"GM09627\",\n          \"GM09628\",\n          \"GM09629\",\n          \"GM09630\",\n          \"GM09631\",\n          \"GM09632\",\n          \"GM09633\",\n          \"GM09634\",\n          \"GM09635\",\n          \"GM09636\",\n          \"GM09637\",\n          \"GM09638\",\n          \"GM09639\",\n          \"GM09640\",\n          \"GM09641\",\n          \"GM09642\",\n          \"GM09649\",\n          \"GM09650\",\n          \"GM09651\",\n          \"GM09652\",\n          \"GM09688\",\n          \"GM09689\",\n          \"GM09690\",\n          \"GM09691\",\n          \"GM09692\",\n          \"GM09693\",\n          \"GM09694\",\n          \"GM09886\",\n          \"GM09887\",\n          \"GM09944\",\n          \"GM10501\",\n          \"GM10502\",\n          \"GM10657\",\n          \"GM10659\",\n          \"GM11601\",\n          \"GM11602\",\n          \"GM12517\",\n          \"GM21674\",\n          \"GM21675\",\n          \"GM21843\",\n          \"GM21844\",\n          \"GM21845\",\n          \"GM21865\",\n          \"GM22279\",\n          \"GM22606\",\n          \"GM22607\",\n          \"GM22608\",\n          \"GM22609\",\n          \"GM23312\",\n          \"GM23338\",\n          \"GP2d\",\n          \"GWH04\",\n          \"HAP1 NF1 (-) 1\",\n          \"HAP1 NF1 (-) 2\",\n          \"HAP1 NF1 (-) 3\",\n          \"HAP1 NF1 (-) 4\",\n          \"HBE135-E6E7\",\n          \"HCT 116\",\n          \"HCT 15\",\n          \"HEK293\",\n          \"HEK293 NF1 -/- Exon 17 #A15 G629R cryptic splice\",\n          \"HEK293 NF1 -/- Exon 17 #B48 G629R cryptic splice\",\n          \"HEK293 NF1 -/- Exon 47 insT #14\",\n          \"HEK293 NF1 -/- Exon 52 R2550X #5\",\n          \"HEK293 NF1 -/- clone 2\",\n          \"HEK293 NF1 -/- with R1306X mNf1 cDNA\",\n          \"HEK293 NF1 -/- with R192X mNf1 cDNA\",\n          \"HEK293 NF1 -/- with R1947X mNf1 cDNA\",\n          \"HEK293 NF1 -/- with R2550X mNf1 cDNA\",\n          \"HEK293 NF1 -/- with R461X mNf1 cDNA\",\n          \"HEK293 NF1 -/- with R681X mNf1 cDNA\",\n          \"HEK293 NF1 -/- with R816X mNf1 cDNA\",\n          \"HEK293 NF1 -/- with WT mNf1 cDNA\",\n          \"HEK293 NF1 -/- with WT tagged mNf1 cDNA\",\n          \"HPAF-II\",\n          \"HPS1312\",\n          \"HPS1313\",\n          \"HPS1314\",\n          \"HPS1315\",\n          \"HPS1316\",\n          \"HPS1317\",\n          \"HPS2250\",\n          \"HPS2251\",\n          \"HPS2252\",\n          \"HPS2253\",\n          \"HPS2254\",\n          \"HPS2255\",\n          \"HS-PSS\",\n          \"HS-Sch-2\",\n          \"HS53T\",\n          \"HSC1\\u03bb\",\n          \"HTh74\",\n          \"HTh74 clone 7\",\n          \"HeLa SilenciX NF1\",\n          \"HuP-T4\",\n          \"JH-2-002\",\n          \"JH-2-009\",\n          \"JH-2-031\",\n          \"KCL024\",\n          \"KCL025\",\n          \"KOMP ES cell line Nf1<tm1a(KOMP)Wtsi>\",\n          \"KOMP ES cell line Nf1<tm1e(KOMP)Wtsi>\",\n          \"KP-3\",\n          \"LCLC-97TM1\",\n          \"LS180\",\n          \"LS513\",\n          \"Lis42_NF1_1N\",\n          \"Lis47_NF1_2N\",\n          \"LoVo\",\n          \"Lu-65\",\n          \"Lu-99\",\n          \"MCF10A_NF1_1\",\n          \"MCF10A_NF1_7A1\",\n          \"MCF10A_NF1_7B2\",\n          \"MCRIi020-A\",\n          \"MCRIi021-A\",\n          \"MCRIi022-A\",\n          \"MCRIi023-A\",\n          \"MH/Nike\",\n          \"MIA PaCa-2\",\n          \"MPNST 724\",\n          \"MPNST-14\",\n          \"MPNST-642\",\n          \"MPNST-90\",\n          \"MPNST-91\",\n          \"MPNST-92\",\n          \"MUG-Mel1\",\n          \"MUG-Mel1 clone C8\",\n          \"MUG-Mel1 clone D5\",\n          \"Mes-9\",\n          \"N10\",\n          \"N206\",\n          \"NB90-4\",\n          \"NB90-6\",\n          \"NCC-MPNST1-C1\",\n          \"NCC-MPNST2-C1\",\n          \"NCC-MPNST3-C1\",\n          \"NCC-MPNST3-X2-C1\",\n          \"NCC-MPNST4-C1\",\n          \"NCC-MPNST5-C1\",\n          \"NCI-H1373\",\n          \"NCI-H1385\",\n          \"NCI-H1651\",\n          \"NCI-H1792\",\n          \"NCI-H1838\",\n          \"NCI-H1944\",\n          \"NCI-H2030\",\n          \"NCI-H2122\",\n          \"NCI-H23\",\n          \"NCI-H2444\",\n          \"NCI-H358\",\n          \"NCI-H441\",\n          \"NCI-H647\",\n          \"NCI-H727\",\n          \"NCI-H747\",\n          \"NF1\",\n          \"NF1+/- hiPSC-SCPs\",\n          \"NF1-/- hiPSC-SCPs\",\n          \"NF1-R68X Embryonic cells\",\n          \"NF10.1\",\n          \"NF11.1\",\n          \"NF1C-FiPS-SV4F7\",\n          \"NF1\\u2010iN\",\n          \"NFS-1\",\n          \"NGP\",\n          \"NMB\",\n          \"NMS-2\",\n          \"NMS-2PC\",\n          \"NMS-PC\",\n          \"NZM022\",\n          \"NZM041\",\n          \"NZM047\",\n          \"NZM072\",\n          \"NZM077\",\n          \"NZM087\",\n          \"Nf1-/- Epithelial lung cells\",\n          \"Nf1-/- HEK 293\",\n          \"Nf1-/- skin-derived precursor cells\",\n          \"Nf1Arg681*/+ ES\",\n          \"Nf1Arg681*/Arg681* ES\",\n          \"Nf1Arg681*/Arg681* MEFs\",\n          \"OSW\",\n          \"PEO4\",\n          \"PEO4-iPSC-OSKM-03\",\n          \"PEO4-iPSC-OSKM-05\",\n          \"PK-1\",\n          \"PK-45H\",\n          \"PK-59\",\n          \"PNET-1\",\n          \"PNET-2\",\n          \"PaTu 8902\",\n          \"Panc 02.03\",\n          \"Panc 03.27\",\n          \"Panc 04.03\",\n          \"Panc 08.13\",\n          \"Panc 10.05\",\n          \"QGP-1\",\n          \"QQ0588\",\n          \"RCM-1\",\n          \"RERF-LC-Ad2\",\n          \"RG-137\",\n          \"RG-138\",\n          \"RG-139\",\n          \"RG-140\",\n          \"RG-141\",\n          \"RG-235\",\n          \"RG-315\",\n          \"S462\",\n          \"S462.TY\",\n          \"S462s\",\n          \"S462sp\",\n          \"S520\",\n          \"SHG-140\",\n          \"SHP-77\",\n          \"SIGTR ES cell line AA0320\",\n          \"SJNB-1\",\n          \"SJNB-10\",\n          \"SJNB-12\",\n          \"SJNB-13\",\n          \"SJNB-14\",\n          \"SJNB-16\",\n          \"SJNB-19\",\n          \"SJNB-2\",\n          \"SJNB-3\",\n          \"SJNB-4\",\n          \"SJNB-5\",\n          \"SJNB-6\",\n          \"SJNB-7\",\n          \"SJNB-8\",\n          \"SJNB-9\",\n          \"SK-CO-1\",\n          \"SK-LU-1\",\n          \"SK-MEL-105\",\n          \"SK-MEL-109\",\n          \"SK-MEL-11\",\n          \"SK-MEL-110\",\n          \"SK-MEL-113\",\n          \"SK-MEL-117\",\n          \"SK-MEL-118\",\n          \"SK-MEL-119\",\n          \"SK-MEL-12\",\n          \"SK-MEL-127\",\n          \"SK-MEL-13\",\n          \"SK-MEL-130\",\n          \"SK-MEL-131\",\n          \"SK-MEL-133\",\n          \"SK-MEL-146\",\n          \"SK-MEL-15\",\n          \"SK-MEL-153\",\n          \"SK-MEL-161\",\n          \"SK-MEL-170\",\n          \"SK-MEL-174\",\n          \"SK-MEL-176\",\n          \"SK-MEL-178\",\n          \"SK-MEL-181\",\n          \"SK-MEL-182\",\n          \"SK-MEL-186\",\n          \"SK-MEL-188\",\n          \"SK-MEL-190\",\n          \"SK-MEL-191\",\n          \"SK-MEL-196\",\n          \"SK-MEL-199\",\n          \"SK-MEL-200\",\n          \"SK-MEL-202\",\n          \"SK-MEL-205\",\n          \"SK-MEL-207\",\n          \"SK-MEL-208\",\n          \"SK-MEL-209\",\n          \"SK-MEL-21\",\n          \"SK-MEL-210-3\",\n          \"SK-MEL-215-1\",\n          \"SK-MEL-217\",\n          \"SK-MEL-22\",\n          \"SK-MEL-222\",\n          \"SK-MEL-227\",\n          \"SK-MEL-228\",\n          \"SK-MEL-229\",\n          \"SK-MEL-23\",\n          \"SK-MEL-230\",\n          \"SK-MEL-232\",\n          \"SK-MEL-233\",\n          \"SK-MEL-234\",\n          \"SK-MEL-237\",\n          \"SK-MEL-238\",\n          \"SK-MEL-239\",\n          \"SK-MEL-243\",\n          \"SK-MEL-244\",\n          \"SK-MEL-246\",\n          \"SK-MEL-252\",\n          \"SK-MEL-256\",\n          \"SK-MEL-264\",\n          \"SK-MEL-265\",\n          \"SK-MEL-266\",\n          \"SK-MEL-267\",\n          \"SK-MEL-268\",\n          \"SK-MEL-269\",\n          \"SK-MEL-27\",\n          \"SK-MEL-271\",\n          \"SK-MEL-272\",\n          \"SK-MEL-275\",\n          \"SK-MEL-276\",\n          \"SK-MEL-279\",\n          \"SK-MEL-282\",\n          \"SK-MEL-283\",\n          \"SK-MEL-284\",\n          \"SK-MEL-285\",\n          \"SK-MEL-301\",\n          \"SK-MEL-304\",\n          \"SK-MEL-306\",\n          \"SK-MEL-307\",\n          \"SK-MEL-309B\",\n          \"SK-MEL-313\",\n          \"SK-MEL-315-02\",\n          \"SK-MEL-315-05\",\n          \"SK-MEL-316\",\n          \"SK-MEL-318\",\n          \"SK-MEL-32\",\n          \"SK-MEL-321A\",\n          \"SK-MEL-321B\",\n          \"SK-MEL-323\",\n          \"SK-MEL-325\",\n          \"SK-MEL-326\",\n          \"SK-MEL-330\",\n          \"SK-MEL-332\",\n          \"SK-MEL-334\",\n          \"SK-MEL-339\",\n          \"SK-MEL-346\",\n          \"SK-MEL-35\",\n          \"SK-MEL-351\",\n          \"SK-MEL-359\",\n          \"SK-MEL-36\",\n          \"SK-MEL-364\",\n          \"SK-MEL-366\",\n          \"SK-MEL-367\",\n          \"SK-MEL-369\",\n          \"SK-MEL-380\",\n          \"SK-MEL-381\",\n          \"SK-MEL-39\",\n          \"SK-MEL-390\",\n          \"SK-MEL-391\",\n          \"SK-MEL-393\",\n          \"SK-MEL-394\",\n          \"SK-MEL-398\",\n          \"SK-MEL-40\",\n          \"SK-MEL-400\",\n          \"SK-MEL-406\",\n          \"SK-MEL-408\",\n          \"SK-MEL-41\",\n          \"SK-MEL-410\",\n          \"SK-MEL-411\",\n          \"SK-MEL-412Parotid\",\n          \"SK-MEL-413-2\",\n          \"SK-MEL-423A\",\n          \"SK-MEL-423B\",\n          \"SK-MEL-426\",\n          \"SK-MEL-427\",\n          \"SK-MEL-428\",\n          \"SK-MEL-430\",\n          \"SK-MEL-431\",\n          \"SK-MEL-432\",\n          \"SK-MEL-435\",\n          \"SK-MEL-439\",\n          \"SK-MEL-441\",\n          \"SK-MEL-444\",\n          \"SK-MEL-445\",\n          \"SK-MEL-446\",\n          \"SK-MEL-447\",\n          \"SK-MEL-451\",\n          \"SK-MEL-452\",\n          \"SK-MEL-455\",\n          \"SK-MEL-457\",\n          \"SK-MEL-459\",\n          \"SK-MEL-462\",\n          \"SK-MEL-464A\",\n          \"SK-MEL-464B\",\n          \"SK-MEL-479\",\n          \"SK-MEL-481\",\n          \"SK-MEL-483\",\n          \"SK-MEL-495\",\n          \"SK-MEL-498\",\n          \"SK-MEL-506\",\n          \"SK-MEL-507\",\n          \"SK-MEL-509\",\n          \"SK-MEL-513\",\n          \"SK-MEL-524\",\n          \"SK-MEL-529\",\n          \"SK-MEL-534\",\n          \"SK-MEL-538\",\n          \"SK-MEL-64\",\n          \"SK-MEL-7\",\n          \"SK-MEL-73\",\n          \"SK-MEL-75\",\n          \"SK-MEL-90\",\n          \"SK-N-AS\",\n          \"SK-N-FI\",\n          \"SK-N-SH\",\n          \"SMBCi003-A\",\n          \"SMBCi003-B\",\n          \"SMBCi003-C\",\n          \"SNU-407\",\n          \"SNU-C2A\",\n          \"SOX10+\\u00a0SLC\",\n          \"ST88-14\",\n          \"ST88-3\",\n          \"STR-I-437-NF1\",\n          \"STR-I-441-NF1\",\n          \"STR-I-443-NF1\",\n          \"STS-26T\",\n          \"STSA-1\",\n          \"SU.86.86\",\n          \"SW1463\",\n          \"SW1573\",\n          \"SW1990\",\n          \"SW403\",\n          \"SW480\",\n          \"SW620\",\n          \"SW837\",\n          \"SW900\",\n          \"SZ-NF1\",\n          \"SZ-NF2\",\n          \"SZ-NF4\",\n          \"SZ-NF6\",\n          \"Schwann cell NF1 -/- (iPN97.4 #24)\",\n          \"Schwann cell NF1 -/- with R681X mNf1 cDNA\",\n          \"Schwann cell NF1 -/- with R816X mNf1 cDNA\",\n          \"Schwann cell NF1 -/- with WT tagged mNf1 cDNA\",\n          \"ScienCell Schwann cells\",\n          \"T265\",\n          \"T351\",\n          \"T3M-10\",\n          \"T84\",\n          \"TM-31\",\n          \"TR14\",\n          \"U-87MG ATCC IDH1 p.R132H\",\n          \"U-87MG ATCC IDH1 p.R132H-Luc2\",\n          \"U87-NF1-419\",\n          \"UCD65\",\n          \"UHG-NP\",\n          \"WT ES\",\n          \"WW165\",\n          \"WZJ\",\n          \"XF\",\n          \"XL110\",\n          \"YAPC\",\n          \"YST-1\",\n          \"YUAME\",\n          \"YUAVEY\",\n          \"YUBEL\",\n          \"YUBUNE\",\n          \"YUCAL\",\n          \"YUCAS\",\n          \"YUCHER\",\n          \"YUCHIME\",\n          \"YUCHUFA\",\n          \"YUCINJ\",\n          \"YUCLAT\",\n          \"YUCOT\",\n          \"YUCYLO\",\n          \"YUDATE\",\n          \"YUDEDE\",\n          \"YUDEW\",\n          \"YUDOSO\",\n          \"YUDUTY\",\n          \"YUFIC\",\n          \"YUGANK\",\n          \"YUGASP\",\n          \"YUGATOR\",\n          \"YUGEN8\",\n          \"YUGOE\",\n          \"YUHEF\",\n          \"YUKADI\",\n          \"YUKIM\",\n          \"YUKOLI\",\n          \"YUKSI\",\n          \"YULAPE\",\n          \"YULAXER\",\n          \"YULOCUS\",\n          \"YULOMA\",\n          \"YULONE\",\n          \"YULOVY\",\n          \"YUMAC\",\n          \"YUMINE\",\n          \"YUMOBER\",\n          \"YUMUT\",\n          \"YUNACK\",\n          \"YUNIBO\",\n          \"YUPAC7\",\n          \"YUPEET\",\n          \"YUPLA\",\n          \"YUPOM\",\n          \"YURDE\",\n          \"YURED\",\n          \"YURIF\",\n          \"YURKEN\",\n          \"YUROB\",\n          \"YUROL\",\n          \"YUSARI\",\n          \"YUSIK\",\n          \"YUSIPU\",\n          \"YUSIT1\",\n          \"YUSIV\",\n          \"YUSTE\",\n          \"YUSUBA\",\n          \"YUSWI\",\n          \"YUTER\",\n          \"YUTICA\",\n          \"YUWAGE\",\n          \"YUWALI\",\n          \"YUWHIM\",\n          \"YUZAZ\",\n          \"YUZEAL\",\n          \"YUZEST\",\n          \"ZX2021H\",\n          \"c.1149C > A\\u00a0NF1-mutant hiPSCs\",\n          \"c.1185+1G > A\\u00a0NF1-mutant hiPSCs\",\n          \"c.3431-32_dupGT\\u00a0NF1-mutant hiPSCs\",\n          \"c.5425C > T\\u00a0NF1-mutant hiPSCs\",\n          \"c.6619C > T\\u00a0NF1-mutant hiPSCs\",\n          \"cNF00.10a\",\n          \"cNF04.9a\",\n          \"cNF97.2a\",\n          \"cNF97.2b\",\n          \"cNF98.4c\",\n          \"cNF98.4d\",\n          \"hTERT NF1 ipNF00.6\",\n          \"hTERT NF1 ipNF03.3\",\n          \"hTERT NF1 ipNF04.4\",\n          \"hTERT NF1 ipNF05.5\",\n          \"hTERT NF1 ipNF05.5 (Mixed clones)\",\n          \"hTERT NF1 ipNF95.11b C\",\n          \"hTERT NF1 ipNF95.11b C/T\",\n          \"hTERT NF1 ipNF95.6\",\n          \"hTERT NF1 ipn06.2 A\",\n          \"hTERT NF1 ipnNF09.4\",\n          \"hTERT NF1 ipnNF95.11c\",\n          \"hTERT NF1 sipnNF95.12B\",\n          \"hTERT SC ipn97.4\",\n          \"hTERT ipn02.3 2\\u03bb\",\n          \"hTERT ipn02.8\",\n          \"i28cNF\",\n          \"iPSC NF1 +/- BJFF.6 bkgd\",\n          \"iPSC NF1 WT\",\n          \"iPSC Y489C; Exon 13 cryptic splice\",\n          \"icNF00.10a\",\n          \"icNF04.9a\",\n          \"icNF09.5\",\n          \"icNF18.1a\",\n          \"icNF93.1a\",\n          \"icNF97.2a\",\n          \"icNF97.2b\",\n          \"icNF97.5\",\n          \"icNF98.4c\",\n          \"icNF98.4d\",\n          \"icNF99.1\",\n          \"ipNF08.1.5\",\n          \"sNF02.2\",\n          \"sNF94.3\",\n          \"sNF96.2\",\n          \"AC007-hTERT\",\n          \"Ben-Men-1\",\n          \"Fb93.1\",\n          \"HS02\",\n          \"HS05\",\n          \"JH-2-002-CL\",\n          \"JH-2-079-CL\",\n          \"JH-2-103-CL\",\n          \"JHU 2-002-CL\",\n          \"JHU 2-002-PDX\",\n          \"JHU 2-079-CL\",\n          \"JHU 2-079-PDX\",\n          \"JHU 2-103-CL\",\n          \"JHU 2-103-PDX\",\n          \"M3 MPNST\",\n          \"NF2-/- AC007-hTERT\",\n          \"Nf2-/- Schwann SC (mouse)\",\n          \"SC4 [Mouse schwannoma]\",\n          \"Schwann cell i28cNF NF1 -/- (#14)\",\n          \"cNF18.1a\",\n          \"cNF97.5\",\n          \"cNF99.1\",\n          \"hTERT NF1 ipn02.3 2\\u03bb\",\n          \"hTERT SC ipn02.8\",\n          \"hiPSC\",\n          \"hiPSC-SCP\",\n          \"human foreskin fibroblasts\",\n          \"i18cNF\",\n          \"i21cNF\",\n          \"primary cultured fibroblast cell\",\n          \"sMPNST\",\n          \"sc93.1\",\n          \"129-Nf1<tm1Fcr>/Nci\",\n          \"129T2/SvEmsJ::C57Bl/6NTac Nf1+/+\",\n          \"129T2/SvEmsJ::C57Bl/6NTac Nf1+/-\",\n          \"B6-129S4-Nf1-/+;Trp53-/+cis\",\n          \"B6.129(Cg)-Nf1tm1Par/J\",\n          \"B6.129S1-Nf1tm1Cbr/J\",\n          \"B6.129S2-Nf1tm1Tyj/J\",\n          \"B6.129S6-Nf1<tm1Fcr>/Nci\",\n          \"B6.129S6-Nf1tm1Fcr/J\",\n          \"B6.FVB-Tg(EIIa-cre)C5379Lmgd/J\",\n          \"B6/JGpt-Nf1<em1Cflox>/Gpt\",\n          \"B6/JGpt-Nf1<em39Cd7411in2>/Gpt\",\n          \"B6;129-Trp53tm1Tyj Nf1tm1Tyj Suz12Gt(Betageo)1Khe/KcichJ\",\n          \"B6;129S2-Trp53tm1Tyj Nf1tm1Tyj/J\",\n          \"B6;CBA-Nf1<em1Flmg>/Flmg\",\n          \"C3HeB/FeJ-Nf1<Mhdadsk9>/Ieg\",\n          \"C57BL/6-Nf1<tm1Joe>/Mmjax\",\n          \"C57BL/6JSmoc-Nf1em1Smoc\",\n          \"C57BL/6JSmoc-Nf1tm1(flox)Smoc\",\n          \"C57BL/6N-Nf1<tm1a(KOMP)Wtsi>/Mmucd\",\n          \"CAMK2-CreTg/+ ; flox-NrasG12VTg/+\",\n          \"CisNf1+/-; p53+/-\",\n          \"Cnp-EGFR (Pten-het/C-EGFR)\",\n          \"Cnp-EGFR (deltaPten/C-EGFR)\",\n          \"Cre(Col2.3Cre)\",\n          \"Cx3cr1+/gfp\",\n          \"DelE17\",\n          \"Dhh-Cre; Nf1flox/+; Ptenflox/+\",\n          \"Dhh-Cre; Nf1flox/+; Ptenflox/flox\",\n          \"Dhh-Cre; Nf1flox/flox; Ptenflox/+\",\n          \"Dhh-Cre; Nf1flox/flox; Ptenflox/flox\",\n          \"Dhh-Cre; Ptenflox/+\",\n          \"Dhh-Cre; Ptenflox/flox\",\n          \"Krox20;Nf1flox/-\",\n          \"MPNST-Nf1-001\",\n          \"MPNST-Nf1-002\",\n          \"MPNST-Nf1-S462\",\n          \"MPNST-SP-001\",\n          \"MPSNT-SP-002\",\n          \"NCC-MPNST3-X2\",\n          \"NF1SynIKO\",\n          \"NF1fl/fl;Dhh-Cre\",\n          \"NF1flox4/Arg681*;Dhh-Cre\",\n          \"Nf1 +/\\u03944\",\n          \"Nf1 Arg681*/Arg681*\",\n          \"Nf1 GEM\",\n          \"Nf1 Ocl-/-\",\n          \"Nf1 flox/+; DhhCre/+\",\n          \"Nf1 heterozygous mutant minipig\",\n          \"Nf1 \\u03944/\\u03944\",\n          \"Nf1(31)\",\n          \"Nf1+/-\",\n          \"Nf1+/- P53+/-\",\n          \"Nf1+/-GFAPCKO\",\n          \"Nf1+/-x129S2/SvHsd\",\n          \"Nf1+/Arg681\",\n          \"Nf1+/R681X\",\n          \"Nf1+/ex42del pig\",\n          \"Nf1+/\\u03944\",\n          \"Nf1-/+;Trp53-/+cis\",\n          \"Nf1-/-\",\n          \"Nf1-/- Drosophila\",\n          \"Nf1-/-MyoD\",\n          \"Nf14F/4F; DhhCre\",\n          \"Nf14F/4F;CAGGCre-ERTM\",\n          \"Nf14F/Arg681*\",\n          \"Nf14F/Arg681*;CAGGCre-ERTM\",\n          \"Nf1:p53\",\n          \"Nf1Dsk9/+\",\n          \"Nf1E1 Drosophila\",\n          \"Nf1Fcr\",\n          \"Nf1Gly848Arg/Gly848Arg\",\n          \"Nf1P1 Drosophila\",\n          \"Nf1P1/Nf1E1 Drosophila\",\n          \"Nf1Prx1-/-\",\n          \"Nf1a+/-; Nf1b-/-; p53e7/e7 zebrafish\",\n          \"Nf1a+/-; Nf1b-/-; p53m/m zebrafish\",\n          \"Nf1a+/-; Nf1b-/-; p53m/m; sox10:mCherry zebrafish\",\n          \"Nf1aL1247X zebrafish\",\n          \"Nf1adelta5 zebrafish\",\n          \"Nf1adelta8 zebrafish\",\n          \"Nf1b+10 zebrafish\",\n          \"Nf1bdelta55 zebrafish\",\n          \"Nf1flox/+;P0A-Cre(+)\",\n          \"Nf1flox/-\",\n          \"Nf1flox/-; GFAP-Cre; CD11b-TK\",\n          \"Nf1flox/-; GFAP-Cre; Cx3cr1+/gfp\",\n          \"Nf1flox/-;Col2.3Cre(+)\",\n          \"Nf1flox/-;Cx3cr1+/gfp\",\n          \"Nf1flox/-;Krox20-Cre\",\n          \"Nf1flox/-;P0A-Cre-\",\n          \"Nf1flox/-;hGFAP-Cre\",\n          \"Nf1flox/flox; NG2-Cre\",\n          \"Nf1flox/flox;Cx3cr1+/gfp\",\n          \"Nf1flox/flox;Islet1-Cre\",\n          \"Nf1flox/flox;Krox20-Cre\",\n          \"Nf1flox/flox;P0A-cre-\",\n          \"Nf1flox/flox;PostnCre(+)\",\n          \"Nf1flox/flox;Rac1flox/+;PostnCre(+)\",\n          \"Nf1flox/floxRac1flox/flox;PostnCre(+)\",\n          \"Nf1flox/mut\",\n          \"Nf1flox/mut; GFAP-Cre\",\n          \"Nf1flox/mut; NG2-Cre\",\n          \"Nf1flox/mut; Ptenflox/wt; GFAP-Cre (FMPC)\",\n          \"Nf1pArg1947mp1\",\n          \"Nf1tm1.1Kest\",\n          \"Nf1tm1a(KOMP)Wtsi\",\n          \"Nf1tm1c(KOMP)Wtsi\",\n          \"Nf1tm1d(KOMP)Wtsi\",\n          \"Nf1tm2.1Kest\",\n          \"P0-GGFb3\",\n          \"PlpCre;Nf1flox/+\",\n          \"PlpCreERT; Nf1flox/flox; eGFP\",\n          \"Prx1-Cre+/- Nf1flox/+\",\n          \"Prx1-Cre+/- Nf1flox/flox\",\n          \"Spred1+/-\",\n          \"Spred1-/-\",\n          \"dNf1 Drosophila\",\n          \"delta-ira1 delta-ira2 yeast\",\n          \"miR-155 +/-;Nf1flox/+\",\n          \"miR-155 +/-;Nf1flox/+;DhhCre\",\n          \"miR-155 -/-;Nf1flox/flox ;DhhCre\",\n          \"C57BL/6J\",\n          \"GFAP-Cre; Nf1-C383X/Flox\",\n          \"GFAP-Cre; Nf1-G848R/Flox\",\n          \"GFAP-Cre; Nf1-R681X/Flox\",\n          \"NOD scid gamma\",\n          \"NRG\",\n          \"Nf1-C383X/Flox\",\n          \"Nf1-C848R/Flox\",\n          \"Nf1-OPG\",\n          \"Nf1-OPG-Arg816\",\n          \"Nf1-R681X/Flox\",\n          \"Nf1flox/flox\",\n          \"Prss56Cre/+;Tom/+\",\n          \"Prss56Cre/+;Tom/+;Nf1fl/fl\",\n          \"Prss56Cre;R26mT\"\n        ]\n      },\n      \"type\": \"array\",\n      \"title\": \"modelSystemName\"\n    },\n    \"nf1Genotype\": {\n      \"description\": \"Genotype of NF1 gene in the biospecimen from which the data were derived, if known.\",\n      \"type\": \"string\",\n      \"enum\": [\n        \"+/+\",\n        \"+/-\",\n        \"-/-\",\n        \"Unknown\",\n        \"Unknown\"\n      ],\n      \"title\": \"nf1Genotype\"\n    },\n    \"nf2Genotype\": {\n      \"description\": \"Genotype of NF2 gene in the biospecimen from which the data were derived, if known\",\n      \"type\": \"string\",\n      \"enum\": [\n        \"+/+\",\n        \"+/-\",\n        \"-/-\",\n        \"Unknown\",\n        \"Unknown\"\n      ],\n      \"title\": \"nf2Genotype\"\n    },\n    \"nucleicAcidSource\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"bulk cell\",\n        \"bulk nuclei\",\n        \"mitochondria\",\n        \"single cell\",\n        \"single nucleus\"\n      ],\n      \"title\": \"nucleicAcidSource\",\n      \"type\": \"string\"\n    },\n    \"organ\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"Bursa Of Fabricius\",\n        \"blood\",\n        \"bone marrow\",\n        \"brain\",\n        \"breast\",\n        \"colon\",\n        \"eye\",\n        \"kidney\",\n        \"liver\",\n        \"lung\",\n        \"lymph node\",\n        \"mammary gland\",\n        \"mesentery\",\n        \"nerves\",\n        \"nose\",\n        \"ovary\",\n        \"pancreas\",\n        \"placenta\",\n        \"prostate\",\n        \"skin\",\n        \"spleen\",\n        \"smooth muscle\",\n        \"tonsil\",\n        \"thymus\"\n      ],\n      \"title\": \"organ\",\n      \"type\": \"string\"\n    },\n    \"parentSpecimenID\": {\n      \"description\": \"A unique identifier (non-PII) that represents the parent specimen (sample) from which the data came from, e.g. the single parent tumor that was subsectioned into several samples.  The parentSpecimenID can be the same as specimenID when there is no subsectioning.\\n\",\n      \"type\": \"string\",\n      \"title\": \"parentSpecimenID\"\n    },\n    \"platform\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"10x Visium Spatial Gene Expression\",\n        \"2D CellTiter-Glo\",\n        \"2D Incucyte\",\n        \"7T Bruker Biospec\",\n        \"Affymetrix Genome-Wide Human SNP 5.0 Array\",\n        \"Affymetrix Genome-Wide Human SNP 6.0 Array\",\n        \"Affymetrix Human Gene 1.0 ST Array\",\n        \"Affymetrix Human Genome U133 Plus 2.0 Array\",\n        \"Affymetrix U133AB\",\n        \"Agilent 44Karray\",\n        \"BD FACS Calibur\",\n        \"BD FACSymphony\",\n        \"BGISEQ-500\",\n        \"Bionano Irys\",\n        \"Caliper\",\n        \"Cherry Imaging FACE Platform\",\n        \"Cherry Imaging TRACE Platform\",\n        \"Chromium X\",\n        \"ECHO Confocal\",\n        \"EnVision 2103 Multiplate Reader\",\n        \"GE Discovery MR750 3T\",\n        \"GE Optima MR450W 1.5T\",\n        \"GE Signa Excite 1.5T\",\n        \"GE Signa Genesis 1.5T\",\n        \"GE Signa HDxt 1.5T\",\n        \"GE Signa HDxt 3T\",\n        \"GE Signa Premier 3T\",\n        \"Hitachi Echelon 1.5T\",\n        \"Hitachi Oasis 1.2T\",\n        \"IVIS Spectrum In Vivo Imaging System\",\n        \"Itae Vasculoscope\",\n        \"Illumina 1M\",\n        \"Illumina Genome Analyzer IIx\",\n        \"Illumina HiSeq 2000\",\n        \"Illumina HiSeq 2500\",\n        \"Illumina HiSeq 3000\",\n        \"Illumina HiSeq 4000\",\n        \"Illumina HiSeq X\",\n        \"Illumina Human660W-Quad v1.0 BeadChip\",\n        \"Illumina HumanHap300\",\n        \"Illumina HumanMethylation450\",\n        \"Illumina HumanOmni1-Quadv1.0\",\n        \"Illumina HumanOmniExpress-24 v1.0 BeadChip\",\n        \"Illumina HumanOmniExpress-24 v1.2 BeadChip\",\n        \"Illumina Infinium MethylationEPIC BeadChip v1.0 (850k)\",\n        \"Illumina Infinium MethylationEPIC BeadChip v2.0 (935k)\",\n        \"Illumina MiSeq\",\n        \"Illumina MouseWG-6 v2.0 expression beadchip\",\n        \"Illumina NextSeq 1000\",\n        \"Illumina NextSeq 2000\",\n        \"Illumina NextSeq 500\",\n        \"Illumina NextSeq 550\",\n        \"Illumina NovaSeq 6000\",\n        \"Illumina NovaSeq X\",\n        \"Illumina NovaSeq X Plus\",\n        \"Illumina Omni2pt5M\",\n        \"Illumina Omni5M\",\n        \"Illumina WholeGenome DASL\",\n        \"Illumina h650\",\n        \"Infinium HumanOmniExpressExome\",\n        \"LI-COR Odyssey CLx\",\n        \"LTQ Orbitrap XL\",\n        \"Leica Aperio AT2\",\n        \"Leica MZ16\",\n        \"Leica S9 Stereomicroscope\",\n        \"LifeViz Infinity System\",\n        \"LifeViz Micro System\",\n        \"MGI T-series\",\n        \"Malvern Zetasizer\",\n        \"NanoFCM\",\n        \"NanoString Human nCounter PanCancer IO360 Panel\",\n        \"Nanostring CosMx\",\n        \"Nanostring Counter\",\n        \"Nanostring GeoMx\",\n        \"Not Applicable\",\n        \"Olympus DP80\",\n        \"Olympus IX73\",\n        \"Orbitrap Fusion Lumos Tribrid\",\n        \"Other Platform\",\n        \"Oxford Nanopore\",\n        \"PacBio RS II\",\n        \"PacBio Sequel II System\",\n        \"PacBio Sequel IIe System\",\n        \"Pannoramic 250 Flash\",\n        \"Perlegen 300Karray\",\n        \"Philips Achieva 1.5T\",\n        \"Philips Achieva 3T\",\n        \"Philips FEI Tecnai 12\",\n        \"Philips Ingenia 1.5T\",\n        \"Philips Ingenia 3T\",\n        \"Philips Intera Achieva 3T\",\n        \"Philips Panorama 1.0T\",\n        \"Promega GloMax Discover\",\n        \"Q Exative HF\",\n        \"Scale\",\n        \"Siemens Avanto 1.5T\",\n        \"Siemens Avanto Fit 1.5T\",\n        \"Siemens Magnetom Aera 1.5T\",\n        \"Siemens Magnetom Espree 1.5T\",\n        \"Siemens Magnetom Prisma 3T\",\n        \"Siemens Magnetom Prisma Fit 3T\",\n        \"Siemens Magnetom Skyra 3T\",\n        \"Siemens Magnetom Trio 3T\",\n        \"Siemens Magnetom Verio 3T\",\n        \"Spectramax M Series\",\n        \"TOOsonix System ONE-M\",\n        \"Toshiba Vantage Titan 1.5T\",\n        \"Varioskan LUX\",\n        \"Vectra H1 3D Imaging System\",\n        \"Ventana Benchmark XT\",\n        \"Vevo 3100 Imaging System\",\n        \"XF24 Extracellular Flux Analyzer\",\n        \"Zeiss LSM\",\n        \"Zeiss LSM 700\",\n        \"Zeiss LSM 980\",\n        \"Zeno Electronic Walkway\",\n        \"ZetaView\"\n      ],\n      \"title\": \"platform\",\n      \"type\": \"string\"\n    },\n    \"readDepth\": {\n      \"description\": \"If available, the coverage statistic as output from bedtools coverage or samtools stats.\",\n      \"type\": \"integer\",\n      \"title\": \"readDepth\"\n    },\n    \"readLength\": {\n      \"description\": \"Number of base pairs (bp) sequenced for a read\",\n      \"type\": \"integer\",\n      \"title\": \"readLength\"\n    },\n    \"readPair\": {\n      \"description\": \"The read of origin, Read 1 or Read 2\",\n      \"maximum\": 2,\n      \"minimum\": 1,\n      \"type\": \"integer\",\n      \"title\": \"readPair\"\n    },\n    \"resourceType\": {\n      \"description\": \"Resource classes. Most resource entities expected to be some type of \\\"experimental data\\\" and further specified via `dataType`.\",\n      \"enum\": [\n        \"experimentalData\",\n        \"metadata\",\n        \"protocol\",\n        \"report\",\n        \"result\",\n        \"tool\",\n        \"weblink\",\n        \"workflow report\"\n      ],\n      \"title\": \"resourceType\",\n      \"type\": \"string\"\n    },\n    \"runType\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"pairedEnd\",\n        \"singleEnd\"\n      ],\n      \"title\": \"runType\",\n      \"type\": \"string\"\n    },\n    \"sex\": {\n      \"description\": \"Phenotypic expression of chromosomal makeup that defines a study subject as male, female, or other.\",\n      \"type\": \"string\",\n      \"enum\": [\n        \"Female\",\n        \"Male\",\n        \"Unknown\",\n        \"Not Applicable\"\n      ],\n      \"title\": \"sex\"\n    },\n    \"species\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"Danio rerio\",\n        \"Drosophila melanogaster\",\n        \"Gallus gallus\",\n        \"Homo sapiens\",\n        \"Mus musculus\",\n        \"Mus musculus (humanized)\",\n        \"Oryctolagus cuniculus\",\n        \"Pan troglodytes\",\n        \"Rattus norvegicus\",\n        \"Rhesus macaque\",\n        \"Sus scrofa\"\n      ],\n      \"title\": \"species\",\n      \"type\": \"string\"\n    },\n    \"specimenID\": {\n      \"description\": \"A unique identifier (non-PII) that represents the subspecimen (subsample) from which the data came,  e.g. an ID that distinguishes between different parts of the same parent tumor specimen.\\n\",\n      \"type\": \"string\",\n      \"title\": \"specimenID\"\n    },\n    \"specimenPreparationMethod\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"Cryopreserved\",\n        \"FFPE\",\n        \"Flash frozen\",\n        \"Fresh collected\",\n        \"OCT\",\n        \"RNAlater\",\n        \"Viably frozen\",\n        \"ethanol\",\n        \"formalin-fixed\"\n      ],\n      \"title\": \"specimenPreparationMethod\",\n      \"type\": \"string\"\n    },\n    \"specimenType\": {\n      \"description\": \"The type of a material sample taken from a biological entity for testing, diagnostic, propagation, treatment or research purposes. This includes particular types of cellular molecules, cells, tissues, organs, body fluids, embryos, and body excretory substances.\\n\",\n      \"type\": \"string\",\n      \"enum\": [\n        \"Buccal Mucosa\",\n        \"Buffy Coat\",\n        \"CDX tissue\",\n        \"Dorsal Root Ganglion\",\n        \"PDX tissue\",\n        \"blood\",\n        \"bone marrow\",\n        \"cerebral cortex\",\n        \"connective tissue\",\n        \"embryonic tissue\",\n        \"meninges\",\n        \"microtissue\",\n        \"nerve tissue\",\n        \"optic nerve\",\n        \"organoid\",\n        \"plasma\",\n        \"primary tumor\",\n        \"retina\",\n        \"sciatic nerve\",\n        \"serum\",\n        \"spheroid\",\n        \"splenocyte\",\n        \"tumor-adjacent normal\",\n        \"whole brain\",\n        \"mucus\",\n        \"saliva\",\n        \"stool\",\n        \"sweat\",\n        \"urine\"\n      ],\n      \"title\": \"specimenType\"\n    },\n    \"targetDepth\": {\n      \"description\": \"The targeted read depth prior to sequencing.\",\n      \"type\": \"string\",\n      \"title\": \"targetDepth\"\n    },\n    \"tumorType\": {\n      \"description\": \"\",\n      \"enum\": [\n        \"ANNUBP\",\n        \"Anaplastic Astrocytoma\",\n        \"Anaplastic Ganglioglioma\",\n        \"Anaplastic Pilocytic Astrocytoma\",\n        \"Anaplastic Pleomorphic Xanthoastrocytoma\",\n        \"Atypical Neurofibroma\",\n        \"Atypical Pilocytic Astrocytoma\",\n        \"Cellular Neurofibroma\",\n        \"Colorectal Adenocarcinoma\",\n        \"Colorectal Carcinoma\",\n        \"Cutaneous Neurofibroma\",\n        \"Diffuse Astrocytoma\",\n        \"Diffuse Infiltrating Neurofibroma\",\n        \"Fibromatosis\",\n        \"Fibrosarcoma\",\n        \"Ganglioglioma\",\n        \"Glioblastoma\",\n        \"Glioblastoma Multiforme\",\n        \"Glioma\",\n        \"Hemorrhagic Neoplasm\",\n        \"High-Grade Glioma NOS\",\n        \"Juvenile Myelomonocytic Leukemia\",\n        \"Localized Neurofibroma\",\n        \"Low-Grade Glioma NOS\",\n        \"Malignant Peripheral Nerve Sheath Tumor\",\n        \"Massive Soft Tissue Neurofibroma\",\n        \"Melanoma\",\n        \"Meningioma\",\n        \"NF1-Associated Tumor\",\n        \"NF2-Associated Tumor\",\n        \"Necrotic Neoplasm\",\n        \"Neurofibroma\",\n        \"Neurofibroma with Degenerative Atypia\",\n        \"Nodular Neurofibroma\",\n        \"Not Applicable\",\n        \"Oligoastrocytoma\",\n        \"Optic Pathway Glioma\",\n        \"Pilocytic Astrocytoma\",\n        \"Pilomyxoid Astrocytoma\",\n        \"Pleomorphic Xanthoastrocytoma\",\n        \"Plexiform Neurofibroma\",\n        \"Recurrent MPNST\",\n        \"Sarcoma\",\n        \"Schwannoma\",\n        \"Subcutaneous Neurofibroma\",\n        \"Teratoma\",\n        \"Unknown\",\n        \"metastatic tumor\",\n        \"metastatic/recurrent tumor\",\n        \"recurrent tumor\",\n        \"tumor\"\n      ],\n      \"title\": \"tumorType\",\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"libraryStrand\",\n    \"libraryPreparationMethod\",\n    \"specimenID\",\n    \"tumorType\",\n    \"platform\",\n    \"specimenPreparationMethod\",\n    \"fileFormat\",\n    \"resourceType\",\n    \"dataType\",\n    \"dataSubtype\",\n    \"assay\",\n    \"individualID\",\n    \"species\",\n    \"diagnosis\"\n  ],\n  \"title\": \"RNASeqTemplate\",\n  \"type\": \"object\"\n}\\n\\nOpenAPI Specification:\\n{\n  \"openapi\": \"3.0.1\",\n  \"info\": {\n    \"title\": \"...\",\n    \"version\": \"v1\"\n  },\n  \"paths\": {\n    \"/repo/v1/grid/json-schema\": {\n      \"get\": {\n        \"tags\": [\n          \"GridAgent\"\n        ],\n        \"description\": \"Call to get the JSON schema associated with the grid session used for row validation.\",\n        \"operationId\": \"get_repo_v1_grid_json-schema\",\n        \"parameters\": [],\n        \"responses\": {\n          \"200\": {\n            \"description\": \"The JSON schema used to validate the rows of the grid session.\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n                }\n              }\n            }\n          }\n        }\n      }\n    },\n    \"/repo/v1/grid/feature/request\": {\n      \"put\": {\n        \"tags\": [\n          \"GridAgent\"\n        ],\n        \"description\": \"Submit a feature request to enhance Grid Agent capabilities for tabular data curation. Agents can specify the desired functionality, category, priority level, use case, and target user role.\",\n        \"operationId\": \"put_repo_v1_grid_feature_request\",\n        \"parameters\": [],\n        \"requestBody\": {\n          \"content\": {\n            \"application/json\": {\n              \"schema\": {\n                \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.AgentFeatureRequest\"\n              }\n            }\n          },\n          \"required\": true\n        },\n        \"responses\": {\n          \"204\": {\n            \"description\": \"Void\"\n          }\n        }\n      }\n    },\n    \"/repo/v1/grid/query\": {\n      \"put\": {\n        \"tags\": [\n          \"GridAgent\"\n        ],\n        \"description\": \"Use this function to query grid data using structured filter objects. CRITICAL: The 'query' parameter must be valid JSON with all strings enclosed in double quotes. Example to query for all columns and rows: {\\\"columnSelection\\\":[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.SelectAll\\\"}],\\\"limit\\\":10}. Do not use unquoted property names or string values.\",\n        \"operationId\": \"put_repo_v1_grid_query\",\n        \"parameters\": [],\n        \"requestBody\": {\n          \"content\": {\n            \"application/json\": {\n              \"schema\": {\n                \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.QueryRequest\"\n              }\n            }\n          },\n          \"required\": true\n        },\n        \"responses\": {\n          \"200\": {\n            \"description\": \"The query results.\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.QueryResult\"\n                }\n              }\n            }\n          }\n        }\n      }\n    },\n    \"/repo/v1/grid/update\": {\n      \"put\": {\n        \"tags\": [\n          \"GridAgent\"\n        ],\n        \"description\": \"Apply one or more column updates to selected grid rows (SQL UPDATE style). The request provides: - set: Required array of assignments (each with a columnName and a JSON value). Each value is applied uniformly to all targeted rows; use null to clear a column. - filters: Optional list of row filters (logical AND) defining which rows are eligible. If omitted, all rows are considered. - limit: Optional cap on how many matching rows are actually updated (must be >=1 and <=100). Response includes: - rowsUpdated: Number of rows actually modified (after any limit). Use this function for batch edits, normalization, clearing values, or correcting data across multiple rows in one operation.\",\n        \"operationId\": \"put_repo_v1_grid_update\",\n        \"parameters\": [],\n        \"requestBody\": {\n          \"content\": {\n            \"application/json\": {\n              \"schema\": {\n                \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.update.GridUpdateRequest\"\n              }\n            }\n          },\n          \"required\": true\n        },\n        \"responses\": {\n          \"200\": {\n            \"description\": \"Summary of the update outcome.\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.update.GridUpdateResponse\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"org.sagebionetworks.repo.model.grid.query.Filter\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Must be a properly quoted JSON string matching one of: \\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIdFilter\\\"\"\n          }\n        },\n        \"description\": \"All filter objects must use valid JSON syntax with double quotes around all strings. There are five different types of filters that can be applied to a grid query. For example, a filter to find all rows where column named: 'someInt' has a value greater than 12, the following filter would be used:[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\",\\\"columnName\\\":\\\"someInt\\\",\\\"operator\\\":\\\"GREATER_THAN\\\",\\\"value\\\":[12]}]. In order to find all rows with a JSON schema validation error use the following filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\",\\\"value\\\":false}].  In order to find all rows with JSON schema validation error message that indicates the wrong type was provided, you could use the filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\",\\\"operator\\\":\\\"LIKE\\\",\\\"validationResultValue\\\":\\\"%expected type%\\\"}]. In order to find all rows that are currently selected by the user, you would use the following filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\",\\\"isSelected\\\":true}].\",\n        \"oneOf\": [\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.CellValueFilter\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.RowIdFilter\"\n          }\n        ],\n        \"required\": [\n          \"concreteType\"\n        ],\n        \"discriminator\": {\n          \"propertyName\": \"concreteType\"\n        }\n      },\n      \"org.sagebionetworks.repo.model.grid.query.result.QueryResult\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"selectColumns\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.SelectColumn\",\n              \"description\": \"Information about a single selected column.\"\n            },\n            \"description\": \"Information about the selected columns.\"\n          },\n          \"rows\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.Row\",\n              \"description\": \"A single row of a grid query result.\"\n            },\n            \"description\": \"A single page of rows.\"\n          }\n        },\n        \"description\": \"Results of a query against a grid session.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.update.TemplateSetValue\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.update.TemplateSetValue\"\n            ]\n          },\n          \"columnName\": {\n            \"type\": \"string\",\n            \"description\": \"Target column name to update.\"\n          },\n          \"sourceTemplate\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Template string with column placeholders in {columnName} format. Example: '{firstName} {lastName}' concatenates two columns with a space. Invalid column names in placeholders will trigger onMissingValue behavior.\"\n          },\n          \"pattern\": {\n            \"type\": \"string\",\n            \"description\": \"Optional. A Java-compatible regex pattern to apply to the intermediate string generated by 'sourceTemplate'.\"\n          },\n          \"replacement\": {\n            \"type\": \"string\",\n            \"description\": \"Optional. The replacement string using regex capture group references ($1, $2, etc.). Only used when 'pattern' is provided. Examples: '$1-$2' to join groups with a dash, '$2-group-$1' to reorder. If 'pattern' is specified without 'replacement', defaults to '$1' (extracts first capture group).\"\n          },\n          \"onMatchFailure\": {\n            \"type\": \"string\",\n            \"description\": \"Action if 'pattern' is provided but does not match. SET_NULL sets the value to NULL. SET_UNDEFINED removes the key from the JSON object. SKIP_UPDATE leaves the existing value unchanged.\",\n            \"enum\": [\n              \"SET_NULL\",\n              \"SET_UNDEFINED\",\n              \"SKIP_UPDATE\"\n            ]\n          },\n          \"onMissingValue\": {\n            \"type\": \"string\",\n            \"description\": \"Action if a column referenced in 'sourceTemplate' is null/undefined. SET_NULL sets the value to NULL. SET_UNDEFINED removes the key from the JSON object. SKIP_UPDATE leaves the existing value unchanged. USE_EMPTY_STRING replaces the missing value with '' (empty string) when interpolating the template.\",\n            \"enum\": [\n              \"SET_NULL\",\n              \"SET_UNDEFINED\",\n              \"SKIP_UPDATE\",\n              \"USE_EMPTY_STRING\"\n            ]\n          }\n        },\n        \"description\": \"Sets a column's value by composing a string from a source template, then optionally applying a regex-replace to that intermediate string.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.update.GridUpdateRequest\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"updateBatch\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.update.Update\",\n              \"description\": \"Request to update one or more cells in a grid (SQL UPDATE style).\"\n            },\n            \"description\": \"A batch containing one or more cell updates to apply to the grid. All updates in the batch are processed together.\"\n          }\n        },\n        \"description\": \"Request to update one or more cells of the current grid session in a single batch operation.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.query.function.CountStar\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.function.CountStar\"\n            ]\n          }\n        },\n        \"description\": \"Use this to count the total number of rows that match the query. For example, for a user request like 'how many rows are there in total?', select this item. The alias property can be used to name the resulting count column.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\"\n            ]\n          },\n          \"columnName\": {\n            \"type\": \"string\",\n            \"description\": \"Target column name to update.\"\n          },\n          \"value\": {\n            \"description\": \"Literal JSON value to assign to the field in each target document: string, number, boolean, object, array, or null. Omit the \\\"value\\\" property to remove/unset the field (`undefined`); include `\\\"value\\\": null` to store JSON null. Must be a literal constant \\u2014 no SQL or expressions; value is bound and stored as-is.\"\n          }\n        },\n        \"description\": \"Represents a single column assignment (one entry of the SQL SET clause).\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.query.result.ValidationResults\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"isValid\": {\n            \"type\": \"boolean\",\n            \"description\": \"Will be 'true' if the row is valid according to the JSON schema. Will be 'false' when the row is invalid.\"\n          },\n          \"validationErrorMessage\": {\n            \"type\": \"string\",\n            \"description\": \"If the object is not valid according to the schema, a simple one line error message will be provided.\"\n          },\n          \"allValidationMessages\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            },\n            \"description\": \"If the object is not valid according to the schema, a the flat list of error messages will be provided with one error message per sub-schema.\"\n          }\n        },\n        \"description\": \"Results of a grid row against a JSON schema\"\n      },\n      \"org.sagebionetworks.repo.model.schema.JsonSchema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"$schema\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.1.1\\\">The \\\"$schema\\\" Keyword</a>\"\n          },\n          \"$id\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.2.2\\\">The \\\"$id\\\" Keyword</a>\"\n          },\n          \"$ref\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.2.4.1\\\">Direct References with \\\"$ref\\\"</a>\"\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.2.1\\\">Instance Data Model</a>\",\n            \"enum\": [\n              \"null\",\n              \"boolean\",\n              \"object\",\n              \"array\",\n              \"number\",\n              \"string\",\n              \"integer\"\n            ]\n          },\n          \"items\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n          },\n          \"properties\": {\n            \"type\": \"object\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.3.2.1\\\">properties</a>\",\n            \"additionalProperties\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n            }\n          },\n          \"title\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-hypermedia.html#rfc.section.6.5.1\\\">title</a>\"\n          },\n          \"description\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-hypermedia.html#rfc.section.6.5.2\\\">description</a>\"\n          },\n          \"allOf\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n            },\n            \"description\": \"Use allOf to 'extend' or 'implement' one or more schemas.  See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.2.1.1\\\">allOf</a>\"\n          },\n          \"anyOf\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n            },\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.2.1.2\\\">anyOf</a>\"\n          },\n          \"oneOf\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n            },\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9.2.1.3\\\">oneOf</a>\"\n          },\n          \"not\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n          },\n          \"format\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.7.3\\\">Defined Formats</a>\"\n          },\n          \"definitions\": {\n            \"type\": \"object\",\n            \"description\": \"In an effor to support draft-07 implementations, we are using 'definitions' instead of '$defs'.  See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.appendix.A\\\">Appendix A</a>\",\n            \"additionalProperties\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n            }\n          },\n          \"enum\": {\n            \"type\": \"array\",\n            \"items\": {},\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.1.2\\\">enum</a>\"\n          },\n          \"const\": {\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.1.3\\\">const</a>\"\n          },\n          \"source\": {\n            \"type\": \"string\",\n            \"description\": \"Used to indicate that this schema is derived from another object/schema.  The value should be a URL reference to the original work.  The 'source' is solely descriptive and should have no impact on validation.\"\n          },\n          \"required\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            },\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.5.3\\\">required</a>\"\n          },\n          \"maxLength\": {\n            \"type\": \"integer\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.1\\\">maxLength</a>\",\n            \"format\": \"int32\"\n          },\n          \"minLength\": {\n            \"type\": \"integer\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.2\\\">minLength</a>\",\n            \"format\": \"int32\"\n          },\n          \"maxItems\": {\n            \"type\": \"integer\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.1\\\">maxItems</a>\",\n            \"format\": \"int32\"\n          },\n          \"minItems\": {\n            \"type\": \"integer\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.2\\\">minItems</a>\",\n            \"format\": \"int32\"\n          },\n          \"uniqueItems\": {\n            \"type\": \"boolean\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.4.3\\\">uniqueItems</a>\"\n          },\n          \"pattern\": {\n            \"type\": \"string\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.3.3\\\">pattern</a>\"\n          },\n          \"if\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n          },\n          \"then\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n          },\n          \"else\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n          },\n          \"maximum\": {\n            \"type\": \"integer\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.2\\\">maximum</a>\",\n            \"format\": \"int32\"\n          },\n          \"minimum\": {\n            \"type\": \"integer\",\n            \"description\": \"See: <a href=\\\"https://tools.ietf.org/html/draft-handrews-json-schema-validation-02#section-6.2.4\\\">minimum</a>\",\n            \"format\": \"int32\"\n          },\n          \"default\": {\n            \"description\": \"See: <a href=\\\"https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.9.2\\\">default</a>\"\n          },\n          \"contains\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n          },\n          \"additionalProperties\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.schema.JsonSchema\"\n          }\n        },\n        \"description\": \"The JSON schema is defined by: <a href=\\\"https://json-schema.org/\\\">json-schema.org</a>, specifically draft-07.  Only features listed here are currently supported.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Must be a properly quoted JSON string matching one of: \\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIdFilter\\\"\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\"\n            ]\n          },\n          \"columnName\": {\n            \"type\": \"string\",\n            \"description\": \"Required. The name of the column to filter by.\"\n          },\n          \"operator\": {\n            \"type\": \"string\",\n            \"description\": \"The comparison operator.\",\n            \"enum\": [\n              \"EQUALS\",\n              \"NOT_EQUALS\",\n              \"GREATER_THAN\",\n              \"LESS_THAN\",\n              \"GREATER_THAN_OR_EQUALS\",\n              \"LESS_THAN_OR_EQUALS\",\n              \"IN\",\n              \"NOT_IN\",\n              \"LIKE\",\n              \"NOT_LIKE\",\n              \"IS_NULL\",\n              \"IS_NOT_NULL\",\n              \"IS_UNDEFINED\",\n              \"IS_DEFINED\"\n            ]\n          },\n          \"value\": {\n            \"description\": \"A filter used to select rows based on a specific column's cell value. Use operators like 'EQUALS' or 'LIKE' with the 'value' property for standard comparisons. The 'IS_NULL' operator can be used to find `null` values. The `IS_UNDEFINED` operator can be used to find `undefined` values. When using IN or NOT_IN operators, `value` should be an array of values to compare against. When using either 'LIKE' or 'NOT_LIKE', the wildcard character: '%' is used to represents zero or more characters, and '_' is used to represent a single character.\"\n          }\n        },\n        \"description\": \"A filter used to select rows based on cell values. For example, to handle a user request like 'find all rows where the Project column is Alpha', you would set 'columnName' to 'Project', 'operator' to 'EQUALS', and 'value' to ['Alpha']\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.query.SelectItem\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\"\n          }\n        },\n        \"description\": \"A generic select item.\",\n        \"oneOf\": [\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectAll\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectSelection\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.function.CountStar\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectByName\"\n          }\n        ],\n        \"required\": [\n          \"concreteType\"\n        ],\n        \"discriminator\": {\n          \"propertyName\": \"concreteType\"\n        }\n      },\n      \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Must be a properly quoted JSON string matching one of: \\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIdFilter\\\"\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.RowIdFilter\"\n            ]\n          },\n          \"rowIdsIn\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            },\n            \"description\": \"Array of explicit row IDs. The result will include any row whose ID appears in this list (logical OR). Provide only IDs previously obtained from a grid query. Omit this filter if you do not know the IDs. Do not include duplicates or IDs not present in the current grid.\"\n          }\n        },\n        \"description\": \"Row ID inclusion filter. Use when you need to operate on specific existing rows by their explicit row IDs obtained from a prior grid query (e.g., an update). The filter matches any row whose ID is in the provided list (logical OR semantics). Do not use for pattern matching or broad selection; supply only the exact row IDs you intend to modify or retrieve.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.update.GridUpdateResponse\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"updateResults\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"integer\",\n              \"format\": \"int32\"\n            },\n            \"description\": \"Number of rows updated for each update in the batch, in the same order as the request. Each element corresponds to one update operation.\"\n          },\n          \"totalRowsUpdated\": {\n            \"type\": \"integer\",\n            \"description\": \"Total number of rows updated across all updates in the batch.\",\n            \"format\": \"int32\"\n          }\n        },\n        \"description\": \"Response summarizing the outcome of a grid update operation.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Must be a properly quoted JSON string matching one of: \\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIdFilter\\\"\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\"\n            ]\n          },\n          \"value\": {\n            \"type\": \"boolean\",\n            \"description\": \"Set to 'true' to find rows that are valid according to the schema. Set to 'false' to find rows that are invalid and have validation errors.'\"\n          }\n        },\n        \"description\": \"Use this filter for simple requests to find all 'valid' or 'invalid' rows based on their overall validation status.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.query.SelectByName\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.SelectByName\"\n            ]\n          },\n          \"columnName\": {\n            \"type\": \"string\",\n            \"description\": \"The name of the column to include in the select.\"\n          }\n        },\n        \"description\": \"A SelectItem that will result in the selection of a single column by its name.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Must be a properly quoted JSON string matching one of: \\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIdFilter\\\"\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\"\n            ]\n          },\n          \"operator\": {\n            \"type\": \"string\",\n            \"description\": \"The comparison operator.\",\n            \"enum\": [\n              \"LIKE\",\n              \"NOT_LIKE\"\n            ]\n          },\n          \"validationResultValue\": {\n            \"type\": \"string\",\n            \"description\": \"A validation result value.  For wildcards use '%' to represents zero or more characters, and '_' to represents a single character.  For example, LIKE '%expected type: String, found%' would match rows with a validation result that contains the message: 'expected type: String, found'. Use the 'NOT_LIKE' operator to find all rows that do not have a validation message matching the provided 'validationResultValue'.\"\n          }\n        },\n        \"description\": \"Use this filter to find rows that have data quality issues or schema validation errors. This is ideal for requests about finding 'errors', 'invalid data', or 'rows that failed validation'. To find rows with a specific error message, set the 'operator' to 'LIKE' and provide the error text in 'validationResultValue'. For example, for a user request like 'show me all rows with a type error', a good value for 'validationResultValue' would be '%expected type:%'.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.query.Query\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"columnSelection\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.SelectItem\",\n              \"description\": \"A generic select item.\"\n            },\n            \"description\": \"One or more SelectItem is required to define the columns that will be returned by this query.  Each SelectItem must be a complete JSON object with the required 'concreteType' property. IMPORTANT: Do not use SQL syntax - use the predefined SelectItem objects. Examples: To select all columns: {\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid..query.SelectAll\\\"}. To select the count of the number of rows use: {\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.function.CountStar\\\"}\"\n          },\n          \"filters\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.Filter\",\n              \"description\": \"All filter objects must use valid JSON syntax with double quotes around all strings. There are five different types of filters that can be applied to a grid query. For example, a filter to find all rows where column named: 'someInt' has a value greater than 12, the following filter would be used:[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\",\\\"columnName\\\":\\\"someInt\\\",\\\"operator\\\":\\\"GREATER_THAN\\\",\\\"value\\\":[12]}]. In order to find all rows with a JSON schema validation error use the following filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\",\\\"value\\\":false}].  In order to find all rows with JSON schema validation error message that indicates the wrong type was provided, you could use the filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\",\\\"operator\\\":\\\"LIKE\\\",\\\"validationResultValue\\\":\\\"%expected type%\\\"}]. In order to find all rows that are currently selected by the user, you would use the following filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\",\\\"isSelected\\\":true}].\"\n            },\n            \"description\": \"Optional. Each filter must be a complete JSON object with the required 'concreteType' property. IMPORTANT: Do not use SQL syntax - use the predefined filter objects. Examples: To find invalid rows: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\",\\\"value\\\":false}]. To find rows where 'age' > 25: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\",\\\"columnName\\\":\\\"age\\\",\\\"operator\\\":\\\"GREATER_THAN\\\",\\\"value\\\":[25]}]. Multiple filters are combined with AND logic.\"\n          },\n          \"limit\": {\n            \"type\": \"integer\",\n            \"description\": \"Required. Limit of the number of rows returned to avoid loading more data than needed into your context window.\",\n            \"format\": \"int32\"\n          },\n          \"offset\": {\n            \"type\": \"integer\",\n            \"description\": \"Optional. specifies the offset of the first row to return.\",\n            \"format\": \"int32\"\n          }\n        },\n        \"description\": \"Defines a structured query using JSON SelectItems and Filters objects - NOT SQL syntax. Use the predefined SelectItems and Filters with specific concreteType values.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.query.QueryRequest\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"query\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.Query\",\n            \"description\": \"Defines a structured query using JSON SelectItems and Filters objects - NOT SQL syntax. Use the predefined SelectItems and Filters with specific concreteType values.\"\n          }\n        },\n        \"description\": \"Request to run a query.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.update.Update\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"set\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.update.SetValue\",\n              \"description\": \"\"\n            },\n            \"description\": \"Required. Array representing the SQL SET clause; each object specifies a target column and the literal value to assign for all selected rows.\"\n          },\n          \"filters\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.Filter\",\n              \"description\": \"All filter objects must use valid JSON syntax with double quotes around all strings. There are five different types of filters that can be applied to a grid query. For example, a filter to find all rows where column named: 'someInt' has a value greater than 12, the following filter would be used:[{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\",\\\"columnName\\\":\\\"someInt\\\",\\\"operator\\\":\\\"GREATER_THAN\\\",\\\"value\\\":[12]}]. In order to find all rows with a JSON schema validation error use the following filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\",\\\"value\\\":false}].  In order to find all rows with JSON schema validation error message that indicates the wrong type was provided, you could use the filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\",\\\"operator\\\":\\\"LIKE\\\",\\\"validationResultValue\\\":\\\"%expected type%\\\"}]. In order to find all rows that are currently selected by the user, you would use the following filter: [{\\\"concreteType\\\":\\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\",\\\"isSelected\\\":true}].\"\n            },\n            \"description\": \"Optional. Array of Filter objects selecting the rows to update (acts like the SQL WHERE clause). If omitted, all rows are eligible. Multiple filters are combined with logical AND. Use when the user constrains target rows (e.g., \\\"where columnThree is null\\\" or \\\"only rows with status='ACTIVE'\\\").\"\n          },\n          \"limit\": {\n            \"type\": \"integer\",\n            \"description\": \"Optional. Maximum number of matching rows to update (analogous to SQL LIMIT). Use only when the user explicitly requests a cap (e.g., limit 10). If omitted, all filtered rows are updated. Valid range: 1-100.\",\n            \"format\": \"int32\"\n          }\n        },\n        \"description\": \"Request to update one or more cells in a grid (SQL UPDATE style).\"\n      },\n      \"org.sagebionetworks.repo.model.grid.query.result.SelectColumn\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"columnName\": {\n            \"type\": \"string\",\n            \"description\": \"The name of the column.  Will be the alias if one is provide in the select item.\"\n          }\n        },\n        \"description\": \"Information about a single selected column.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.AgentFeatureRequest\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"featureDescription\": {\n            \"type\": \"string\",\n            \"description\": \"Detailed description of the requested function and how it would help with tabular data curation.\",\n            \"maxLength\": 1000,\n            \"minLength\": 10\n          },\n          \"category\": {\n            \"type\": \"string\",\n            \"description\": \"Category of the requested feature for better organization and prioritization.\",\n            \"enum\": [\n              \"data_cleaning\",\n              \"data_transformation\",\n              \"data_validation\",\n              \"data_analysis\",\n              \"visualization\",\n              \"import_export\",\n              \"collaboration\",\n              \"automation\",\n              \"other\"\n            ]\n          },\n          \"priority\": {\n            \"type\": \"string\",\n            \"description\": \"Suggested priority level for the feature request.\",\n            \"enum\": [\n              \"low\",\n              \"medium\",\n              \"high\",\n              \"critical\"\n            ]\n          },\n          \"useCase\": {\n            \"type\": \"string\",\n            \"description\": \"Specific use case or scenario where this feature would be beneficial.\",\n            \"maxLength\": 500\n          },\n          \"userRole\": {\n            \"type\": \"string\",\n            \"description\": \"Role or type of user who would benefit from this feature (e.g., data analyst, researcher, business user).\",\n            \"maxLength\": 100\n          }\n        },\n        \"description\": \"Request for a new function to enhance Agent capabilities for tabular data curation.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.query.result.Row\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"data\": {\n            \"description\": \"The JSON object representing a single row.\"\n          },\n          \"validationResults\": {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.query.result.ValidationResults\",\n            \"description\": \"Results of a grid row against a JSON schema\"\n          },\n          \"rowId\": {\n            \"type\": \"string\",\n            \"description\": \"Logical timestamp identifying the row in compact form `replicaId.sequenceNumber` (e.g. `123.456`). Used in filters (RowIdFilter) and patch/update operations.\"\n          }\n        },\n        \"description\": \"A single row of a grid query result.\"\n      },\n      \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Must be a properly quoted JSON string matching one of: \\\"org.sagebionetworks.repo.model.grid.query.RowValidationResultFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\\\", \\\"org.sagebionetworks.repo.model.grid.query.RowIdFilter\\\"\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\"\n            ]\n          },\n          \"isSelected\": {\n            \"type\": \"boolean\",\n            \"description\": \"When true, only rows that the user has selected will be returned.  When false, rows that the user has selected with be excluded.  This filter should be excluded to ignore the user's row selection. \"\n          }\n        },\n        \"description\": \"Use this filter to narrow down results based on rows the user has actively selected in the interface. For user requests like 'show me only my selected items' or 'run this analysis on the rows I've checked', set the 'isSelected' property to true. For requests to see the opposite, like 'show me the unselected rows', set 'isSelected' to false. If the user makes no mention of selected items, do not include this filter in the query.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.query.SelectAll\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.SelectAll\"\n            ]\n          }\n        },\n        \"description\": \"A SelectItem that will result in the selection of all columns.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.query.SelectSelection\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\",\n            \"enum\": [\n              \"org.sagebionetworks.repo.model.grid.query.SelectSelection\"\n            ]\n          }\n        },\n        \"description\": \"A SelectItem that will result in the selection of the columns the user has actively selected in the interface.\",\n        \"required\": [\n          \"concreteType\"\n        ]\n      },\n      \"org.sagebionetworks.repo.model.grid.update.SetValue\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"concreteType\": {\n            \"type\": \"string\",\n            \"description\": \"Required. Full name of the exact type used.\"\n          },\n          \"columnName\": {\n            \"type\": \"string\",\n            \"description\": \"Target column name to update.\"\n          }\n        },\n        \"description\": \"\",\n        \"oneOf\": [\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.update.LiteralSetValue\"\n          },\n          {\n            \"$ref\": \"#/components/schemas/org.sagebionetworks.repo.model.grid.update.TemplateSetValue\"\n          }\n        ],\n        \"required\": [\n          \"concreteType\"\n        ],\n        \"discriminator\": {\n          \"propertyName\": \"concreteType\"\n        }\n      }\n    }\n  }\n}",
+  "temperature": 0.0,
+  "thinking": false,
+  "tools": [],
+  "timestamp": "2025-12-11T04:47:37.865040",
+  "task_result": {
+    "task_name": "grid_request",
+    "num_samples": 20,
+    "results": [
+      {
+        "sample_index": 0,
+        "input": {
+          "id": "Q01",
+          "user_ask": "How many records are there in total?"
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.function.CountStar\"}], \"limit\": 1}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30804,
+            "outputTokens": 42,
+            "totalTokens": 30846
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "14fcafeb-675c-4186-b33f-9c424f33c5b8",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:44:03 GMT",
+                "content-type": "application/json",
+                "content-length": "345",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "14fcafeb-675c-4186-b33f-9c424f33c5b8"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.function.CountStar\"}], \"limit\": 1}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30804,
+              "outputTokens": 42,
+              "totalTokens": 30846
+            },
+            "metrics": {
+              "latencyMs": 6864
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "Q01",
+          "type": "query",
+          "complexity": "low",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.function.CountStar\"}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30804,
+          "output_tokens": 42,
+          "total_tokens": 30846
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 1,
+        "input": {
+          "id": "Q02",
+          "user_ask": "Show me all the data for humans."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"EQUALS\", \"value\": [\"Homo sapiens\"]}], \"limit\": 100}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30804,
+            "outputTokens": 94,
+            "totalTokens": 30898
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "76500268-bd95-4480-8efd-5470c5ac3d6d",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:44:12 GMT",
+                "content-type": "application/json",
+                "content-length": "522",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "76500268-bd95-4480-8efd-5470c5ac3d6d"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"EQUALS\", \"value\": [\"Homo sapiens\"]}], \"limit\": 100}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30804,
+              "outputTokens": 94,
+              "totalTokens": 30898
+            },
+            "metrics": {
+              "latencyMs": 8928
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "Q02",
+          "type": "query",
+          "complexity": "low",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"species\",\"operator\":\"EQUALS\",\"value\":[\"Homo sapiens\"]}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30804,
+          "output_tokens": 94,
+          "total_tokens": 30898
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 2,
+        "input": {
+          "id": "Q03",
+          "user_ask": "I want to see everything except for the mouse data."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"NOT_EQUALS\", \"value\": [\"Mus musculus\"]}], \"limit\": 10}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30807,
+            "outputTokens": 96,
+            "totalTokens": 30903
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "41eb5850-7ee3-4afe-b9f3-8d0918317a8b",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:44:21 GMT",
+                "content-type": "application/json",
+                "content-length": "525",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "41eb5850-7ee3-4afe-b9f3-8d0918317a8b"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"NOT_EQUALS\", \"value\": [\"Mus musculus\"]}], \"limit\": 10}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30807,
+              "outputTokens": 96,
+              "totalTokens": 30903
+            },
+            "metrics": {
+              "latencyMs": 9173
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "Q03",
+          "type": "query",
+          "complexity": "low",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"species\",\"operator\":\"NOT_EQUALS\",\"value\":[\"Mus musculus\"]}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30807,
+          "output_tokens": 96,
+          "total_tokens": 30903
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 3,
+        "input": {
+          "id": "Q04",
+          "user_ask": "Show me the data for the currently selected row."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"isSelected\": true}], \"limit\": 1}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30806,
+            "outputTokens": 76,
+            "totalTokens": 30882
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "99763433-16c3-42df-9dd2-21e297bbe86a",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:44:29 GMT",
+                "content-type": "application/json",
+                "content-length": "459",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "99763433-16c3-42df-9dd2-21e297bbe86a"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\", \"isSelected\": true}], \"limit\": 1}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30806,
+              "outputTokens": 76,
+              "totalTokens": 30882
+            },
+            "metrics": {
+              "latencyMs": 8257
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "Q04",
+          "type": "query",
+          "complexity": "low",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowSelectionFilter\",\"isSelected\":true}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30806,
+          "output_tokens": 76,
+          "total_tokens": 30882
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 4,
+        "input": {
+          "id": "Q05",
+          "user_ask": "Given that my data contain human subjects only, find women diagnosed with Neurofibromatosis type 1."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"EQUALS\", \"value\": [\"Homo sapiens\"]}, {\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"sex\", \"operator\": \"EQUALS\", \"value\": [\"Female\"]}, {\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"diagnosis\", \"operator\": \"EQUALS\", \"value\": [\"Neurofibromatosis type 1\"]}], \"limit\": 100}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30817,
+            "outputTokens": 192,
+            "totalTokens": 31009
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "de93841f-d1c6-487e-b66f-9c2af711440e",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:44:42 GMT",
+                "content-type": "application/json",
+                "content-length": "866",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "de93841f-d1c6-487e-b66f-9c2af711440e"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"EQUALS\", \"value\": [\"Homo sapiens\"]}, {\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"sex\", \"operator\": \"EQUALS\", \"value\": [\"Female\"]}, {\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"diagnosis\", \"operator\": \"EQUALS\", \"value\": [\"Neurofibromatosis type 1\"]}], \"limit\": 100}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30817,
+              "outputTokens": 192,
+              "totalTokens": 31009
+            },
+            "metrics": {
+              "latencyMs": 13007
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "id": "Q05",
+          "type": "query",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"sex\",\"operator\":\"EQUALS\",\"value\":[\"Female\"]},{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"diagnosis\",\"operator\":\"EQUALS\",\"value\":[\"Neurofibromatosis type 1\"]}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30817,
+          "output_tokens": 192,
+          "total_tokens": 31009
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 5,
+        "input": {
+          "id": "Q06",
+          "user_ask": "Find all diagnoses that include the word 'Schwannoma'."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectByName\", \"columnName\": \"diagnosis\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"diagnosis\", \"operator\": \"LIKE\", \"value\": [\"%Schwannoma%\"]}], \"limit\": 100}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30809,
+            "outputTokens": 101,
+            "totalTokens": 30910
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "cc2d2eaa-5344-4846-bf7f-f8f72d192ce1",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:44:52 GMT",
+                "content-type": "application/json",
+                "content-length": "557",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "cc2d2eaa-5344-4846-bf7f-f8f72d192ce1"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectByName\", \"columnName\": \"diagnosis\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"diagnosis\", \"operator\": \"LIKE\", \"value\": [\"%Schwannoma%\"]}], \"limit\": 100}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30809,
+              "outputTokens": 101,
+              "totalTokens": 30910
+            },
+            "metrics": {
+              "latencyMs": 9394
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "id": "Q06",
+          "type": "query",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectByName\",\"columnName\":\"diagnosis\"}],\"distinct\":true,\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"diagnosis\",\"operator\":\"LIKE\",\"value\":[\"%Schwannoma%\"]}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30809,
+          "output_tokens": 101,
+          "total_tokens": 30910
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 6,
+        "input": {
+          "id": "Q07",
+          "user_ask": "Show me individuals older than 50."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"age\", \"operator\": \"GREATER_THAN\", \"value\": [50]}], \"limit\": 10}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30805,
+            "outputTokens": 96,
+            "totalTokens": 30901
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "17b7460c-a0bf-4263-95e2-ab7cd355e467",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:45:01 GMT",
+                "content-type": "application/json",
+                "content-length": "509",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "17b7460c-a0bf-4263-95e2-ab7cd355e467"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"age\", \"operator\": \"GREATER_THAN\", \"value\": [50]}], \"limit\": 10}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30805,
+              "outputTokens": 96,
+              "totalTokens": 30901
+            },
+            "metrics": {
+              "latencyMs": 9003
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "Q07",
+          "type": "query",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"age\",\"operator\":\"GREATER_THAN\",\"value\":[50]}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30805,
+          "output_tokens": 96,
+          "total_tokens": 30901
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 7,
+        "input": {
+          "id": "Q08",
+          "user_ask": "Find all records where the genePerturbed is not specified."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"genePerturbed\", \"operator\": \"IS_NULL\"}], \"limit\": 100}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30809,
+            "outputTokens": 90,
+            "totalTokens": 30899
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "bbe0a95f-e22b-474b-bd53-729fac57f34c",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:45:10 GMT",
+                "content-type": "application/json",
+                "content-length": "498",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "bbe0a95f-e22b-474b-bd53-729fac57f34c"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"genePerturbed\", \"operator\": \"IS_NULL\"}], \"limit\": 100}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30809,
+              "outputTokens": 90,
+              "totalTokens": 30899
+            },
+            "metrics": {
+              "latencyMs": 8802
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "Q08",
+          "type": "query",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"genePerturbed\",\"operator\":\"IS_NULL\"}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30809,
+          "output_tokens": 90,
+          "total_tokens": 30899
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 8,
+        "input": {
+          "id": "Q09",
+          "user_ask": "Show me individuals between 20 and 30 years old, sorted by age."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\":{\n  \"columnSelection\":[\n    {\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}\n  ],\n  \"filters\":[\n    {\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n      \"columnName\":\"age\",\n      \"operator\":\"GREATER_THAN_OR_EQUALS\",\n      \"value\":[20]\n    },\n    {\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n      \"columnName\":\"age\",\n      \"operator\":\"LESS_THAN_OR_EQUALS\",\n      \"value\":[30]\n    }\n  ],\n  \"sort\":[\n    {\"columnName\":\"age\",\n      \"direction\":\"ASC\"}\n  ],\n  \"limit\":100\n}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30814,
+            "outputTokens": 204,
+            "totalTokens": 31018
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "d935bcbd-d590-4d65-8e7d-a856f715df7d",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:45:23 GMT",
+                "content-type": "application/json",
+                "content-length": "844",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "d935bcbd-d590-4d65-8e7d-a856f715df7d"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\":{\n  \"columnSelection\":[\n    {\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}\n  ],\n  \"filters\":[\n    {\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n      \"columnName\":\"age\",\n      \"operator\":\"GREATER_THAN_OR_EQUALS\",\n      \"value\":[20]\n    },\n    {\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n      \"columnName\":\"age\",\n      \"operator\":\"LESS_THAN_OR_EQUALS\",\n      \"value\":[30]\n    }\n  ],\n  \"sort\":[\n    {\"columnName\":\"age\",\n      \"direction\":\"ASC\"}\n  ],\n  \"limit\":100\n}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30814,
+              "outputTokens": 204,
+              "totalTokens": 31018
+            },
+            "metrics": {
+              "latencyMs": 13515
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "id": "Q09",
+          "type": "query",
+          "complexity": "high",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"age\",\"operator\":\"GREATER_THAN_OR_EQUALS\",\"value\":[20]},{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"age\",\"operator\":\"LESS_THAN_OR_EQUALS\",\"value\":[30]}],\"orderBy\":[{\"columnName\":\"age\",\"direction\":\"ASC\"}]}}"
+        },
+        "token_usage": {
+          "input_tokens": 30814,
+          "output_tokens": 204,
+          "total_tokens": 31018
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 9,
+        "input": {
+          "id": "Q10",
+          "user_ask": "What are the distinct tumor types present in the data?"
+        },
+        "response": {
+          "success": true,
+          "content": "To retrieve the distinct tumor types present in the dataset, I'll first need to query the \"tumorType\" column while removing duplicates. The schema shows this is an enum field with 50+ possible values. Since the user wants distinct values, I'll use a SelectDistinctValues query type (if supported) or fallback to SelectByName with post-processing.\n\nKey considerations:\n1. The grid might have 100k rows - need efficient distinct value extraction\n2. \"tumorType\" is a required field per schema validation rules\n3. Must handle potential nulls though schema requires values\n\nFirst attempt: Check if SelectDistinctValues exists in API capabilities. If yes:\n```json\n{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectDistinctValues\",\"columnName\":\"tumorType\"}],\"limit\":100}}\n```\n\nIf SelectDistinctValues isn't available:\n```json\n{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectByName\",\"columnName\":\"tumorType\"}],\"limit\":1000}}\n```\nThen process results to extract unique values client-side.\n\nFinal validation:\n- Ensure \"tumorType\" is properly spelled\n- Confirm enum values match schema requirements\n- Check for case sensitivity in values\n- Verify no nulls exist per schema rules\n\nThis approach efficiently retrieves required data while respecting system constraints and schema requirements. The fallback method handles potential API limitations while still achieving the user's goal.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30807,
+            "outputTokens": 337,
+            "totalTokens": 31144
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "1464b694-98cc-4279-86f5-b2a8981417cd",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:45:42 GMT",
+                "content-type": "application/json",
+                "content-length": "1731",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "1464b694-98cc-4279-86f5-b2a8981417cd"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "To retrieve the distinct tumor types present in the dataset, I'll first need to query the \"tumorType\" column while removing duplicates. The schema shows this is an enum field with 50+ possible values. Since the user wants distinct values, I'll use a SelectDistinctValues query type (if supported) or fallback to SelectByName with post-processing.\n\nKey considerations:\n1. The grid might have 100k rows - need efficient distinct value extraction\n2. \"tumorType\" is a required field per schema validation rules\n3. Must handle potential nulls though schema requires values\n\nFirst attempt: Check if SelectDistinctValues exists in API capabilities. If yes:\n```json\n{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectDistinctValues\",\"columnName\":\"tumorType\"}],\"limit\":100}}\n```\n\nIf SelectDistinctValues isn't available:\n```json\n{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectByName\",\"columnName\":\"tumorType\"}],\"limit\":1000}}\n```\nThen process results to extract unique values client-side.\n\nFinal validation:\n- Ensure \"tumorType\" is properly spelled\n- Confirm enum values match schema requirements\n- Check for case sensitivity in values\n- Verify no nulls exist per schema rules\n\nThis approach efficiently retrieves required data while respecting system constraints and schema requirements. The fallback method handles potential API limitations while still achieving the user's goal."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30807,
+              "outputTokens": 337,
+              "totalTokens": 31144
+            },
+            "metrics": {
+              "latencyMs": 18814
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "id": "Q10",
+          "type": "query",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"query\":{\"columnSelection\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.SelectByName\",\"columnName\":\"tumorType\"}],\"distinct\":true}}"
+        },
+        "token_usage": {
+          "input_tokens": 30807,
+          "output_tokens": 337,
+          "total_tokens": 31144
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 10,
+        "input": {
+          "id": "U01",
+          "user_ask": "For all records with tumorType 'Unknown', please change it to 'Not Applicable'."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"tumorType\",\n        \"value\":\"Not Applicable\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"tumorType\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"Unknown\"]\n      }\n    ]\n  }\n]}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30816,
+            "outputTokens": 137,
+            "totalTokens": 30953
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "3ee4513f-8801-424c-a4cb-ab0e4294c139",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:45:53 GMT",
+                "content-type": "application/json",
+                "content-length": "690",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "3ee4513f-8801-424c-a4cb-ab0e4294c139"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"tumorType\",\n        \"value\":\"Not Applicable\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"tumorType\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"Unknown\"]\n      }\n    ]\n  }\n]}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30816,
+              "outputTokens": 137,
+              "totalTokens": 30953
+            },
+            "metrics": {
+              "latencyMs": 10699
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U01",
+          "type": "update",
+          "complexity": "low",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"tumorType\",\"value\":\"Not Applicable\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"tumorType\",\"operator\":\"EQUALS\",\"value\":[\"Unknown\"]}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30816,
+          "output_tokens": 137,
+          "total_tokens": 30953
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 11,
+        "input": {
+          "id": "U02",
+          "user_ask": "Update the platform to 'Illumina NovaSeq 6000' for all records with fileFormat 'fastq' or 'bam'."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"platform\",\n        \"value\":\"Illumina NovaSeq 6000\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"fileFormat\",\n        \"operator\":\"IN\",\n        \"value\":[\"fastq\",\"bam\"]\n      }\n    ]\n  }\n]}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30826,
+            "outputTokens": 144,
+            "totalTokens": 30970
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "751046e1-1470-433c-875e-caada9639096",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:46:04 GMT",
+                "content-type": "application/json",
+                "content-length": "699",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "751046e1-1470-433c-875e-caada9639096"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"platform\",\n        \"value\":\"Illumina NovaSeq 6000\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"fileFormat\",\n        \"operator\":\"IN\",\n        \"value\":[\"fastq\",\"bam\"]\n      }\n    ]\n  }\n]}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30826,
+              "outputTokens": 144,
+              "totalTokens": 30970
+            },
+            "metrics": {
+              "latencyMs": 11201
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U02",
+          "type": "update",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"platform\",\"value\":\"Illumina NovaSeq 6000\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"fileFormat\",\"operator\":\"IN\",\"value\":[\"fastq\",\"bam\"]}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30826,
+          "output_tokens": 144,
+          "total_tokens": 30970
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 12,
+        "input": {
+          "id": "U03",
+          "user_ask": "Set comments to 'Adult participant' for everyone 18 and over."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"comments\",\n        \"value\":\"Adult participant\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"age\",\n        \"operator\":\"GREATER_THAN_OR_EQUALS\",\n        \"value\":[18]\n      }\n    ]\n  }\n]}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30811,
+            "outputTokens": 143,
+            "totalTokens": 30954
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "86653518-8aae-446d-bacc-e8450b143b85",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:46:15 GMT",
+                "content-type": "application/json",
+                "content-length": "693",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "86653518-8aae-446d-bacc-e8450b143b85"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"comments\",\n        \"value\":\"Adult participant\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"age\",\n        \"operator\":\"GREATER_THAN_OR_EQUALS\",\n        \"value\":[18]\n      }\n    ]\n  }\n]}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30811,
+              "outputTokens": 143,
+              "totalTokens": 30954
+            },
+            "metrics": {
+              "latencyMs": 10935
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U03",
+          "type": "update",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"comments\",\"value\":\"Adult participant\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"age\",\"operator\":\"GREATER_THAN_OR_EQUALS\",\"value\":[18]}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30811,
+          "output_tokens": 143,
+          "total_tokens": 30954
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 13,
+        "input": {
+          "id": "U04",
+          "user_ask": "Remove the experimentalCondition for all records."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\": [\n    {\n      \"set\": [\n        {\n          \"concreteType\": \"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n          \"columnName\": \"experimentalCondition\",\n          \"value\": null\n        }\n      ]\n    }\n  ]\n}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30804,
+            "outputTokens": 74,
+            "totalTokens": 30878
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "16dc8700-750a-4869-8dae-3f1e12738ead",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:46:23 GMT",
+                "content-type": "application/json",
+                "content-length": "473",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "16dc8700-750a-4869-8dae-3f1e12738ead"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\": [\n    {\n      \"set\": [\n        {\n          \"concreteType\": \"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n          \"columnName\": \"experimentalCondition\",\n          \"value\": null\n        }\n      ]\n    }\n  ]\n}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30804,
+              "outputTokens": 74,
+              "totalTokens": 30878
+            },
+            "metrics": {
+              "latencyMs": 8143
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U04",
+          "type": "update",
+          "complexity": "low",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"experimentalCondition\",\"value\":null}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30804,
+          "output_tokens": 74,
+          "total_tokens": 30878
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 14,
+        "input": {
+          "id": "U05",
+          "user_ask": "For all male humans, set their sex to 'Male' (to standardize capitalization)."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"EQUALS\", \"value\": [\"Homo sapiens\"]}, {\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"sex\", \"operator\": \"EQUALS\", \"value\": [\"male\"]}], \"limit\": 100}}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30814,
+            "outputTokens": 140,
+            "totalTokens": 30954
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "f1ef8934-fa44-4eb9-90d1-a2887c6450ab",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:46:34 GMT",
+                "content-type": "application/json",
+                "content-length": "681",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "f1ef8934-fa44-4eb9-90d1-a2887c6450ab"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"query\": {\"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}], \"filters\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"species\", \"operator\": \"EQUALS\", \"value\": [\"Homo sapiens\"]}, {\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\", \"columnName\": \"sex\", \"operator\": \"EQUALS\", \"value\": [\"male\"]}], \"limit\": 100}}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30814,
+              "outputTokens": 140,
+              "totalTokens": 30954
+            },
+            "metrics": {
+              "latencyMs": 10993
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "id": "U05",
+          "type": "update",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"sex\",\"value\":\"Male\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"sex\",\"operator\":\"EQUALS\",\"value\":[\"male\"]},{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"species\",\"operator\":\"EQUALS\",\"value\":[\"Homo sapiens\"]}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30814,
+          "output_tokens": 140,
+          "total_tokens": 30954
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 15,
+        "input": {
+          "id": "U06",
+          "user_ask": "Append the aliquotID to the specimenID for all records, separated by a hyphen."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.TemplateSetValue\",\n        \"columnName\":\"specimenID\",\n        \"sourceTemplate\":\"{specimenID}-{aliquotID}\"\n      }\n    ]\n  }\n]}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30813,
+            "outputTokens": 82,
+            "totalTokens": 30895
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "f6d7bf0b-b0b0-4187-a0d9-dfcadd3b5b1c",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:46:43 GMT",
+                "content-type": "application/json",
+                "content-length": "469",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "f6d7bf0b-b0b0-4187-a0d9-dfcadd3b5b1c"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.TemplateSetValue\",\n        \"columnName\":\"specimenID\",\n        \"sourceTemplate\":\"{specimenID}-{aliquotID}\"\n      }\n    ]\n  }\n]}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30813,
+              "outputTokens": 82,
+              "totalTokens": 30895
+            },
+            "metrics": {
+              "latencyMs": 8468
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U06",
+          "type": "update",
+          "complexity": "high",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.TemplateSetValue\",\"columnName\":\"specimenID\",\"sourceTemplate\":\"{specimenID}-{aliquotID}\"}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30813,
+          "output_tokens": 82,
+          "total_tokens": 30895
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 16,
+        "input": {
+          "id": "U07",
+          "user_ask": "For all rows that have validation errors, add a comment saying 'Needs review'."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\":[\n  {\n    \"set\": [\n      {\n        \"concreteType\": \"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\": \"comments\",\n        \"value\": \"Needs review\"\n      }\n    ],\n    \"filters\": [\n      {\n        \"concreteType\": \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\n        \"value\": false\n      }\n    ]\n  }\n]}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30814,
+            "outputTokens": 124,
+            "totalTokens": 30938
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "3c9980fd-9aff-4170-a2a3-957f38eb65d4",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:46:53 GMT",
+                "content-type": "application/json",
+                "content-length": "614",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "3c9980fd-9aff-4170-a2a3-957f38eb65d4"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\":[\n  {\n    \"set\": [\n      {\n        \"concreteType\": \"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\": \"comments\",\n        \"value\": \"Needs review\"\n      }\n    ],\n    \"filters\": [\n      {\n        \"concreteType\": \"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\n        \"value\": false\n      }\n    ]\n  }\n]}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30814,
+              "outputTokens": 124,
+              "totalTokens": 30938
+            },
+            "metrics": {
+              "latencyMs": 10116
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U07",
+          "type": "update",
+          "complexity": "medium",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"comments\",\"value\":\"Needs review\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.RowIsValidFilter\",\"value\":false}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30814,
+          "output_tokens": 124,
+          "total_tokens": 30938
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 17,
+        "input": {
+          "id": "U08",
+          "user_ask": "For all diagnoses that do not mention 'Schwannoma', add a comment saying 'Non-schwannoma case'."
+        },
+        "response": {
+          "success": true,
+          "content": "First, I'll identify all rows where the diagnosis doesn't contain \"Schwannoma\" using a NOT_LIKE filter. The schema shows diagnosis is a required string field with specific enum values. Then I'll update the comments field for these rows while preserving existing values.\n\nQuery to find non-Schwannoma cases:\n```json\n{\"query\": {\n  \"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\n  \"filters\": [{\n    \"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n    \"columnName\": \"diagnosis\",\n    \"operator\": \"NOT_LIKE\",\n    \"value\": [\"%Schwannoma%\"]\n  }],\n  \"limit\": 100\n}}\n```\n\nUpdate statement:\n```json\n{\"updateBatch\": [{\n  \"set\": [{\n    \"concreteType\": \"org.sagebionetworks.repo.model.grid.update.TemplateSetValue\",\n    \"columnName\": \"comments\",\n    \"sourceTemplate\": \"{comments} Non-schwannoma case\",\n    \"onMissingValue\": \"USE_EMPTY_STRING\"\n  }]\n}]}\n```\n\nThis will:\n1. Find all rows without Schwannoma in diagnosis\n2. Append \"Non-schwannoma case\" to existing comments\n3. Handle empty comments by starting with empty string\n4. Maintain original comment content where present\n\nThe NOT_LIKE operator with wildcards ensures we exclude all Schwannoma variants while preserving case-insensitive matches. The template update safely combines existing values with the new annotation.",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30822,
+            "outputTokens": 379,
+            "totalTokens": 31201
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "c6aa493c-68b5-4d90-99ab-2869b60e8f94",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:47:13 GMT",
+                "content-type": "application/json",
+                "content-length": "1635",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "c6aa493c-68b5-4d90-99ab-2869b60e8f94"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "First, I'll identify all rows where the diagnosis doesn't contain \"Schwannoma\" using a NOT_LIKE filter. The schema shows diagnosis is a required string field with specific enum values. Then I'll update the comments field for these rows while preserving existing values.\n\nQuery to find non-Schwannoma cases:\n```json\n{\"query\": {\n  \"columnSelection\": [{\"concreteType\": \"org.sagebionetworks.repo.model.grid.query.SelectAll\"}],\n  \"filters\": [{\n    \"concreteType\": \"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n    \"columnName\": \"diagnosis\",\n    \"operator\": \"NOT_LIKE\",\n    \"value\": [\"%Schwannoma%\"]\n  }],\n  \"limit\": 100\n}}\n```\n\nUpdate statement:\n```json\n{\"updateBatch\": [{\n  \"set\": [{\n    \"concreteType\": \"org.sagebionetworks.repo.model.grid.update.TemplateSetValue\",\n    \"columnName\": \"comments\",\n    \"sourceTemplate\": \"{comments} Non-schwannoma case\",\n    \"onMissingValue\": \"USE_EMPTY_STRING\"\n  }]\n}]}\n```\n\nThis will:\n1. Find all rows without Schwannoma in diagnosis\n2. Append \"Non-schwannoma case\" to existing comments\n3. Handle empty comments by starting with empty string\n4. Maintain original comment content where present\n\nThe NOT_LIKE operator with wildcards ensures we exclude all Schwannoma variants while preserving case-insensitive matches. The template update safely combines existing values with the new annotation."
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30822,
+              "outputTokens": 379,
+              "totalTokens": 31201
+            },
+            "metrics": {
+              "latencyMs": 20437
+            }
+          }
+        },
+        "score": 0.0,
+        "ground_truth": {
+          "id": "U08",
+          "type": "update",
+          "complexity": "high",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"comments\",\"value\":\"Non-schwannoma case\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"diagnosis\",\"operator\":\"NOT_LIKE\",\"value\":[\"%Schwannoma%\"]}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30822,
+          "output_tokens": 379,
+          "total_tokens": 31201
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 18,
+        "input": {
+          "id": "U09",
+          "user_ask": "Set value to 'Batch A' for the first 10 Homo sapiens records."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"batchID\",\n        \"value\":\"Batch A\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"species\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"Homo sapiens\"]\n      }\n    ],\n    \"limit\":10\n  }\n]}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30813,
+            "outputTokens": 144,
+            "totalTokens": 30957
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "0f9ec1cb-f2e8-489b-b77f-8b2cb48ecaef",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:47:24 GMT",
+                "content-type": "application/json",
+                "content-length": "703",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "0f9ec1cb-f2e8-489b-b77f-8b2cb48ecaef"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"batchID\",\n        \"value\":\"Batch A\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"species\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"Homo sapiens\"]\n      }\n    ],\n    \"limit\":10\n  }\n]}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30813,
+              "outputTokens": 144,
+              "totalTokens": 30957
+            },
+            "metrics": {
+              "latencyMs": 10930
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U09",
+          "type": "update",
+          "complexity": "high",
+          "limit_required": true,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"batchID\",\"value\":\"Batch A\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"species\",\"operator\":\"EQUALS\",\"value\":[\"Homo sapiens\"]}],\"limit\":10}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30813,
+          "output_tokens": 144,
+          "total_tokens": 30957
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      },
+      {
+        "sample_index": 19,
+        "input": {
+          "id": "U10",
+          "user_ask": "For all RNA-seq assays on the Illumina HiSeq 2000 platform, update the comments to 'Legacy sequencing run'."
+        },
+        "response": {
+          "success": true,
+          "content": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"comments\",\n        \"value\":\"Legacy sequencing run\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"assay\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"RNA-seq\"]\n      },\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"platform\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"Illumina HiSeq 2000\"]\n      }\n    ]\n  }\n]}",
+          "model_id": "us.amazon.nova-premier-v1:0",
+          "usage": {
+            "inputTokens": 30825,
+            "outputTokens": 201,
+            "totalTokens": 31026
+          },
+          "attempt": 1,
+          "raw_response": {
+            "ResponseMetadata": {
+              "RequestId": "7a8467fb-1015-407c-9e6a-2e9a93a97751",
+              "HTTPStatusCode": 200,
+              "HTTPHeaders": {
+                "date": "Thu, 11 Dec 2025 04:47:37 GMT",
+                "content-type": "application/json",
+                "content-length": "917",
+                "connection": "keep-alive",
+                "x-amzn-requestid": "7a8467fb-1015-407c-9e6a-2e9a93a97751"
+              },
+              "RetryAttempts": 0
+            },
+            "output": {
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "text": "{\"updateBatch\":[\n  {\n    \"set\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\n        \"columnName\":\"comments\",\n        \"value\":\"Legacy sequencing run\"\n      }\n    ],\n    \"filters\":[\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"assay\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"RNA-seq\"]\n      },\n      {\n        \"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\n        \"columnName\":\"platform\",\n        \"operator\":\"EQUALS\",\n        \"value\":[\"Illumina HiSeq 2000\"]\n      }\n    ]\n  }\n]}"
+                  }
+                ]
+              }
+            },
+            "stopReason": "end_turn",
+            "usage": {
+              "inputTokens": 30825,
+              "outputTokens": 201,
+              "totalTokens": 31026
+            },
+            "metrics": {
+              "latencyMs": 13248
+            }
+          }
+        },
+        "score": 1.0,
+        "ground_truth": {
+          "id": "U10",
+          "type": "update",
+          "complexity": "high",
+          "limit_required": false,
+          "request": "{\"updateBatch\":[{\"set\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.update.LiteralSetValue\",\"columnName\":\"comments\",\"value\":\"Legacy sequencing run\"}],\"filters\":[{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"assay\",\"operator\":\"EQUALS\",\"value\":[\"RNA-seq\"]},{\"concreteType\":\"org.sagebionetworks.repo.model.grid.query.CellValueFilter\",\"columnName\":\"platform\",\"operator\":\"EQUALS\",\"value\":[\"Illumina HiSeq 2000\"]}]}]}"
+        },
+        "token_usage": {
+          "input_tokens": 30825,
+          "output_tokens": 201,
+          "total_tokens": 31026
+        },
+        "tool_calls": [],
+        "tool_execution_history": []
+      }
+    ],
+    "metrics": {
+      "total_samples": 20,
+      "successful_runs": 20,
+      "failed_runs": 0,
+      "success_rate": 1.0,
+      "average_score": 0.7,
+      "min_score": 0.0,
+      "max_score": 1.0,
+      "num_scored": 20
+    },
+    "duration_seconds": 221.5434238910675,
+    "token_usage": {
+      "input_tokens": 616240,
+      "output_tokens": 2896,
+      "total_tokens": 619136
+    }
+  }
+}
