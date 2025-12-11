@@ -50,9 +50,10 @@ def _fetch_query_results(query_wrapper_url: str, timeout: int = 10) -> Optional[
         if not sql_query:
             return None
 
-        # Extract table/entity ID from the SQL query (e.g., "SELECT * FROM syn51730943")
+        # Extract table/entity ID from the SQL query (e.g., "SELECT * FROM syn51730943" or "syn65676531.75")
+        # The regex matches both with and without version numbers
         import re as regex_module
-        table_match = regex_module.search(r'FROM\s+(syn\d+)', sql_query, regex_module.IGNORECASE)
+        table_match = regex_module.search(r'FROM\s+(syn\d+(?:\.\d+)?)', sql_query, regex_module.IGNORECASE)
         if not table_match:
             return None
 
