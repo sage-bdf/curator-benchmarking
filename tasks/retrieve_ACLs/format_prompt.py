@@ -14,16 +14,16 @@ def format_prompt(
 
     Args:
         prompt_template: The base prompt template from default_prompt.txt
-        sample: Input sample containing 'requirementId'
+        sample: Input sample containing 'entityId'
         ground_truth: Ground truth sample (not used during inference)
         schema: Optional JSON schema (not used for this task)
 
     Returns:
         Formatted prompt string
     """
-    requirement_id = sample.get('requirementId', '')
+    entity_id = sample.get('entityId', '')
 
-    # Build the prompt with requirement ID
-    formatted_prompt = f"{prompt_template}\n\nAccess Requirement ID to analyze: {requirement_id}"
+    # Build the prompt with entity ID
+    formatted_prompt = f"{prompt_template}\n\nDataset Entity ID: {entity_id}"
 
     return formatted_prompt

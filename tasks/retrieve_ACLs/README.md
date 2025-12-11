@@ -1,88 +1,97 @@
 # Retrieve ACLs Task
 
-This task evaluates the model's ability to retrieve Access Control List (ACL) information for Synapse access requirements using the Synapse REST API.
+This task evaluates the model's ability to **retrieve Access Control List (ACL) information** for Synapse datasets and **summarize who manages access in the context of data use**.
 
 ## Task Description
 
-Given an access requirement ID, the model should:
-1. Use the ACL REST API to retrieve the ACL for that access requirement
-2. Extract the ACL ID and resource access information
-3. Provide a clear explanation of who can manage the access requirement
+Given a Synapse entity ID (dataset), the model must:
+1. **Retrieve** access requirement information for the entity using the restriction information API
+2. **Retrieve** ACL information for each access requirement using the ACL API
+3. **Summarize** who manages access to this dataset and what this means for researchers wanting to use the data
 
-## REST API Used
+The emphasis is on:
+- Completing the action: actually making API calls to retrieve ACLs
+- Providing data use context: explaining who researchers should contact and what this means for data access
 
-### Access Requirement ACL API
+## REST APIs Used
+
+### 1. Restriction Information API (to get access requirements)
+- **Endpoint**: `POST https://repo-prod.prod.sagebase.org/repo/v1/restrictionInformation`
+- **Purpose**: Get access requirement IDs for an entity
+- **Request Body**:
+  ```json
+  {
+    "objectId": "syn12345",
+    "restrictableObjectType": "ENTITY"
+  }
+  ```
+
+### 2. Access Requirement ACL API (to get ACLs)
 - **Endpoint**: `GET https://repo-prod.prod.sagebase.org/repo/v1/accessRequirement/{requirementId}/acl`
-- **Purpose**: Gets the access control list for a specific access requirement
-- **URL Parameter**: `requirementId` - The ID of the access requirement
-- **Response**: AccessControlList object containing:
-  - `id`: The ID of the ACL
-  - `createdBy`: User who created the ACL
-  - `creationDate`: When the ACL was created
-  - `modifiedBy`: User who last modified the ACL
-  - `modifiedOn`: When the ACL was last modified
-  - `resourceAccess`: Array of resource access entries, each containing:
-    - `principalId`: ID of the user or team
-    - `accessType`: Array of access types (e.g., "CHANGE_PERMISSIONS", "READ", "UPDATE", "DELETE", "REVIEW_SUBMISSIONS")
+- **Purpose**: Get ACL for a specific access requirement
+- **Response**: AccessControlList with principals and permissions
 
 ## Input Format
 
-The input data is provided as a TSV file with the following column:
-- `requirementId`: Access requirement ID (e.g., "9603064")
+The input data is provided as a TSV file with:
+- `entityId`: Synapse entity ID (e.g., "syn26462036")
 
 ## Output Format
 
-The model should return a JSON response with the following structure:
+The model should return JSON with retrieved ACL information and data use summary:
 
 ```json
 {
-  "aclId": "9603064",
-  "resourceAccess": [
+  "hasAccessRequirements": true,
+  "aclSummary": [
     {
-      "principalId": "3350396",
-      "accessType": ["REVIEW_SUBMISSIONS", "READ", "UPDATE"]
+      "requirementId": "9603064",
+      "aclId": "9603064",
+      "managedBy": "Team ID 3350396",
+      "permissions": ["REVIEW_SUBMISSIONS", "READ", "UPDATE", "DELETE"]
     }
   ],
-  "explanation": "This access requirement has an ACL with specific principals who have permissions to manage it..."
+  "dataUseSummary": "This dataset is governed by managed access requirements. Access requests are reviewed and approved by designated team administrators. Researchers who want to use this data should submit an access request through Synapse."
 }
 ```
 
 ### Output Fields
 
-- **aclId** (string): The ID of the ACL (typically matches the access requirement ID)
-- **resourceAccess** (array): List of principals and their permissions
-  - **principalId** (string): The ID of the user or team
-  - **accessType** (array of strings): List of permission types
-- **explanation** (string): A human-readable explanation of who can manage this access requirement
+- **hasAccessRequirements** (boolean): Whether the entity has access requirements
+- **aclSummary** (array): Retrieved ACL information for each requirement
+  - **requirementId** (string): The access requirement ID
+  - **aclId** (string): The ACL ID
+  - **managedBy** (string): Who manages this (principal/team IDs or names)
+  - **permissions** (array): List of permission types
+- **dataUseSummary** (string): Human-readable explanation focused on data use - who manages access and what researchers should do
 
 ## Scoring
 
-The scoring function evaluates three components:
-
-1. **aclId** (30% of score): Whether the model correctly extracted the ACL ID
-2. **resourceAccess** (40% of score):
-   - Whether resource access entries are present (30%)
-   - Whether the structure is valid (10%)
-3. **explanation** (30% of score): Quality of the explanation, checking if key concepts are present
+The scoring evaluates:
+1. **hasAccessRequirements** (30%): Correctly identified if requirements exist
+2. **aclSummary** (30%): Retrieved ACL information with correct structure
+3. **dataUseSummary** (40%): Quality of data use explanation
 
 ## Example
 
 **Input:**
 ```
-requirementId: 9603064
+entityId: syn26462036
 ```
 
 **Expected Output:**
 ```json
 {
-  "aclId": "9603064",
-  "resourceAccess": [
+  "hasAccessRequirements": true,
+  "aclSummary": [
     {
-      "principalId": "3350396",
-      "accessType": ["REVIEW_SUBMISSIONS", "READ", "UPDATE", "DELETE", "CHANGE_PERMISSIONS"]
+      "requirementId": "9603064",
+      "aclId": "9603064",
+      "managedBy": "Team ID 3350396",
+      "permissions": ["REVIEW_SUBMISSIONS", "READ", "UPDATE"]
     }
   ],
-  "explanation": "This access requirement has an ACL with specific principals (users or teams) who have permissions to manage it. The ACL defines who can review access requests, grant or deny access, and modify the requirement settings."
+  "dataUseSummary": "This dataset is governed by managed access requirements. Access requests are reviewed and approved by designated team administrators. Researchers who want to use this data should submit an access request through Synapse, which will be reviewed by the access management team."
 }
 ```
 
@@ -92,10 +101,9 @@ requirementId: 9603064
 python -m src.cli run retrieve_ACLs --model <model_name>
 ```
 
-## Notes
+## Key Points
 
-- The model needs to make API calls to the Synapse REST API to retrieve ACL information
-- An access requirement ACL defines who can administer that requirement
-- Principals in the ACL can be individual users or teams
-- Common access types include: REVIEW_SUBMISSIONS, READ, UPDATE, DELETE, CHANGE_PERMISSIONS
-- The ACL ID typically matches the access requirement ID
+- The model must **actively retrieve** ACL information via API calls
+- Focus is on **who manages access** (administrators, review teams)
+- Summary must be in the **context of data use** (what does this mean for researchers?)
+- For open datasets with no requirements, the model should indicate no ACLs to retrieve

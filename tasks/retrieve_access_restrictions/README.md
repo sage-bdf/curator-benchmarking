@@ -1,20 +1,22 @@
 # Retrieve Access Restrictions Task
 
-This task evaluates the model's ability to explain access restrictions for Synapse datasets using the Synapse REST API.
+This task evaluates the model's ability to **retrieve access restriction information** for Synapse datasets and **summarize what users must do to use the data**.
 
 ## Task Description
 
-Given a Synapse entity ID, the model should:
-1. Use the restriction information REST API to retrieve access restriction details
-2. Determine whether the dataset has access restrictions
-3. Identify the type of restriction (if any)
-4. Provide a clear, human-readable explanation of what users need to do to access the dataset
+Given a Synapse entity ID (dataset), the model must:
+1. **Retrieve** restriction information for the entity using the restriction information API
+2. **Summarize** what access requirements apply and what researchers need to do to access and use the data
+
+The emphasis is on:
+- Completing the action: actually making API calls to retrieve restriction information
+- Providing data use context: explaining what researchers must do to use this data
 
 ## REST API Used
 
 ### Restriction Information API
 - **Endpoint**: `POST https://repo-prod.prod.sagebase.org/repo/v1/restrictionInformation`
-- **Purpose**: Retrieves restriction information for a Synapse entity
+- **Purpose**: Retrieve restriction information for an entity
 - **Request Body**:
   ```json
   {
@@ -22,38 +24,48 @@ Given a Synapse entity ID, the model should:
     "restrictableObjectType": "ENTITY"
   }
   ```
-- **Response**: RestrictionInformationResponse with details about access requirements
+- **Response**: RestrictionInformationResponse with access requirement details
 
 ## Input Format
 
-The input data is provided as a TSV file with the following column:
+The input data is provided as a TSV file with:
 - `entityId`: Synapse entity ID (e.g., "syn26462036")
 
 ## Output Format
 
-The model should return a JSON response with the following structure:
+The model should return JSON with retrieved restriction information and data use summary:
 
 ```json
 {
   "hasRestrictions": true,
-  "restrictionType": "Managed Access",
-  "explanation": "This dataset has managed access restrictions. Users must request access and have their request approved..."
+  "restrictionLevel": "Managed Access",
+  "requirements": [
+    {
+      "requirementId": "9603064",
+      "type": "ManagedACTAccessRequirement",
+      "description": "Users must submit access request for review"
+    }
+  ],
+  "dataUseSummary": "This dataset has managed access restrictions. Researchers must submit an access request through Synapse that includes information about their research project and intended data use. The request will be reviewed by the Access Requirement Team."
 }
 ```
 
 ### Output Fields
 
-- **hasRestrictions** (boolean): Whether the dataset has any access restrictions
-- **restrictionType** (string or null): The type of restriction ("Managed Access", "Controlled Access", etc.) or null if no restrictions
-- **explanation** (string): A human-readable explanation of the access restrictions and what users need to do
+- **hasRestrictions** (boolean): Whether the dataset has access restrictions
+- **restrictionLevel** (string): The restriction level ("Open Access", "Self-Sign", "Managed Access", "Controlled Access")
+- **requirements** (array): Retrieved requirement details
+  - **requirementId** (string): The requirement ID
+  - **type** (string): Type of requirement
+  - **description** (string): What users must do
+- **dataUseSummary** (string): Human-readable explanation focused on data use - what researchers must do to access and use this data
 
 ## Scoring
 
-The scoring function evaluates three components:
-
-1. **hasRestrictions** (40% of score): Whether the model correctly identified if restrictions exist
-2. **restrictionType** (30% of score): Whether the model correctly identified the type of restriction
-3. **explanation** (30% of score): Quality of the explanation, checking if key concepts are present
+The scoring evaluates:
+1. **hasRestrictions** (30%): Correctly identified if restrictions exist
+2. **restrictionLevel** (30%): Correctly identified restriction level
+3. **dataUseSummary** (40%): Quality of data use explanation
 
 ## Example
 
@@ -66,8 +78,15 @@ entityId: syn26462036
 ```json
 {
   "hasRestrictions": true,
-  "restrictionType": "Managed Access",
-  "explanation": "This dataset has managed access restrictions. Users must request access and have their request approved by the dataset's Access Requirement Team (ACT) or designated reviewers before they can download or access the data."
+  "restrictionLevel": "Managed Access",
+  "requirements": [
+    {
+      "requirementId": "9603064",
+      "type": "ManagedACTAccessRequirement",
+      "description": "Access request review required"
+    }
+  ],
+  "dataUseSummary": "This dataset has managed access restrictions. Researchers must submit an access request through Synapse that includes information about their research project and intended data use. The request will be reviewed by the Access Requirement Team (ACT) or designated reviewers. Once approved, researchers can download and use the data according to the approved terms."
 }
 ```
 
@@ -77,9 +96,9 @@ entityId: syn26462036
 python -m src.cli run retrieve_access_restrictions --model <model_name>
 ```
 
-## Notes
+## Key Points
 
-- The model needs to make API calls to the Synapse REST API to retrieve restriction information
-- Different entities may have different types of access restrictions (managed access, controlled access, open access, etc.)
-- The explanation should be clear and helpful for users trying to understand how to access the dataset
-- Some datasets may have no restrictions and be open access
+- The model must **actively retrieve** restriction information via API calls
+- Focus is on **what requirements apply** (managed access, certifications, terms of use)
+- Summary must be in the **context of data use** (what must researchers do to use this data?)
+- For open datasets, the model should indicate no restrictions and that data is freely accessible
