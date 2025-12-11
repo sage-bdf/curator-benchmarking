@@ -50,24 +50,47 @@ def _fetch_query_results(query_wrapper_url: str, timeout: int = 10) -> Optional[
         if not sql_query:
             return None
 
-        # Build Synapse REST API request
-        # POST to /repo/v1/table/query/async/start
-        api_url = "https://repo-prod.prod.sagebase.org/repo/v1/table/query/async/start"
+        # Extract table/entity ID from the SQL query (e.g., "SELECT * FROM syn51730943")
+        import re as regex_module
+        table_match = regex_module.search(r'FROM\s+(syn\d+)', sql_query, regex_module.IGNORECASE)
+        if not table_match:
+            return None
 
-        # Prepare request body
-        request_body = {
-            "query": sql_query,
-            "includeEntityEtag": False,
-            "isConsistent": False
+        table_id = table_match.group(1)
+
+        # Build Synapse REST API request
+        # POST to /entity/{id}/table/query/async/start
+        api_url = f"https://repo-prod.prod.sagebase.org/repo/v1/entity/{table_id}/table/query/async/start"
+
+        # Prepare Query object
+        query_obj = {
+            "sql": sql_query,
+            "includeEntityEtag": False
         }
+
+        # Add limit if present
+        if 'limit' in query_wrapper:
+            query_obj['limit'] = query_wrapper['limit']
+
+        # Add offset if present
+        if 'offset' in query_wrapper:
+            query_obj['offset'] = query_wrapper['offset']
 
         # Add selected facets if present
         if 'selectedFacets' in query_wrapper:
-            request_body['selectedFacets'] = query_wrapper['selectedFacets']
+            query_obj['selectedFacets'] = query_wrapper['selectedFacets']
 
         # Add additional filters if present
         if 'additionalFilters' in query_wrapper:
-            request_body['additionalFilters'] = query_wrapper['additionalFilters']
+            query_obj['additionalFilters'] = query_wrapper['additionalFilters']
+
+        # Prepare QueryBundleRequest
+        request_body = {
+            "concreteType": "org.sagebionetworks.repo.model.table.QueryBundleRequest",
+            "query": query_obj,
+            "partMask": 0x1,  # Just get query results (QUERY_RESULTS = 0x1)
+            "isConsistent": False
+        }
 
         # Make the request
         headers = {
@@ -91,27 +114,34 @@ def _fetch_query_results(query_wrapper_url: str, timeout: int = 10) -> Optional[
                 return None
 
             # Poll for results
-            result_url = f"https://repo-prod.prod.sagebase.org/repo/v1/table/query/async/get/{token}"
+            result_url = f"https://repo-prod.prod.sagebase.org/repo/v1/entity/{table_id}/table/query/async/get/{token}"
 
-            max_attempts = 10
+            max_attempts = 20
             for attempt in range(max_attempts):
-                time.sleep(0.5)  # Wait before polling
+                time.sleep(1)  # Wait before polling
 
                 result_req = urllib.request.Request(result_url, headers={'Accept': 'application/json'})
                 try:
                     with urllib.request.urlopen(result_req, timeout=timeout) as result_response:
-                        query_result = json.loads(result_response.read().decode('utf-8'))
+                        result_bundle = json.loads(result_response.read().decode('utf-8'))
 
-                        # Extract row IDs from results
-                        row_ids = set()
-                        if 'queryResult' in query_result:
-                            rows = query_result['queryResult'].get('queryResults', {}).get('rows', [])
+                        # The response is a QueryResultBundle when job is complete
+                        # Check if it has queryResult (means job is complete)
+                        if 'queryResult' in result_bundle:
+                            query_result = result_bundle.get('queryResult', {})
+                            query_results = query_result.get('queryResults', {})
+                            rows = query_results.get('rows', [])
+
+                            # Extract row IDs
+                            row_ids = set()
                             for row in rows:
                                 row_id = row.get('rowId')
                                 if row_id:
                                     row_ids.add(str(row_id))
 
-                        return row_ids
+                            return row_ids
+                        # If no queryResult, job might still be processing, continue polling
+
                 except urllib.error.HTTPError as e:
                     if e.code == 202:  # Still processing
                         continue
