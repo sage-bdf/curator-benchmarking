@@ -2,47 +2,67 @@
 import json
 import urllib.request
 import urllib.error
+import time
 from typing import Dict, Any, Optional, Set, Tuple
 
 
-def _fetch_restriction_info(entity_id: str, timeout: int = 10) -> Optional[Dict[str, Any]]:
+def _fetch_restriction_info(entity_id: str, timeout: int = 30, max_retries: int = 3) -> Optional[Dict[str, Any]]:
     """
-    Fetch restriction information for an entity from Synapse REST API.
+    Fetch restriction information for an entity from Synapse REST API with retry logic.
 
     Args:
         entity_id: The Synapse entity ID (e.g., syn26462036)
         timeout: Request timeout in seconds
+        max_retries: Maximum number of retry attempts
 
     Returns:
         Dictionary with restriction information or None if fetch failed
     """
-    try:
-        api_url = "https://repo-prod.prod.sagebase.org/repo/v1/restrictionInformation"
+    api_url = "https://repo-prod.prod.sagebase.org/repo/v1/restrictionInformation"
 
-        request_body = {
-            "restrictableObjectType": "ENTITY",
-            "objectId": entity_id
-        }
+    request_body = {
+        "restrictableObjectType": "ENTITY",
+        "objectId": entity_id
+    }
 
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
 
-        req = urllib.request.Request(
-            api_url,
-            data=json.dumps(request_body).encode('utf-8'),
-            headers=headers,
-            method='POST'
-        )
+    for attempt in range(max_retries):
+        try:
+            req = urllib.request.Request(
+                api_url,
+                data=json.dumps(request_body).encode('utf-8'),
+                headers=headers,
+                method='POST'
+            )
 
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            return result
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                result = json.loads(response.read().decode('utf-8'))
+                return result
 
-    except Exception as e:
-        print(f"    Error fetching restriction info: {e}")
-        return None
+        except urllib.error.HTTPError as e:
+            print(f"    HTTP error fetching restriction info (attempt {attempt + 1}/{max_retries}): {e.code} {e.reason}")
+            if attempt < max_retries - 1 and e.code >= 500:
+                time.sleep(2 ** attempt)  # Exponential backoff
+                continue
+            return None
+        except urllib.error.URLError as e:
+            print(f"    Network error fetching restriction info (attempt {attempt + 1}/{max_retries}): {e.reason}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return None
+        except Exception as e:
+            print(f"    Error fetching restriction info (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return None
+
+    return None
 
 
 def _extract_restriction_fields(restriction_info: Dict[str, Any]) -> Tuple[bool, str, Set[str]]:
@@ -174,8 +194,8 @@ def score(
         restriction_info = _fetch_restriction_info(entity_id)
 
         if restriction_info is None:
-            print(f"    Could not fetch restriction info for {entity_id}")
-            return None
+            print(f"    Could not fetch restriction info for {entity_id} - scoring as 0.0")
+            return 0.0
 
         # Extract actual values from API response
         actual_has_restr, actual_level, actual_requirements = _extract_restriction_fields(restriction_info)

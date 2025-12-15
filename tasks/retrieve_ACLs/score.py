@@ -2,82 +2,118 @@
 import json
 import urllib.request
 import urllib.error
+import time
 from typing import Dict, Any, Optional, Set, List, Tuple
 
 
-def _fetch_restriction_info(entity_id: str, timeout: int = 10) -> Optional[Dict[str, Any]]:
+def _fetch_restriction_info(entity_id: str, timeout: int = 30, max_retries: int = 3) -> Optional[Dict[str, Any]]:
     """
-    Fetch restriction information for an entity from Synapse REST API.
+    Fetch restriction information for an entity from Synapse REST API with retry logic.
 
     Args:
         entity_id: The Synapse entity ID (e.g., syn26462036)
         timeout: Request timeout in seconds
+        max_retries: Maximum number of retry attempts
 
     Returns:
         Dictionary with restriction information or None if fetch failed
     """
-    try:
-        api_url = "https://repo-prod.prod.sagebase.org/repo/v1/restrictionInformation"
+    api_url = "https://repo-prod.prod.sagebase.org/repo/v1/restrictionInformation"
 
-        request_body = {
-            "restrictableObjectType": "ENTITY",
-            "objectId": entity_id
-        }
+    request_body = {
+        "restrictableObjectType": "ENTITY",
+        "objectId": entity_id
+    }
 
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
 
-        req = urllib.request.Request(
-            api_url,
-            data=json.dumps(request_body).encode('utf-8'),
-            headers=headers,
-            method='POST'
-        )
+    for attempt in range(max_retries):
+        try:
+            req = urllib.request.Request(
+                api_url,
+                data=json.dumps(request_body).encode('utf-8'),
+                headers=headers,
+                method='POST'
+            )
 
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            return result
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                result = json.loads(response.read().decode('utf-8'))
+                return result
 
-    except Exception as e:
-        print(f"    Error fetching restriction info: {e}")
-        return None
+        except urllib.error.HTTPError as e:
+            print(f"    HTTP error fetching restriction info (attempt {attempt + 1}/{max_retries}): {e.code} {e.reason}")
+            if attempt < max_retries - 1 and e.code >= 500:
+                time.sleep(2 ** attempt)  # Exponential backoff
+                continue
+            return None
+        except urllib.error.URLError as e:
+            print(f"    Network error fetching restriction info (attempt {attempt + 1}/{max_retries}): {e.reason}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return None
+        except Exception as e:
+            print(f"    Error fetching restriction info (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return None
+
+    return None
 
 
-def _fetch_acl(requirement_id: str, timeout: int = 10) -> Optional[Dict[str, Any]]:
+def _fetch_acl(requirement_id: str, timeout: int = 30, max_retries: int = 3) -> Optional[Dict[str, Any]]:
     """
-    Fetch ACL for an access requirement from Synapse REST API.
+    Fetch ACL for an access requirement from Synapse REST API with retry logic.
 
     Args:
         requirement_id: The access requirement ID
         timeout: Request timeout in seconds
+        max_retries: Maximum number of retry attempts
 
     Returns:
         Dictionary with ACL information or None if fetch failed
     """
-    try:
-        api_url = f"https://repo-prod.prod.sagebase.org/repo/v1/accessRequirement/{requirement_id}/acl"
+    api_url = f"https://repo-prod.prod.sagebase.org/repo/v1/accessRequirement/{requirement_id}/acl"
 
-        headers = {
-            'Accept': 'application/json'
-        }
+    headers = {
+        'Accept': 'application/json'
+    }
 
-        req = urllib.request.Request(api_url, headers=headers)
+    for attempt in range(max_retries):
+        try:
+            req = urllib.request.Request(api_url, headers=headers)
 
-        with urllib.request.urlopen(req, timeout=timeout) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            return result
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                result = json.loads(response.read().decode('utf-8'))
+                return result
 
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            # No ACL found for this requirement
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                # No ACL found for this requirement - this is expected for some requirements
+                return None
+            print(f"    HTTP error fetching ACL for requirement {requirement_id} (attempt {attempt + 1}/{max_retries}): {e.code}")
+            if attempt < max_retries - 1 and e.code >= 500:
+                time.sleep(2 ** attempt)
+                continue
             return None
-        print(f"    Error fetching ACL for requirement {requirement_id}: HTTP {e.code}")
-        return None
-    except Exception as e:
-        print(f"    Error fetching ACL for requirement {requirement_id}: {e}")
-        return None
+        except urllib.error.URLError as e:
+            print(f"    Network error fetching ACL for requirement {requirement_id} (attempt {attempt + 1}/{max_retries}): {e.reason}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return None
+        except Exception as e:
+            print(f"    Error fetching ACL for requirement {requirement_id} (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return None
+
+    return None
 
 
 def _extract_acl_principals(restriction_info: Dict[str, Any]) -> Set[str]:
@@ -206,8 +242,8 @@ def score(
         restriction_info = _fetch_restriction_info(entity_id)
 
         if restriction_info is None:
-            print(f"    Could not fetch restriction info for {entity_id}")
-            return None
+            print(f"    Could not fetch restriction info for {entity_id} - scoring as 0.0")
+            return 0.0
 
         # Determine if there are actual access requirements
         actual_has_reqs = restriction_info.get("hasUnmetAccessRequirement", False)
