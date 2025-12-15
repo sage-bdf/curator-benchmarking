@@ -50,6 +50,10 @@ def _fetch_query_results(query_wrapper_url: str, timeout: int = 30, max_retries:
             # Extract SQL query
             sql_query = query_wrapper.get('sql', '')
             if not sql_query:
+                # If no SQL query, this is likely a simple query format {"query":"..."}
+                # which cannot be executed via API. Return None to indicate no executable query.
+                print(f"    Query wrapper has no 'sql' field - has 'query': {query_wrapper.get('query', 'N/A')}")
+                print(f"    Cannot execute simple query format via Synapse SQL API")
                 return None
 
             # Extract table/entity ID from the SQL query (e.g., "SELECT * FROM syn51730943" or "syn65676531.75")
@@ -256,7 +260,12 @@ def score(
         gt_results = _fetch_query_results(expected_query_wrapper)
 
         if pred_results is None or gt_results is None:
-            print(f"    Could not fetch query results for comparison - scoring as 0.0")
+            if pred_results is None and gt_results is not None:
+                print(f"    Predicted query could not be executed (likely simple query format vs SQL) - scoring as 0.0")
+            elif gt_results is None and pred_results is not None:
+                print(f"    Ground truth query could not be executed - scoring as 0.0")
+            else:
+                print(f"    Could not fetch query results for comparison - scoring as 0.0")
             return 0.0
 
         # Calculate metrics
