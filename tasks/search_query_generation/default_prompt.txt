@@ -16,10 +16,11 @@ The query wrapper uses URL-encoded JSON with Synapse SQL queries:
 - Use `additionalFilters` with `TextMatchesQueryFilter` for search terms
 - Set `limit` to 25
 
-**Example for "neuroscience":**
+**Example Query 1:**
+Input: queryPhrase="neuroscience", platform="Bridge2AI Standards"
+Output:
 ```json
 {
-  "platform": "Bridge2AI Standards",
   "queryWrapper": "https://b2ai.standards.synapse.org/Explore/?QueryWrapper0=%7B%22sql%22%3A%22SELECT%20mature%2C%20acronym%2C%20name%2C%20category%20FROM%20syn65676531.75%22%2C%22limit%22%3A25%2C%22additionalFilters%22%3A%5B%7B%22concreteType%22%3A%22org.sagebionetworks.repo.model.table.TextMatchesQueryFilter%22%2C%22searchExpression%22%3A%22neuroscience%22%2C%22searchMode%22%3A%22BOOLEAN%22%7D%5D%7D"
 }
 ```
@@ -46,10 +47,11 @@ The query wrapper uses URL-encoded JSON with Synapse SQL queries:
 - Can filter by `resourceType` and other facets using `selectedFacets`
 - Set `limit` to 25
 
-**Example for "mouse models":**
+**Example Query 2:**
+Input: queryPhrase="mouse models", platform="NF Tools"
+Output:
 ```json
 {
-  "platform": "NF Tools",
   "queryWrapper": "https://nf.synapse.org/Explore/Tools?QueryWrapper0=%7B%22sql%22%3A%22SELECT%20*%20FROM%20syn51730943%22%2C%22limit%22%3A25%2C%22selectedFacets%22%3A%5B%7B%22concreteType%22%3A%22org.sagebionetworks.repo.model.table.FacetColumnValuesRequest%22%2C%22columnName%22%3A%22resourceType%22%2C%22facetValues%22%3A%5B%22Animal%20Model%22%5D%7D%5D%7D"
 }
 ```
@@ -70,13 +72,20 @@ The decoded QueryWrapper0 parameter:
 ## Instructions
 
 You will be given:
-- A query phrase (natural language search request)
-- Target platform (Bridge2AI Standards or NF Tools)
+- **queryPhrase**: A natural language search request
+- **platform**: Either "Bridge2AI Standards" or "NF Tools"
 
-Generate the complete query wrapper URL with URL-encoded SQL query.
+Your task: Generate the complete query wrapper URL for the specified platform.
 
-**Return format:**
+**CRITICAL REQUIREMENTS:**
+1. MUST include SQL query with "sql" field (e.g., "SELECT * FROM syn51730943")
+2. MUST include table reference: syn65676531.75 for Bridge2AI, syn51730943 for NF Tools
+3. MUST set "limit": 25
+4. MUST properly URL-encode the entire JSON QueryWrapper0 parameter
+5. For text search, use "additionalFilters" with "TextMatchesQueryFilter"
+6. For filtering by type, use "selectedFacets" with "FacetColumnValuesRequest"
+
+**Return format (JSON only):**
 {
-  "platform": "Bridge2AI Standards" or "NF Tools",
   "queryWrapper": "complete URL with encoded SQL query"
 }
