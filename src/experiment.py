@@ -165,17 +165,33 @@ class Experiment:
     def _run_task(self, task: Task) -> Dict[str, Any]:
         """Run a single task and return results."""
         task_start_time = time.time()
-        
+
+        # Load task-specific tools if available
+        task_tools = []
+        task_tool_executor = None
+        if task.has_tools:
+            from .tool import ToolRegistry
+            from .tool_executor import ToolExecutor
+
+            task_tool_registry = ToolRegistry()
+            task_tools = task.load_tools(task_tool_registry)
+            if task_tools:
+                task_tool_executor = ToolExecutor(task_tool_registry)
+
+        # Use task-specific tools if available, otherwise use experiment-level tools
+        active_tools = task_tools if task_tools else self.tools
+        active_tool_executor = task_tool_executor if task_tool_executor else self.tool_executor
+
         input_samples = task.get_input_samples()
         if self.test_mode:
             print(f"    [TEST MODE] Processing only the first sample")
             input_samples = input_samples[:1]
-            
+
         ground_truth_samples = task.get_ground_truth_samples()
-        
+
         results = []
         experiment_config = self.config.experiment_config
-        
+
         # Include schema in prompt if available
         schema_text = ""
         if task.schema:
@@ -228,7 +244,7 @@ class Experiment:
             # Get dynamic system instructions
             system_instructions = task.get_system_instructions() or self.system_instructions
 
-            # Invoke model
+            # Invoke model with task-specific tools
             response = self.model_client.invoke_model(
                 model_id=self.model_id,
                 prompt=formatted_prompt,
@@ -237,8 +253,8 @@ class Experiment:
                 thinking=self.thinking,
                 max_tokens=experiment_config.get('max_tokens', 4096),
                 max_retries=experiment_config.get('max_retries', 3),
-                tools=self.tools if self.tools else None,
-                tool_executor=self.tool_executor
+                tools=active_tools if active_tools else None,
+                tool_executor=active_tool_executor
             )
             
             # Initialize score to None
