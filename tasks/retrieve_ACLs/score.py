@@ -3,7 +3,7 @@ import json
 import urllib.request
 import urllib.error
 import time
-from typing import Dict, Any, Optional, Set, List, Tuple
+from typing import Dict, Any, Optional
 
 
 def _fetch_restriction_info(entity_id: str, timeout: int = 30, max_retries: int = 3) -> Optional[Dict[str, Any]]:
@@ -65,132 +65,21 @@ def _fetch_restriction_info(entity_id: str, timeout: int = 30, max_retries: int 
     return None
 
 
-def _fetch_acl(requirement_id: str, timeout: int = 30, max_retries: int = 3) -> Optional[Dict[str, Any]]:
-    """
-    Fetch ACL for an access requirement from Synapse REST API with retry logic.
-
-    Args:
-        requirement_id: The access requirement ID
-        timeout: Request timeout in seconds
-        max_retries: Maximum number of retry attempts
-
-    Returns:
-        Dictionary with ACL information or None if fetch failed
-    """
-    api_url = f"https://repo-prod.prod.sagebase.org/repo/v1/accessRequirement/{requirement_id}/acl"
-
-    headers = {
-        'Accept': 'application/json'
-    }
-
-    for attempt in range(max_retries):
-        try:
-            req = urllib.request.Request(api_url, headers=headers)
-
-            with urllib.request.urlopen(req, timeout=timeout) as response:
-                result = json.loads(response.read().decode('utf-8'))
-                return result
-
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                # No ACL found for this requirement - this is expected for some requirements
-                return None
-            print(f"    HTTP error fetching ACL for requirement {requirement_id} (attempt {attempt + 1}/{max_retries}): {e.code}")
-            if attempt < max_retries - 1 and e.code >= 500:
-                time.sleep(2 ** attempt)
-                continue
-            return None
-        except urllib.error.URLError as e:
-            print(f"    Network error fetching ACL for requirement {requirement_id} (attempt {attempt + 1}/{max_retries}): {e.reason}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)
-                continue
-            return None
-        except Exception as e:
-            print(f"    Error fetching ACL for requirement {requirement_id} (attempt {attempt + 1}/{max_retries}): {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)
-                continue
-            return None
-
-    return None
-
-
-def _extract_acl_principals(restriction_info: Dict[str, Any]) -> Set[str]:
-    """
-    Extract all principal IDs that have ACL access from restriction information.
-
-    Args:
-        restriction_info: The API response from /restrictionInformation
-
-    Returns:
-        Set of principal IDs (user/team IDs) that appear in ACLs
-    """
-    principals = set()
-
-    # Get access requirement IDs from restriction details
-    restriction_details = restriction_info.get("restrictionDetails", [])
-
-    for detail in restriction_details:
-        requirement_id = detail.get("accessRequirementId")
-        if requirement_id:
-            # Fetch ACL for this requirement
-            acl = _fetch_acl(str(requirement_id))
-            if acl and "resourceAccess" in acl:
-                for access_entry in acl["resourceAccess"]:
-                    principal_id = access_entry.get("principalId")
-                    if principal_id:
-                        principals.add(str(principal_id))
-
-    return principals
-
-
-def _calculate_metrics(
+def _calculate_score(
     pred_has_reqs: bool,
-    actual_has_reqs: bool,
-    pred_principals: Set[str],
-    actual_principals: Set[str]
-) -> Tuple[int, int, int, int]:
+    actual_has_reqs: bool
+) -> float:
     """
-    Calculate TP, FP, FN, TN for ACL detection.
+    Calculate score based on binary classification of hasAccessRequirements.
 
     Args:
         pred_has_reqs: Predicted hasAccessRequirements
         actual_has_reqs: Actual hasAccessRequirements from API
-        pred_principals: Set of principal IDs from prediction
-        actual_principals: Set of principal IDs from actual ACLs
 
     Returns:
-        Tuple of (true_positive, false_positive, false_negative, true_negative)
+        1.0 if prediction matches actual, 0.0 otherwise
     """
-    # Metrics for hasAccessRequirements boolean
-    if pred_has_reqs and actual_has_reqs:
-        tp_reqs = 1
-        fp_reqs = 0
-        fn_reqs = 0
-        tn_reqs = 0
-    elif not pred_has_reqs and not actual_has_reqs:
-        tp_reqs = 0
-        fp_reqs = 0
-        fn_reqs = 0
-        tn_reqs = 1
-    elif pred_has_reqs and not actual_has_reqs:
-        tp_reqs = 0
-        fp_reqs = 1
-        fn_reqs = 0
-        tn_reqs = 0
-    else:  # not pred_has_reqs and actual_has_reqs
-        tp_reqs = 0
-        fp_reqs = 0
-        fn_reqs = 1
-        tn_reqs = 0
-
-    # Metrics for principal overlap (if ACLs exist)
-    tp_principals = len(pred_principals & actual_principals)
-    fp_principals = len(pred_principals - actual_principals)
-    fn_principals = len(actual_principals - pred_principals)
-
-    return tp_reqs + tp_principals, fp_reqs + fp_principals, fn_reqs + fn_principals, tn_reqs
+    return 1.0 if pred_has_reqs == actual_has_reqs else 0.0
 
 
 def score(
@@ -226,17 +115,6 @@ def score(
 
         # Extract prediction fields
         pred_has_access_reqs = pred.get("hasAccessRequirements", False)
-        pred_acl_summary = pred.get("aclSummary", [])
-
-        # Extract principal IDs from predicted ACL summary
-        pred_principals = set()
-        if isinstance(pred_acl_summary, list):
-            for acl_entry in pred_acl_summary:
-                if isinstance(acl_entry, dict):
-                    # Look for principal IDs in various possible fields
-                    for key in ["principalId", "userId", "teamId", "id"]:
-                        if key in acl_entry:
-                            pred_principals.add(str(acl_entry[key]))
 
         # Fetch actual restriction information from API
         restriction_info = _fetch_restriction_info(entity_id)
@@ -248,41 +126,16 @@ def score(
         # Determine if there are actual access requirements
         actual_has_reqs = restriction_info.get("hasUnmetAccessRequirement", False)
 
-        # Extract actual principal IDs from ACLs
-        actual_principals = set()
-        if actual_has_reqs:
-            actual_principals = _extract_acl_principals(restriction_info)
-
-        # Calculate metrics
-        tp, fp, fn, tn = _calculate_metrics(
-            pred_has_access_reqs,
-            actual_has_reqs,
-            pred_principals,
-            actual_principals
-        )
+        # Calculate score based on binary classification
+        score_value = _calculate_score(pred_has_access_reqs, actual_has_reqs)
 
         print(f"    API Results Comparison for {entity_id}:")
         print(f"      Predicted hasAccessRequirements: {pred_has_access_reqs}")
         print(f"      Actual hasAccessRequirements: {actual_has_reqs}")
-        print(f"      Predicted ACL principals: {len(pred_principals)} principal(s)")
-        print(f"      Actual ACL principals: {len(actual_principals)} principal(s)")
-        print(f"      True Positives (TP): {tp}")
-        print(f"      False Positives (FP): {fp}")
-        print(f"      False Negatives (FN): {fn}")
-        print(f"      True Negatives (TN): {tn}")
+        print(f"      Classification Correct: {pred_has_access_reqs == actual_has_reqs}")
+        print(f"      Score: {score_value:.3f}")
 
-        # Calculate accuracy-based score
-        total = tp + fp + fn + tn
-        if total > 0:
-            accuracy = (tp + tn) / total
-            print(f"      Accuracy: {accuracy:.3f}")
-            return accuracy
-        else:
-            # If no ACLs exist and prediction correctly identified no ACLs
-            if not actual_has_reqs and not pred_has_access_reqs:
-                print(f"      Accuracy: 1.000 (correctly identified no requirements)")
-                return 1.0
-            return 0.0
+        return score_value
 
     except Exception as e:
         print(f"Error scoring retrieve_ACLs: {e}")

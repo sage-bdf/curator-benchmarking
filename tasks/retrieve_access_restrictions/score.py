@@ -99,59 +99,21 @@ def _extract_restriction_fields(restriction_info: Dict[str, Any]) -> Tuple[bool,
     return has_restrictions, restriction_level, requirements
 
 
-def _calculate_metrics(
-    pred_has_restr: bool,
-    actual_has_restr: bool,
+def _calculate_score(
     pred_level: str,
     actual_level: str
-) -> Tuple[int, int, int, int]:
+) -> float:
     """
-    Calculate TP, FP, FN, TN for restriction detection.
+    Calculate score based on restriction level match.
 
     Args:
-        pred_has_restr: Predicted hasRestrictions
-        actual_has_restr: Actual hasRestrictions from API
         pred_level: Predicted restriction level
         actual_level: Actual restriction level from API
 
     Returns:
-        Tuple of (true_positive, false_positive, false_negative, true_negative)
+        1.0 if prediction matches actual, 0.0 otherwise
     """
-    # For hasRestrictions boolean
-    if pred_has_restr and actual_has_restr:
-        tp_restr = 1
-        fp_restr = 0
-        fn_restr = 0
-        tn_restr = 0
-    elif not pred_has_restr and not actual_has_restr:
-        tp_restr = 0
-        fp_restr = 0
-        fn_restr = 0
-        tn_restr = 1
-    elif pred_has_restr and not actual_has_restr:
-        tp_restr = 0
-        fp_restr = 1
-        fn_restr = 0
-        tn_restr = 0
-    else:  # not pred_has_restr and actual_has_restr
-        tp_restr = 0
-        fp_restr = 0
-        fn_restr = 1
-        tn_restr = 0
-
-    # For restriction level (if restrictions exist)
-    tp_level = 0
-    fp_level = 0
-    fn_level = 0
-
-    if actual_has_restr:
-        if pred_level.lower() == actual_level.lower():
-            tp_level = 1
-        else:
-            fp_level = 1
-            fn_level = 1
-
-    return tp_restr + tp_level, fp_restr + fp_level, fn_restr + fn_level, tn_restr
+    return 1.0 if pred_level.lower() == actual_level.lower() else 0.0
 
 
 def score(
@@ -186,9 +148,7 @@ def score(
         entity_id = input_sample['entityId']
 
         # Extract prediction fields
-        pred_has_restrictions = pred.get("hasRestrictions", False)
         pred_restriction_level = pred.get("restrictionLevel", "")
-        pred_data_use_summary = pred.get("dataUseSummary", "")
 
         # Fetch actual restriction information from API
         restriction_info = _fetch_restriction_info(entity_id)
@@ -200,32 +160,16 @@ def score(
         # Extract actual values from API response
         actual_has_restr, actual_level, actual_requirements = _extract_restriction_fields(restriction_info)
 
-        # Calculate metrics
-        tp, fp, fn, tn = _calculate_metrics(
-            pred_has_restrictions,
-            actual_has_restr,
-            pred_restriction_level,
-            actual_level
-        )
+        # Calculate score based on restriction level match
+        score_value = _calculate_score(pred_restriction_level, actual_level)
 
         print(f"    API Results Comparison for {entity_id}:")
-        print(f"      Predicted hasRestrictions: {pred_has_restrictions}")
-        print(f"      Actual hasRestrictions: {actual_has_restr}")
         print(f"      Predicted restrictionLevel: {pred_restriction_level}")
         print(f"      Actual restrictionLevel: {actual_level}")
-        print(f"      True Positives (TP): {tp}")
-        print(f"      False Positives (FP): {fp}")
-        print(f"      False Negatives (FN): {fn}")
-        print(f"      True Negatives (TN): {tn}")
+        print(f"      Level Match: {pred_restriction_level.lower() == actual_level.lower()}")
+        print(f"      Score: {score_value:.3f}")
 
-        # Calculate accuracy-based score
-        total = tp + fp + fn + tn
-        if total > 0:
-            accuracy = (tp + tn) / total
-            print(f"      Accuracy: {accuracy:.3f}")
-            return accuracy
-        else:
-            return 0.0
+        return score_value
 
     except Exception as e:
         print(f"Error scoring retrieve_access_restrictions: {e}")
