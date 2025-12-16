@@ -88,15 +88,15 @@ def score(
     input_sample: Optional[Dict[str, Any]] = None
 ) -> Optional[float]:
     """
-    Score the model's prediction by comparing with actual API results.
+    Score the model's prediction by comparing with ground truth.
 
     Args:
         prediction: Model's output as a string (should be JSON)
-        ground_truth: Ground truth dictionary (not used - we fetch actual data)
+        ground_truth: Ground truth dictionary with hasAccessRequirements field
         input_sample: Input sample with entityId
 
     Returns:
-        Score between 0.0 and 1.0 based on API result accuracy, or None on error
+        Score between 0.0 and 1.0 based on ground truth accuracy, or None on error
     """
     try:
         # Parse prediction as JSON
@@ -107,32 +107,25 @@ def score(
             return 0.0
 
         # Get entityId from input
-        if not input_sample or 'entityId' not in input_sample:
-            print("    No entityId in input_sample")
-            return None
-
-        entity_id = input_sample['entityId']
+        entity_id = input_sample.get('entityId', 'unknown') if input_sample else 'unknown'
 
         # Extract prediction fields
         pred_has_access_reqs = pred.get("hasAccessRequirements", False)
 
-        # Fetch actual restriction information from API
-        restriction_info = _fetch_restriction_info(entity_id)
+        # Get expected value from ground truth
+        expected_has_reqs = ground_truth.get("hasAccessRequirements", False)
 
-        if restriction_info is None:
-            print(f"    Could not fetch restriction info for {entity_id} - scoring as 0.0")
-            return 0.0
-
-        # Determine if there are actual access requirements
-        actual_has_reqs = restriction_info.get("hasUnmetAccessRequirement", False)
+        # Handle string "true"/"false" from TSV
+        if isinstance(expected_has_reqs, str):
+            expected_has_reqs = expected_has_reqs.lower() == "true"
 
         # Calculate score based on binary classification
-        score_value = _calculate_score(pred_has_access_reqs, actual_has_reqs)
+        score_value = _calculate_score(pred_has_access_reqs, expected_has_reqs)
 
-        print(f"    API Results Comparison for {entity_id}:")
+        print(f"    Ground Truth Comparison for {entity_id}:")
         print(f"      Predicted hasAccessRequirements: {pred_has_access_reqs}")
-        print(f"      Actual hasAccessRequirements: {actual_has_reqs}")
-        print(f"      Classification Correct: {pred_has_access_reqs == actual_has_reqs}")
+        print(f"      Expected hasAccessRequirements: {expected_has_reqs}")
+        print(f"      Classification Correct: {pred_has_access_reqs == expected_has_reqs}")
         print(f"      Score: {score_value:.3f}")
 
         return score_value

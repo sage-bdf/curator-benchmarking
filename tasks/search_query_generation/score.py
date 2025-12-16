@@ -53,6 +53,7 @@ def _fetch_query_results(query_wrapper_url: str, timeout: int = 30, max_retries:
                 # If no SQL query, this is likely a simple query format {"query":"..."}
                 # which cannot be executed via API. Return None to indicate no executable query.
                 print(f"    Query wrapper has no 'sql' field - has 'query': {query_wrapper.get('query', 'N/A')}")
+                print(f"    Full query wrapper: {query_wrapper}")
                 print(f"    Cannot execute simple query format via Synapse SQL API")
                 return None
 
@@ -171,7 +172,16 @@ def _fetch_query_results(query_wrapper_url: str, timeout: int = 30, max_retries:
                 return None
 
         except urllib.error.HTTPError as e:
+            error_body = ""
+            try:
+                error_body = e.read().decode('utf-8')
+            except:
+                pass
             print(f"    HTTP error fetching query results (attempt {retry_attempt + 1}/{max_retries}): {e.code} {e.reason}")
+            print(f"    SQL query: {sql_query}")
+            print(f"    Query wrapper: {json.dumps(query_obj, indent=2)}")
+            if error_body:
+                print(f"    Error response: {error_body[:500]}")
             if retry_attempt < max_retries - 1 and e.code >= 500:
                 time.sleep(2 ** retry_attempt)
                 continue

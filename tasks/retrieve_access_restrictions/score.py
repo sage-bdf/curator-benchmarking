@@ -122,15 +122,15 @@ def score(
     input_sample: Optional[Dict[str, Any]] = None
 ) -> Optional[float]:
     """
-    Score the model's prediction by comparing with actual API results.
+    Score the model's prediction by comparing with ground truth.
 
     Args:
         prediction: Model's output as a string (should be JSON)
-        ground_truth: Ground truth dictionary (not used - we fetch actual data)
+        ground_truth: Ground truth dictionary with restrictionLevel field
         input_sample: Input sample with entityId
 
     Returns:
-        Score between 0.0 and 1.0 based on API result accuracy, or None on error
+        Score between 0.0 and 1.0 based on ground truth accuracy, or None on error
     """
     try:
         # Parse prediction as JSON
@@ -141,32 +141,21 @@ def score(
             return 0.0
 
         # Get entityId from input
-        if not input_sample or 'entityId' not in input_sample:
-            print("    No entityId in input_sample")
-            return None
-
-        entity_id = input_sample['entityId']
+        entity_id = input_sample.get('entityId', 'unknown') if input_sample else 'unknown'
 
         # Extract prediction fields
         pred_restriction_level = pred.get("restrictionLevel", "")
 
-        # Fetch actual restriction information from API
-        restriction_info = _fetch_restriction_info(entity_id)
-
-        if restriction_info is None:
-            print(f"    Could not fetch restriction info for {entity_id} - scoring as 0.0")
-            return 0.0
-
-        # Extract actual values from API response
-        actual_has_restr, actual_level, actual_requirements = _extract_restriction_fields(restriction_info)
+        # Get expected value from ground truth
+        expected_level = ground_truth.get("restrictionLevel", "")
 
         # Calculate score based on restriction level match
-        score_value = _calculate_score(pred_restriction_level, actual_level)
+        score_value = _calculate_score(pred_restriction_level, expected_level)
 
-        print(f"    API Results Comparison for {entity_id}:")
+        print(f"    Ground Truth Comparison for {entity_id}:")
         print(f"      Predicted restrictionLevel: {pred_restriction_level}")
-        print(f"      Actual restrictionLevel: {actual_level}")
-        print(f"      Level Match: {pred_restriction_level.lower() == actual_level.lower()}")
+        print(f"      Expected restrictionLevel: {expected_level}")
+        print(f"      Level Match: {pred_restriction_level.lower() == expected_level.lower()}")
         print(f"      Score: {score_value:.3f}")
 
         return score_value
