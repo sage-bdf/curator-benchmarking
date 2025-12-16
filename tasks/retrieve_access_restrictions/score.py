@@ -1,5 +1,6 @@
 """Scoring function for retrieve_access_restrictions task."""
 import json
+import re
 import urllib.request
 import urllib.error
 import time
@@ -116,6 +117,36 @@ def _calculate_score(
     return 1.0 if pred_level.lower() == actual_level.lower() else 0.0
 
 
+def _extract_json(text: str) -> Optional[Dict[str, Any]]:
+    """
+    Extract JSON object from text that may contain extra content.
+
+    Args:
+        text: Text that may contain JSON along with explanatory text
+
+    Returns:
+        Parsed JSON dict or None if no valid JSON found
+    """
+    # First try direct parsing
+    try:
+        return json.loads(text.strip())
+    except json.JSONDecodeError:
+        pass
+
+    # Try to find JSON object in the text using regex
+    # Look for patterns like {...} that span multiple lines
+    json_pattern = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
+    matches = re.finditer(json_pattern, text, re.DOTALL)
+
+    for match in matches:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            continue
+
+    return None
+
+
 def score(
     prediction: str,
     ground_truth: Dict[str, Any],
@@ -133,10 +164,9 @@ def score(
         Score between 0.0 and 1.0 based on ground truth accuracy, or None on error
     """
     try:
-        # Parse prediction as JSON
-        try:
-            pred = json.loads(prediction)
-        except json.JSONDecodeError:
+        # Parse prediction as JSON (with extraction for noisy responses)
+        pred = _extract_json(prediction)
+        if pred is None:
             print("    Prediction is not valid JSON")
             return 0.0
 
