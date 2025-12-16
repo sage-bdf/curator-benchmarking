@@ -69,10 +69,14 @@ The decoded QueryWrapper0 parameter (note structure):
 }
 ```
 
-**Example Query 3 - Using both filtering and text search:**
+**Example Query 3 - Combining resourceType filter with text search:**
 Input: queryPhrase="antibodies for NF1 protein", platform="NF Tools"
 
-CORRECT structure (separate arrays):
+This requires BOTH:
+- Filtering by resourceType="Antibody" → use selectedFacets
+- Text search for "NF1 protein" → use additionalFilters
+
+CORRECT structure (two separate arrays):
 ```json
 {
   "sql": "SELECT * FROM syn51730943",
@@ -84,19 +88,18 @@ CORRECT structure (separate arrays):
   }],
   "additionalFilters": [{
     "concreteType": "org.sagebionetworks.repo.model.table.TextMatchesQueryFilter",
-    "searchExpression": "NF1 protein",
+    "searchExpression": "NF1",
     "searchMode": "BOOLEAN"
   }]
 }
 ```
 
-WRONG structure (DO NOT DO THIS):
+❌ WRONG - DO NOT put TextMatchesQueryFilter in selectedFacets:
 ```json
 {
-  "sql": "SELECT * FROM syn51730943",
   "selectedFacets": [
     {"concreteType": "...FacetColumnValuesRequest", ...},
-    {"concreteType": "...TextMatchesQueryFilter", ...}  ❌ WRONG! Must be in additionalFilters
+    {"concreteType": "...TextMatchesQueryFilter", ...}  ← ERROR!
   ]
 }
 ```
