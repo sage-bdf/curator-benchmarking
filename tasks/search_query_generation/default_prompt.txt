@@ -56,7 +56,7 @@ Output:
 }
 ```
 
-The decoded QueryWrapper0 parameter:
+The decoded QueryWrapper0 parameter (note structure):
 ```json
 {
   "sql": "SELECT * FROM syn51730943",
@@ -66,6 +66,38 @@ The decoded QueryWrapper0 parameter:
     "columnName": "resourceType",
     "facetValues": ["Animal Model"]
   }]
+}
+```
+
+**Example Query 3 - Using both filtering and text search:**
+Input: queryPhrase="antibodies for NF1 protein", platform="NF Tools"
+
+CORRECT structure (separate arrays):
+```json
+{
+  "sql": "SELECT * FROM syn51730943",
+  "limit": 25,
+  "selectedFacets": [{
+    "concreteType": "org.sagebionetworks.repo.model.table.FacetColumnValuesRequest",
+    "columnName": "resourceType",
+    "facetValues": ["Antibody"]
+  }],
+  "additionalFilters": [{
+    "concreteType": "org.sagebionetworks.repo.model.table.TextMatchesQueryFilter",
+    "searchExpression": "NF1 protein",
+    "searchMode": "BOOLEAN"
+  }]
+}
+```
+
+WRONG structure (DO NOT DO THIS):
+```json
+{
+  "sql": "SELECT * FROM syn51730943",
+  "selectedFacets": [
+    {"concreteType": "...FacetColumnValuesRequest", ...},
+    {"concreteType": "...TextMatchesQueryFilter", ...}  ❌ WRONG! Must be in additionalFilters
+  ]
 }
 ```
 
@@ -82,8 +114,11 @@ Your task: Generate the complete query wrapper URL for the specified platform.
 2. MUST include table reference: syn65676531.75 for Bridge2AI, syn51730943 for NF Tools
 3. MUST set "limit": 25
 4. MUST properly URL-encode the entire JSON QueryWrapper0 parameter
-5. For text search, use "additionalFilters" with "TextMatchesQueryFilter"
-6. For filtering by type, use "selectedFacets" with "FacetColumnValuesRequest"
+5. For text search, use "additionalFilters" array with "TextMatchesQueryFilter" objects
+6. For filtering by exact values, use "selectedFacets" array with "FacetColumnValuesRequest" objects
+7. **NEVER mix TextMatchesQueryFilter and FacetColumnValuesRequest in the same array**
+   - TextMatchesQueryFilter → additionalFilters ONLY
+   - FacetColumnValuesRequest → selectedFacets ONLY
 
 **Return format (JSON only):**
 {
