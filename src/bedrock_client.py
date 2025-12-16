@@ -145,12 +145,14 @@ class BedrockClient:
     ) -> Dict[str, Any]:
         """
         Invoke model with tools, handling tool use flow.
-        
+
         This method handles the multi-turn conversation where the model may request
         tool calls, we execute them, and continue the conversation.
         """
+        print(f"    [DEBUG] _invoke_model_with_tools called with {len(tools)} tool(s)")
         # Convert tools to Bedrock format
         bedrock_tools = self._convert_tools_to_bedrock_format(tools, model_id)
+        print(f"    [DEBUG] Converted to {len(bedrock_tools)} Bedrock format tool(s)")
         
         # Build initial messages
         messages = []
@@ -236,6 +238,10 @@ class BedrockClient:
                             "messages": messages,
                             "tools": bedrock_tools
                         }
+                        # Debug: Print tool info
+                        print(f"    [DEBUG] Passing {len(bedrock_tools)} tool(s) to Bedrock API")
+                        if bedrock_tools:
+                            print(f"    [DEBUG] Tool names: {[t.get('name') for t in bedrock_tools]}")
                         if system_instructions:
                             body["system"] = system_instructions
                         if thinking:
@@ -471,9 +477,13 @@ class BedrockClient:
         """
         if system_instructions is None:
             system_instructions = self.config.default_system_instructions
-        
+
+        # Debug: Check tool status
+        print(f"    [DEBUG] invoke_model called: tools={len(tools) if tools else 0}, tool_executor={tool_executor is not None}")
+
         # If tools are provided, use tool-aware invocation
         if tools and tool_executor:
+            print(f"    [DEBUG] Using tool-aware invocation")
             return self._invoke_model_with_tools(
                 model_id=model_id,
                 prompt=prompt,
@@ -485,6 +495,8 @@ class BedrockClient:
                 tools=tools,
                 tool_executor=tool_executor
             )
+        else:
+            print(f"    [DEBUG] Using standard invocation (no tools)")
         
         # Otherwise, use standard invocation (existing code)
         # Detect model provider and prepare appropriate request body
