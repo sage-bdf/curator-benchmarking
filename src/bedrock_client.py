@@ -145,7 +145,7 @@ class BedrockClient:
     ) -> Dict[str, Any]:
         """
         Invoke model with tools, handling tool use flow.
-        
+
         This method handles the multi-turn conversation where the model may request
         tool calls, we execute them, and continue the conversation.
         """
@@ -471,7 +471,7 @@ class BedrockClient:
         """
         if system_instructions is None:
             system_instructions = self.config.default_system_instructions
-        
+
         # If tools are provided, use tool-aware invocation
         if tools and tool_executor:
             return self._invoke_model_with_tools(

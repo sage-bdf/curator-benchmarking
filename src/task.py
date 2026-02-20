@@ -1,43 +1,47 @@
 """Task management for benchmarking."""
+import json
 import pandas as pd
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 
 class Task:
     """Represents a benchmarking task."""
-    
+
     def __init__(self, task_dir: Path):
         """Initialize task from directory."""
         self.task_dir = Path(task_dir)
         self.name = self.task_dir.name
-        
+
         # Load task configuration
         self.config = self._load_config()
-        
+
         # Load input data
         self.input_data = self._load_input_data()
-        
+
         # Load ground truth
         self.ground_truth = self._load_ground_truth()
-        
+
         # Load default prompt
         self.default_prompt = self._load_default_prompt()
-        
+
         # Load system instructions if they exist
         self.system_instructions = self._load_system_instructions()
-        
+
         # Load schema if it exists
         self.schema = self._load_schema()
-        
+
         # Load custom prompt formatter if it exists
         self.format_prompt_func = self._load_prompt_formatter()
-        
+
         # Load custom system instructions formatter if it exists
         self.format_system_instructions_func = self._load_system_instructions_formatter()
-        
+
         # Load custom scorer if it exists
         self.score_func = self._load_scorer()
+
+        # Check if task has tools configuration
+        self.has_tools = self._check_for_tools()
     
     def _load_config(self) -> Dict[str, Any]:
         """Load task configuration if it exists."""
@@ -220,4 +224,34 @@ class Task:
             except Exception as e:
                 print(f"Warning: Could not load score.py for {self.name}: {e}")
         return None
+
+    def _check_for_tools(self) -> bool:
+        """Check if task has a tools configuration file."""
+        tools_path = self.task_dir / "tools.json"
+        return tools_path.exists()
+
+    def load_tools(self, tool_registry):
+        """
+        Load tools for this task from tools.json.
+
+        Args:
+            tool_registry: ToolRegistry instance to load tools into
+
+        Returns:
+            List of loaded Tool instances
+        """
+        from .tool import ToolRegistry
+
+        tools_path = self.task_dir / "tools.json"
+        if not tools_path.exists():
+            return []
+
+        try:
+            tools = tool_registry.load_from_config(tools_path)
+            if tools:
+                print(f"    Loaded {len(tools)} tool(s) for task '{self.name}': {', '.join([t.name for t in tools])}")
+            return tools
+        except Exception as e:
+            print(f"    Warning: Could not load tools for {self.name}: {e}")
+            return []
 
