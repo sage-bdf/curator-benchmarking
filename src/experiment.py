@@ -2,6 +2,7 @@
 import json
 import hashlib
 import time
+import math
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -11,6 +12,38 @@ from .scorer import Scorer
 from .config import Config
 from .tool import Tool, ToolRegistry
 from .tool_executor import ToolExecutor
+
+
+class NaNSafeJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder that converts NaN, Infinity to null."""
+
+    def default(self, obj):
+        if isinstance(obj, float):
+            if math.isnan(obj) or math.isinf(obj):
+                return None
+        return super().default(obj)
+
+    def encode(self, obj):
+        """Override encode to handle NaN in nested structures."""
+        if isinstance(obj, float):
+            if math.isnan(obj) or math.isinf(obj):
+                return 'null'
+        return super().encode(obj)
+
+    def iterencode(self, obj, _one_shot=False):
+        """Override iterencode to handle NaN in nested structures."""
+        return super().iterencode(self._convert_nan(obj), _one_shot)
+
+    def _convert_nan(self, obj):
+        """Recursively convert NaN/Inf to None in nested structures."""
+        if isinstance(obj, dict):
+            return {k: self._convert_nan(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_nan(item) for item in obj]
+        elif isinstance(obj, float):
+            if math.isnan(obj) or math.isinf(obj):
+                return None
+        return obj
 
 
 def compute_task_hash(task: Task) -> str:
@@ -385,7 +418,7 @@ class Experiment:
         }
         
         with open(task_file, 'w') as f:
-            json.dump(result_data, f, indent=2)
+            json.dump(result_data, f, indent=2, cls=NaNSafeJSONEncoder)
     
     def _experiment_exists_in_log(self) -> bool:
         """Check if this experiment exists in the experiments log."""
@@ -424,7 +457,7 @@ class Experiment:
             'tools': tool_names
         }
         with open(log_file, 'a') as f:
-            f.write(json.dumps(summary) + '\n')
+            f.write(json.dumps(summary, cls=NaNSafeJSONEncoder) + '\n')
     
     def run(self, update_other_experiments: bool = True) -> Dict[str, Any]:
         """
@@ -644,18 +677,24 @@ class Experiment:
     
     def _calculate_metrics(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Calculate aggregate metrics from results."""
-        scores = [r['score'] for r in results if r['score'] is not None]
+        # Filter out None and NaN values
+        scores = [
+            r['score'] for r in results
+            if r['score'] is not None and not (isinstance(r['score'], float) and math.isnan(r['score']))
+        ]
         successful_runs = [r for r in results if r['response'].get('success', False)]
-        
+
         metrics = {
             'total_samples': len(results),
             'successful_runs': len(successful_runs),
             'failed_runs': len(results) - len(successful_runs),
             'success_rate': len(successful_runs) / len(results) if results else 0
         }
-        
+
         if scores:
-            metrics['average_score'] = sum(scores) / len(scores)
+            avg = sum(scores) / len(scores)
+            # Additional safety check in case of any remaining NaN
+            metrics['average_score'] = None if math.isnan(avg) else avg
             metrics['min_score'] = min(scores)
             metrics['max_score'] = max(scores)
             metrics['num_scored'] = len(scores)
@@ -664,7 +703,7 @@ class Experiment:
             metrics['min_score'] = None
             metrics['max_score'] = None
             metrics['num_scored'] = 0
-        
+
         return metrics
     
     def _update_other_experiments_for_new_tasks(
